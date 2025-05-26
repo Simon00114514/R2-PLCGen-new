@@ -1,0 +1,115 @@
+PROGRAM SequentialMotorControl
+VAR_INPUT
+    Start : BOOL;      (* External start command *)
+    Reset : BOOL;      (* External reset command *)
+END_VAR
+
+VAR_OUTPUT
+    Motor1            : BOOL;    (* Output to control Motor 1 *)
+    Motor2            : BOOL;    (* Output to control Motor 2 *)
+    Motor3            : BOOL;    (* Output to control Motor 3 *)
+    OperationComplete : BOOL;    (* TRUE when the sequence completes *)
+    Error             : BOOL;    (* TRUE if an error occurs *)
+    OperationElapsed  : TIME;    (* Overall operation elapsed time *)
+END_VAR
+
+VAR
+    currentStep      : INT;     (* State machine step *)
+    motorTONInst     : TON;     (* Timer instance for an active motor period *)
+    delayTONInst     : TON;     (* Timer instance for the inter鈥恗otor delay *)
+    operationTONInst : TON;     (* Timer instance for the overall operation time *)
+END_VAR
+
+(* Reset: clear state and turn off timers *)
+IF Reset = TRUE THEN
+    currentStep := 0;
+    Motor1 := FALSE;
+    Motor2 := FALSE;
+    Motor3 := FALSE;
+    OperationComplete := FALSE;
+    Error := FALSE;
+    operationTONInst.IN := FALSE;
+    motorTONInst.IN := FALSE;
+    delayTONInst.IN := FALSE;
+END_IF;
+
+(* Start overall operation when in idle state and Start is asserted *)
+IF (currentStep = 0) AND (Start = TRUE) THEN
+    currentStep := 1;
+    operationTONInst.IN := TRUE;
+    operationTONInst.PT := T#10S;   (* Total operation must complete within 10 seconds *)
+END_IF;
+
+CASE currentStep OF
+    1:  (* Activate Motor 1 *)
+        Motor1 := TRUE;
+        motorTONInst.IN := TRUE;
+        motorTONInst.PT := T#2S;   (* Motor 1 runs for 2 seconds *)
+        motorTONInst();           (* Update timer instance *)
+        IF motorTONInst.Q = TRUE THEN
+            Motor1 := FALSE;
+            motorTONInst.IN := FALSE;  (* Reset motor timer *)
+            currentStep := 2;
+        END_IF;
+
+    2:  (* Delay after Motor 1 *)
+        delayTONInst.IN := TRUE;
+        delayTONInst.PT := T#1S;   (* Delay of 1 second between motors *)
+        delayTONInst();           (* Update delay timer *)
+        IF delayTONInst.Q = TRUE THEN
+            delayTONInst.IN := FALSE;  (* Reset delay timer *)
+            currentStep := 3;
+        END_IF;
+
+    3:  (* Activate Motor 2 *)
+        Motor2 := TRUE;
+        motorTONInst.IN := TRUE;
+        motorTONInst.PT := T#2S;   (* Motor 2 runs for 2 seconds *)
+        motorTONInst();           (* Update timer instance *)
+        IF motorTONInst.Q = TRUE THEN
+            Motor2 := FALSE;
+            motorTONInst.IN := FALSE;  (* Reset motor timer *)
+            currentStep := 4;
+        END_IF;
+
+    4:  (* Delay after Motor 2 *)
+        delayTONInst.IN := TRUE;
+        delayTONInst.PT := T#1S;   (* Delay of 1 second *)
+        delayTONInst();           (* Update delay timer *)
+        IF delayTONInst.Q = TRUE THEN
+            delayTONInst.IN := FALSE;  (* Reset delay timer *)
+            currentStep := 5;
+        END_IF;
+
+    5:  (* Activate Motor 3 *)
+        Motor3 := TRUE;
+        motorTONInst.IN := TRUE;
+        motorTONInst.PT := T#2S;   (* Motor 3 runs for 2 seconds *)
+        motorTONInst();           (* Update timer instance *)
+        IF motorTONInst.Q = TRUE THEN
+            Motor3 := FALSE;
+            motorTONInst.IN := FALSE;  (* Reset motor timer *)
+            currentStep := 6;
+        END_IF;
+
+    6:  (* Sequence complete *)
+        OperationComplete := TRUE;
+        OperationElapsed := operationTONInst.ET;  (* Get elapsed operation time *)
+        IF operationTONInst.ET > T#10S THEN
+            Error := TRUE;
+        ELSE
+            Error := FALSE;
+        END_IF;
+
+    ELSE  (* For any unexpected state, return to idle *)
+        currentStep := 0;
+END_CASE;
+
+(* Safety check: Ensure only one motor is active at any given time *)
+IF (Motor1 AND (Motor2 OR Motor3)) OR
+   (Motor2 AND (Motor1 OR Motor3)) OR
+   (Motor3 AND (Motor1 OR Motor2)) THEN
+    Error := TRUE;
+END_IF;
+
+END_PROGRAM

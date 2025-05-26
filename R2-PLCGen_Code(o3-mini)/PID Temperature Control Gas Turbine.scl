@@ -1,0 +1,132 @@
+PROGRAM PIDTemperatureControl
+VAR_INPUT
+    CurrentTemp : INT;       // Measured temperature from the sensor
+    Threshold   : INT;       // Temperature threshold for control
+    SensorOk    : INT;       // 1 if sensor is operating correctly, 0 otherwise
+    PIDActive   : INT;       // 1 if the PID controller is active, 0 otherwise
+END_VAR
+
+VAR_OUTPUT
+    ValveOpening : INT := 50;     // Valve opening (%) initially set to safe position
+    Alert        : INT := 0;      // 1 indicates an error condition; 0 indicates normal operation
+END_VAR
+
+VAR
+    // PID coefficients and related variables (all as INT)
+    Kp         : INT := 1;  // Proportional coefficient
+    Ki         : INT := 1;  // Integral coefficient
+    Kd         : INT := 1;  // Derivative coefficient
+    error      : INT := 0;  // Difference between threshold and measured temperature
+    integral   : INT := 0;  // Accumulated error over time
+    derivative : INT := 0;  // Change of error
+    lastError  : INT := 0;  // Error from the previous cycle
+    PIDOutput  : INT := 0;  // Result of the PID calculation
+    cycleTime  : INT := 1;  // Control cycle time (assumed to be 1 for simplicity)
+    
+    // For overflow-protected arithmetic
+    termP      : INT := 0;  // Kp * error
+    termI      : INT := 0;  // Ki * integral
+    termD      : INT := 0;  // Kd * derivative
+    sumPID     : INT := 0;  // Intermediate sum for PID output
+    tempVal    : INT := 0;  // Temporary variable for multiplication
+     
+    // Valve position boundaries and safe preset
+    MaxValvePos: INT := 100;
+    MinValvePos: INT := 0;
+    SafeValvePos: INT := 50;
+END_VAR
+
+CONST
+    MAX_INT : INT := 32767;
+    MIN_INT : INT := -32768;
+END_CONST
+
+// Begin PID control algorithm with integer arithmetic and overflow protection
+
+IF SensorOk = 0 THEN
+    // Sensor failure: trigger alert and keep the valve unchanged
+    Alert := 1;
+ELSE
+    Alert := 0;
+    IF PIDActive = 0 THEN
+        // PID controller failure: trigger alert and force valve to safe position
+        Alert := 1;
+        ValveOpening := SafeValvePos;
+    ELSE
+        // Compute the error (desired - measured)
+        error := Threshold - CurrentTemp;
+
+        // Update the integral term with overflow check (cycleTime is 1)
+        tempVal := error * cycleTime;
+        IF (integral > 0) AND (tempVal > 0) THEN
+            IF integral > MAX_INT - tempVal THEN
+                integral := MAX_INT;
+            ELSE
+                integral := integral + tempVal;
+            END_IF;
+        ELSIF (integral < 0) AND (tempVal < 0) THEN
+            IF integral < MIN_INT - tempVal THEN
+                integral := MIN_INT;
+            ELSE
+                integral := integral + tempVal;
+            END_IF;
+        ELSE
+            integral := integral + tempVal;
+        END_IF;
+
+        // Compute derivative term (difference between current and last error)
+        derivative := error - lastError;
+        lastError := error;
+
+        // Compute PID output components with overflow protection
+        termP := Kp * error;
+        termI := Ki * integral;
+        termD := Kd * derivative;
+
+        // Sum the proportional component first
+        sumPID := termP;
+        
+        // Add the integral component
+        IF (termI > 0) AND (sumPID > MAX_INT - termI) THEN
+            sumPID := MAX_INT;
+        ELSIF (termI < 0) AND (sumPID < MIN_INT - termI) THEN
+            sumPID := MIN_INT;
+        ELSE
+            sumPID := sumPID + termI;
+        END_IF;
+        
+        // Add the derivative component
+        IF (termD > 0) AND (sumPID > MAX_INT - termD) THEN
+            PIDOutput := MAX_INT;
+        ELSIF (termD < 0) AND (sumPID < MIN_INT - termD) THEN
+            PIDOutput := MIN_INT;
+        ELSE
+            PIDOutput := sumPID + termD;
+        END_IF;
+        
+        // Discrete adjustment of valve opening based on PIDOutput 
+        // A PIDOutput greater or equal to 1 increases the valve,
+        // while less or equal to -1 decreases the valve.
+        IF PIDOutput >= 1 THEN
+            IF ValveOpening < MaxValvePos THEN
+                ValveOpening := ValveOpening + 1;
+            END_IF;
+        ELSIF PIDOutput <= -1 THEN
+            IF ValveOpening > MinValvePos THEN
+                ValveOpening := ValveOpening - 1;
+            END_IF;
+        ELSE
+            // Maintain the current valve opening if PIDOutput is near zero
+            ValveOpening := ValveOpening;
+        END_IF;
+        
+        // Final check to ensure the valve opening stays within bounds
+        IF ValveOpening > MaxValvePos THEN
+            ValveOpening := MaxValvePos;
+        ELSIF ValveOpening < MinValvePos THEN
+            ValveOpening := MinValvePos;
+        END_IF;
+    END_IF;
+END_IF;
+
+END_PROGRAM

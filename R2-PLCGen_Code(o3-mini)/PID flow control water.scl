@@ -1,0 +1,121 @@
+PROGRAM PID_ChlorineDosing_INT
+VAR_INPUT
+    ChlorineConcentration : INT;    // Measured chlorine concentration in hundredths ppm (e.g., 300 = 3.00 ppm)
+    Reset : BOOL;                   // System reset signal
+END_VAR
+
+VAR_OUTPUT
+    FlowRate : INT;                 // Dosing flow rate (scaled as required)
+    Alarm : BOOL;                   // Alarm flag for abnormal PID output or dosing mechanism error
+END_VAR
+
+VAR
+    setpoint : INT := 300;          // Target concentration (300 equals 3.00 ppm)
+    tolerance : INT := 10;          // Acceptable deviation (10 equals 0.10 ppm)
+    Kp : INT := 5;                  // Proportional gain (scaled)
+    Ki : INT := 1;                  // Integral gain (scaled)
+    Kd : INT := 1;                  // Derivative gain (scaled)
+    error : INT;                    // error = measured concentration - setpoint
+    temp_error : INT;               // Absolute error value used for PID calculation
+    prev_error_mag : INT := 0;        // Absolute error from previous cycle
+    integral : INT := 0;            // Integral accumulator (fixed‐point scaling)
+    derivative : INT;               // Derivative term
+    pid_value : INT;                // Magnitude of PID adjustment (scaled)
+    sampleTime : INT := 100;        // Sampling period in milliseconds (100 ms)
+END_VAR
+
+CONST
+    MAX_INT : INT := 32767;
+    MIN_INT : INT := -32767;        // Adjusted minimum value to avoid using 32768 directly
+    PID_LIMIT : INT := 10000;       // Limit for PID output magnitude to trigger alarm
+END_CONST
+
+// Main PID control logic with corrected action:
+// If the chlorine concentration is below the threshold then reduce flow rate,
+// if above then increase flow rate, and if within the acceptable range then maintain flow rate.
+IF Reset = TRUE THEN
+    integral := 0;
+    prev_error_mag := 0;
+    FlowRate := 1000;         // Initialize with a base flow rate (scaled as needed)
+    Alarm := FALSE;
+ELSE
+    error := ChlorineConcentration - setpoint;
+    
+    // When concentration is below threshold (i.e. error is negative beyond tolerance),
+    // calculate adjustment using the absolute error and then reduce the flow rate.
+    IF error < -tolerance THEN
+        temp_error := -error;  // Make error positive
+        
+        // Update the integral term with overflow protection
+        IF (integral > 0) AND (temp_error > 0) THEN
+            IF integral > (MAX_INT - temp_error * sampleTime) THEN
+                integral := MAX_INT;
+            ELSE
+                integral := integral + temp_error * sampleTime;
+            END_IF;
+        ELSIF (integral < 0) AND (temp_error > 0) THEN
+            IF integral < (MIN_INT - temp_error * sampleTime) THEN
+                integral := MIN_INT;
+            ELSE
+                integral := integral + temp_error * sampleTime;
+            END_IF;
+        ELSE
+            integral := integral + temp_error * sampleTime;
+        END_IF;
+        
+        derivative := (temp_error - prev_error_mag) / sampleTime;
+        pid_value := Kp * temp_error + Ki * integral + Kd * derivative;
+        prev_error_mag := temp_error;
+        
+        // For concentration below threshold, reduce flow rate by subtracting the PID adjustment
+        FlowRate := FlowRate - pid_value;
+        IF FlowRate < 0 THEN
+            FlowRate := 0;
+        END_IF;
+        
+    // When concentration is above threshold (i.e. error is positive beyond tolerance),
+    // calculate adjustment using the error directly and then increase the flow rate.
+    ELSIF error > tolerance THEN
+        temp_error := error;
+        
+        // Update the integral term with overflow protection
+        IF (integral > 0) AND (temp_error > 0) THEN
+            IF integral > (MAX_INT - temp_error * sampleTime) THEN
+                integral := MAX_INT;
+            ELSE
+                integral := integral + temp_error * sampleTime;
+            END_IF;
+        ELSIF (integral < 0) AND (temp_error > 0) THEN
+            IF integral < (MIN_INT - temp_error * sampleTime) THEN
+                integral := MIN_INT;
+            ELSE
+                integral := integral + temp_error * sampleTime;
+            END_IF;
+        ELSE
+            integral := integral + temp_error * sampleTime;
+        END_IF;
+        
+        derivative := (temp_error - prev_error_mag) / sampleTime;
+        pid_value := Kp * temp_error + Ki * integral + Kd * derivative;
+        prev_error_mag := temp_error;
+        
+        // For concentration above threshold, increase flow rate by adding the PID adjustment
+        FlowRate := FlowRate + pid_value;
+        
+    // When concentration is within the acceptable range, do not change the flow rate.
+    ELSE
+        // Optionally, clear the accumulated error
+        integral := 0;
+        prev_error_mag := 0;
+        FlowRate := FlowRate;
+    END_IF;
+    
+    // Check for an excessively high adjustment value; if so, trigger an alarm.
+    IF (pid_value > PID_LIMIT) OR (pid_value < -PID_LIMIT) THEN
+        Alarm := TRUE;
+    ELSE
+        Alarm := FALSE;
+    END_IF;
+END_IF;
+
+END_PROGRAM

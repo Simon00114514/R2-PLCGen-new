@@ -1,0 +1,59 @@
+PROGRAM SprayStationOp
+VAR_INPUT
+    sprayButton : BOOL;     (* Operator presses to start spraying *)
+    stopButton  : BOOL;     (* Operator presses to stop the conveyor for safety *)
+    carDetected : BOOL;     (* Sensor signal: TRUE when a car is present at the spray station *)
+END_VAR
+
+VAR_OUTPUT
+    conveyorRun : BOOL;     (* TRUE: Conveyor is running; FALSE: Conveyor is stopped *)
+    sprayActive : BOOL;     (* TRUE: Spray system is active; FALSE: Spray system is idle *)
+END_VAR
+
+VAR
+    sprayState      : INT;  (* 0 = Idle; 1 = Spraying *)
+    prevSprayButton : BOOL; (* Used for rising edge detection of sprayButton *)
+    tonSpray        : TON;  (* Timer instance for spray duration *)
+END_VAR
+
+(* Main Code Execution *)
+
+IF sprayState = 0 THEN
+    (* Emergency stop: If stop button is pressed and a car is detected, stop conveyor *)
+    IF stopButton = TRUE AND carDetected = TRUE THEN
+        conveyorRun := FALSE;
+        sprayActive := FALSE;
+    ELSIF (sprayButton = TRUE AND prevSprayButton = FALSE) AND carDetected = TRUE THEN
+        (* Rising edge on spray button and car is present: start spraying *)
+        sprayState := 1;
+        tonSpray(IN := TRUE, PT := T#3s);
+        sprayActive := TRUE;
+        conveyorRun := FALSE;
+    ELSE
+        (* Normal operation: No spraying command and no emergency stop *)
+        conveyorRun := TRUE;
+        sprayActive := FALSE;
+    END_IF;
+ELSIF sprayState = 1 THEN
+    (* Continue spraying: run timer and keep conveyor stopped during spraying *)
+    tonSpray(IN := TRUE, PT := T#3s);
+    conveyorRun := FALSE;
+    sprayActive := TRUE;
+    IF tonSpray.Q = TRUE THEN
+        (* Spraying cycle complete: reset spray state and timer *)
+        sprayState := 0;
+        tonSpray(IN := FALSE, PT := T#3s);
+        sprayActive := FALSE;
+        (* After spraying, check if stop button remains pressed *)
+        IF stopButton = TRUE AND carDetected = TRUE THEN
+            conveyorRun := FALSE;
+        ELSE
+            conveyorRun := TRUE;
+        END_IF;
+    END_IF;
+END_IF;
+
+(* Update previous spray button state for edge detection *)
+prevSprayButton := sprayButton;
+    
+END_PROGRAM
