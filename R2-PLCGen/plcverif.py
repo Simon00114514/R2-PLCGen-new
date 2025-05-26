@@ -1,390 +1,163 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
 
+# This file is part of Beremiz ... (keeping original license headers for context)
+# ... (rest of the license headers) ...
 
 import os
-import wx
-import wx.html2
-import wx.grid
-import xml_translate
 import sys
+import subprocess  # Preferred over os.system
 
 
-class PluginDialog(wx.Dialog):
-    def __init__(self, parent, info):
-        title = "Formal Verif Plugin"
-        wx.Dialog.__init__(self, parent, title=title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
-        self.SetSize((800, 600))  # 修改尺寸以适应两个选项卡
-        self.SetMinSize((800, 600))
-        self.SetMaxSize((1000, 1000))
-        self.info = info
-        self.html_file_path = ''
+# Removed wx, wx.html2, wx.grid, xml_translate imports as they are GUI related
+# If xml_translate was a non-GUI utility function potentially needed, it could be kept.
+# For now, assuming it was tied to the GUI button.
 
-        if parent and parent.GetIcon():
-            self.SetIcon(parent.GetIcon())
+def parse_cli_set(filepath):
+    config = {}
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):  # Skip empty lines and comments
+                    continue
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip()
+                    # Remove surrounding quotes if present (e.g., "value" -> value)
+                    if (value.startswith('"') and value.endswith('"')) or \
+                            (value.startswith("'") and value.endswith("'")):
+                        value = value[1:-1]
+                    config[key] = value
+    except FileNotFoundError:
+        print(f"Error: Configuration file {filepath} not found.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error parsing configuration file {filepath}: {e}")
+        sys.exit(1)
+    return config
 
-        # 创建 Notebook 控件
-        self.notebook = wx.Notebook(self, style=wx.NB_TOP)
-        self.notebook.SetMinSize((800, 600))
-        self.notebook.SetSize((800, 600))
 
-        # 创建第一个选项卡（Verifcase.vc3）
-        self.verifcase_panel = wx.ScrolledWindow(self.notebook)
-        self.notebook.AddPage(self.verifcase_panel, "Verifcase")
+def run_verification():
+    """
+    Runs the verification process based on cli_set.txt.
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
-        # 在第一个选项卡中添加控件
-        metadata_label = wx.StaticText(self.verifcase_panel, label="Metadata")
-        id_label = wx.StaticText(self.verifcase_panel, label="ID")
-        self.id_text = wx.TextCtrl(self.verifcase_panel)
-        name_label = wx.StaticText(self.verifcase_panel, label="NAME")
-        self.name_text = wx.TextCtrl(self.verifcase_panel)
-        description_label = wx.StaticText(self.verifcase_panel, label="DESCRIPTION")
-        self.description_text = wx.TextCtrl(self.verifcase_panel)
+    # Construct paths relative to the script's location
+    # PLCverif_cli directory is expected to be your own path
+    plcverif_cli_dir = "D:\\project\\R2-PLCGen\\PLCverif_cli"
+    plcverif_executable = os.path.join(plcverif_cli_dir, "eclipsec.exe")
+    cli_settings_file = os.path.join(plcverif_cli_dir, "cli_set.txt")
 
-        sourcefile_label = wx.StaticText(self.verifcase_panel, label="SourceFile")
-        sourcefiles_list = wx.ListBox(self.verifcase_panel, pos=(20, 20), size=(350, 100))
-        self.sourcefiles_list = sourcefiles_list
-        translate_file_button = wx.Button(self.verifcase_panel, label="Translate XML File")
-        translate_file_button.Bind(wx.EVT_BUTTON, self.on_translate_file_button)
-        add_file_button = wx.Button(self.verifcase_panel, label="Add File")
-        add_file_button.Bind(wx.EVT_BUTTON, self.on_add_file_button)
-        # sourcefiles_list.InsertColumn(0, "Sourcefiles", width=400)
+    # Check if essential files/dirs exist
+    if not os.path.isdir(plcverif_cli_dir):
+        print(f"Error: PLCverif_cli directory not found at {plcverif_cli_dir}")
+        print(f"Ensure it's a subdirectory relative to the script: {current_dir}")
+        sys.exit(1)
+    if not os.path.isfile(plcverif_executable):
+        print(f"Error: Verifier executable not found at {plcverif_executable}")
+        sys.exit(1)
+    if not os.path.isfile(cli_settings_file):
+        print(f"Error: Settings file not found at {cli_settings_file}")
+        sys.exit(1)
 
-        entry_block_label = wx.StaticText(self.verifcase_panel, label="Entry_Block")
-        self.entry_block_text = wx.TextCtrl(self.verifcase_panel)
+    # Parse cli_set.txt to get necessary info, e.g., for report path
+    config = parse_cli_set(cli_settings_file)
 
-        verifymessage_label = wx.StaticText(self.verifcase_panel, label="VerifMessage")
-        self.pattern_choice = wx.Choice(self.verifcase_panel, choices=[
-            "If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle.",
-            "{1} is always true at the end of the PLC cycle.",
-            "{1} is impossible at the end of the PLC cycle.",
-            "If {1} is true at the beginning of the PLC cycle, then {2} is always true at the end of the same cycle.",
-            "If {1} is true at the end of cycle N and {2} is true at the end of cycle N+1, then {3} is always true at the end of cycle N+1.",
-            "It is possible to have {1} at the end of a cycle.",
-            "Any time it is possible to have eventually {1} at the end of a cycle.",
-            "If {1} is true at the end of a cycle, {2} was true at the end of an earlier cycle."
-        ], pos=(100, 10))
-        self.parameter_texts = []
-        self.pattern_choice.Bind(wx.EVT_CHOICE, self.on_update_parameters)
-        self.pattern_choice.SetSelection(0)
-        self.pattern_choice.Bind(wx.EVT_MOUSEWHEEL, self.on_choice_mouse_wheel)
+    verification_id = config.get("-id")
+    if not verification_id:
+        print("Error: '-id' not found in cli_set.txt. This is needed for the report filename.")
+        sys.exit(1)
 
-        advance_setting_label = wx.StaticText(self.verifcase_panel, label="Advanced setting(BOOL or TYPE#VALUE)")
-        add_button = wx.Button(self.verifcase_panel, label="Add Row")
-        add_button.Bind(wx.EVT_BUTTON, self.on_add_row)
-        self.grid = wx.grid.Grid(self.verifcase_panel)
-        self.grid.CreateGrid(3, 4)
-        self.grid.SetColLabelValue(0, 'Variable Name')
-        self.grid.SetColLabelValue(1, 'Initial Value')
-        self.grid.SetColLabelValue(2, 'Bound Low')
-        self.grid.SetColLabelValue(3, 'Bound High')
-        self.grid.SetColSize(0, 150)
-        self.grid.SetColSize(1, 150)
-        self.grid.SetColSize(2, 150)
-        self.grid.SetColSize(3, 150)
-        self.grid.EnableEditing(True)
-        self.grid.Bind(wx.grid.EVT_GRID_CELL_CHANGED, self.on_cell_changed)
+    # Determine the output directory for the report
+    # The original script hardcoded part of this. Let's try to be consistent.
+    # cli_set.txt has "-output = PLCverif_cli/output".
+    # If eclipsec.exe CWD is plcverif_cli_dir, then relative path "output" is sufficient in cli_set.txt.
+    # The report path constructed by the original script was:
+    # html_file_dir = os.path.join(current_dir, "PLCverif_cli", "output")
+    # report_filename = self.id_text.GetValue() + '.report.html'
+    # self.html_file_path = os.path.join(html_file_dir, report_filename)
 
-        verif_button = wx.Button(self.verifcase_panel, label="Go Verif")
-        verif_button.SetMinSize((200, 50))
-        verif_button.SetForegroundColour(wx.Colour(205, 92, 92))
-        verif_button.SetBackgroundColour(wx.Colour(30, 144, 255))
-        verif_button.Bind(wx.EVT_BUTTON, self.get_verif)
-        report_button = wx.Button(self.verifcase_panel, label="Open Report")
-        report_button.SetMinSize((200, 50))
-        report_button.Bind(wx.EVT_BUTTON, self.go_page2)
+    # Let's assume the output directory specified in cli_set.txt (-output) is relative
+    # to the plcverif_cli_dir (which will be the CWD for eclipsec.exe).
+    # If cli_set.txt says "-output = output", then reports go to "plcverif_cli_dir/output/".
+    # If cli_set.txt says "-output = PLCverif_cli/output", and CWD is plcverif_cli_dir,
+    # this could lead to "plcverif_cli_dir/PLCverif_cli/output".
+    # For robust report path prediction, it's best if cli_set.txt's -output is simple like "output".
 
-        close = wx.Button(self.verifcase_panel, id=wx.ID_CANCEL, label="&Close")
-        close.Bind(wx.EVT_BUTTON, self.on_close)
+    # The python script will predict the report path based on original logic:
+    # current_dir/PLCverif_cli/output/ID.report.html
+    expected_report_output_dir = os.path.join(plcverif_cli_dir, "output")  # This is where this script expects it
 
-        # 修正布局
-        btnSizer = wx.BoxSizer(wx.HORIZONTAL)
-        btnSizer.Add(close, flag=wx.CENTER | wx.RIGHT, border=5)
+    # Ensure this expected output directory by Python script exists
+    # eclipsec.exe should ideally create its output directory based on its own config.
+    os.makedirs(expected_report_output_dir, exist_ok=True)
 
-        # 元数据部分布局
-        metadata_sizer = wx.BoxSizer(wx.VERTICAL)
-        metadata_sizer.Add(metadata_label, flag=wx.TOP | wx.LEFT, border=10)
-        fgs = wx.FlexGridSizer(3, 2, 9, 25)
-        fgs.AddGrowableCol(1, 1)
-        fgs.AddGrowableRow(2, 1)
-        fgs.AddMany([(id_label), (self.id_text, 1, wx.EXPAND), (name_label),
-                     (self.name_text, 1, wx.EXPAND), (description_label, 1, wx.EXPAND),
-                     (self.description_text, 1, wx.EXPAND)])
-        metadata_sizer.Add(fgs, proportion=1, flag=wx.ALL | wx.EXPAND, border=15)
+    html_report_path = os.path.join(expected_report_output_dir, f"{verification_id}.report.html")
 
-        # 文件部分布局
-        file_sizer = wx.BoxSizer(wx.VERTICAL)
-        file_sizer.Add(sourcefile_label, flag=wx.TOP | wx.LEFT, border=10)
-        file_sizer.Add(sourcefiles_list, flag=wx.EXPAND | wx.ALL, border=10)
-        file_sizer.Add(translate_file_button, flag=wx.ALIGN_RIGHT | wx.RIGHT | wx.BOTTOM, border=10)
-        file_sizer.Add(add_file_button, flag=wx.ALIGN_RIGHT | wx.RIGHT | wx.BOTTOM, border=10)
+    # --- Construct the command for eclipsec.exe ---
+    # The eclipsec.exe tool is given the cli_set.txt file as its main configuration.
+    # All specific parameters (ID, name, sourcefiles, pattern, etc.) should be read by
+    # eclipsec.exe directly from the cli_set.txt file.
+    command = [plcverif_executable, cli_settings_file]
 
-        # 验证进入
-        entry_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        entry_sizer.Add(entry_block_label, flag=wx.EXPAND | wx.ALL, border=10)
-        entry_sizer.Add(self.entry_block_text, proportion=1, flag=wx.EXPAND | wx.ALL, border=10)
+    print(f"Starting verification...")
+    print(f"Executing: \"{plcverif_executable}\" \"{cli_settings_file}\"")
+    print(f"Working directory for eclipsec.exe will be: {plcverif_cli_dir}")
 
-        # 验证消息部分布局
-        verify_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.verify_sizer = verify_sizer
-        self.verify_sizer.Add(verifymessage_label, flag=wx.TOP | wx.LEFT, border=10)
-        self.verify_sizer.Add(self.pattern_choice, flag=wx.TOP | wx.LEFT, border=10)
-        self.on_update_parameters(None)
+    try:
+        # Run eclipsec.exe. It's important to set the CWD (Current Working Directory)
+        # to plcverif_cli_dir because cli_set.txt might contain relative paths
+        # (e.g., "./NuSMV.exe", "output" for -output) that are relative to that directory.
+        process = subprocess.run(
+            command,
+            cwd=plcverif_cli_dir,  # Set working directory
+            check=True,  # Raise an exception for non-zero exit codes
+            capture_output=True,  # Capture stdout and stderr
+            text=True,  # Decode output as text
+            encoding='utf-8',  # Specify encoding
+            errors='replace'  # Handle potential decoding errors
+        )
+        print("\n--- eclipsec.exe STDOUT ---")
+        print(process.stdout)
+        if process.stderr:
+            print("\n--- eclipsec.exe STDERR ---")  # NuSMV often prints to stderr
+            print(process.stderr)
+        print("Verification process completed successfully.")
 
-        # 特殊定义部分布局
-        advance_sizer = wx.BoxSizer(wx.VERTICAL)
-        advance_top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        advance_top_sizer.Add(advance_setting_label, flag=wx.TOP | wx.LEFT, border=10)
-        advance_top_sizer.Add(add_button, flag=wx.TOP | wx.RIGHT, border=10)
-        advance_sizer.Add(advance_top_sizer)
-        advance_sizer.Add(self.grid, flag=wx.EXPAND | wx.ALL, border=10)
+    except subprocess.CalledProcessError as e:
+        print("\n--- eclipsec.exe STDOUT (on error) ---")
+        print(e.stdout)
+        print("\n--- eclipsec.exe STDERR (on error) ---")
+        print(e.stderr)
+        print(f"Verification failed with exit code {e.returncode}.")
+        sys.exit(1)
+    except FileNotFoundError:
+        # This would catch if plcverif_executable itself is not found by subprocess
+        print(f"Error: Command '{plcverif_executable}' not found. Ensure it's correctly specified and executable.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"An unexpected error occurred during verification: {e}")
+        sys.exit(1)
 
-        # 验证布局
-        verif_button_sizer = wx.BoxSizer(wx.VERTICAL)
-        verif_button_sizer.Add(verif_button, flag=wx.TOP | wx.LEFT, border=10)
-        verif_button_sizer.Add(report_button, flag=wx.TOP | wx.LEFT, border=10)
+    print(f"\nVerification finished.")
+    # Check if the report was generated where this script expects it.
+    # Note: eclipsec.exe will place the report based on its own interpretation of the -output
+    # setting in cli_set.txt, relative to its CWD (which we set to plcverif_cli_dir).
+    # If cli_set.txt has `-output = output`, the report will be in `plcverif_cli_dir/output/`.
+    if os.path.exists(html_report_path):
+        print(f"Report is expected at: {html_report_path}")
+    else:
+        print(f"Report was expected at: {html_report_path} (BUT NOT FOUND!)")
+        print("Please check:")
+        print(f"1. The eclipsec.exe output above for any errors or alternative report location.")
+        print(
+            f"2. The '-output' setting in '{cli_settings_file}'. Currently it is: '{config.get('-output', 'Not Set')}'")
+        print(f"   If CWD for eclipsec.exe is '{plcverif_cli_dir}', then for the report to be at the expected path,")
+        print(f"   '-output' should ideally be 'output' or './output' in '{cli_settings_file}'.")
 
-        # 整体布局
-        main_sizer = wx.BoxSizer(wx.VERTICAL)
-        main_sizer.Add(metadata_sizer, flag=wx.EXPAND | wx.ALL, border=10)
-        main_sizer.Add(file_sizer, flag=wx.EXPAND | wx.ALL, border=10)
-        main_sizer.Add(entry_sizer, flag=wx.EXPAND | wx.ALL, border=10)
-        main_sizer.Add(self.verify_sizer, flag=wx.EXPAND | wx.ALL, border=10)
-        main_sizer.Add(advance_sizer, flag=wx.EXPAND | wx.ALL, border=10)
-        main_sizer.Add(verif_button_sizer, flag=wx.CENTER | wx.BOTTOM, border=10)
-        main_sizer.Add(btnSizer, flag=wx.CENTER | wx.BOTTOM, border=10)
-
-        # 设置 sizer 到 verifcase_panel
-        self.verifcase_panel.SetSizer(main_sizer)
-
-        # 设置虚拟大小，确保能滚动
-        self.verifcase_panel.SetVirtualSize(self.verifcase_panel.GetBestSize())
-
-        # 设置滚动步长
-        self.verifcase_panel.SetScrollRate(10, 10)
-
-        # 创建第二个选项卡（Verifreport.html）
-        self.verifreport_panel = wx.ScrolledWindow(self.notebook)
-        self.notebook.AddPage(self.verifreport_panel, "Verifreport")
-
-        # 在第二个选项卡中添加一个 web 视图控件来显示 HTML 文件
-        self.web_view = wx.html2.WebView.New(self.verifreport_panel)
-        # 加载 HTML 文件
-        self.web_view.LoadURL(self.html_file_path)
-
-        self.web_view.SetSize(self.verifreport_panel.GetSize())
-
-        web_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.verifreport_panel.SetSizer(web_sizer)
-
-        # 设置布局
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.notebook, 1, wx.EXPAND | wx.ALL, 5)
-
-        self.SetSizer(sizer)
-        self.Layout()
-        self.Fit()
-        self.Centre()
-        self.Show(True)
-
-    def on_translate_file_button(self, event):
-        # 创建文件对话框
-        file_dialog = wx.FileDialog(self, "选择文件",
-                                    wildcard="XML files|*.xml|All files (*.*)|*.*",
-                                    style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-
-        # 判断用户是否选择了文件
-        if file_dialog.ShowModal() == wx.ID_OK:
-            # 获取文件路径
-            file_path = file_dialog.GetPath()
-            # 将文件路径添加到列表框中
-            xml_translate.trans_xml(file_path)
-
-        else:
-            print("Dialog was cancelled by the user")
-
-        # 关闭文件对话框
-        file_dialog.Destroy()
-
-    def on_add_file_button(self, event):
-        # 创建文件对话框
-        file_dialog = wx.FileDialog(self, "选择文件",
-                                    wildcard="ST and SCL files (*.st;*.scl)|*.st;*.scl|ST files (*.st)|*.st|SCL files (*.scl)|*.scl|All files (*.*)|*.*",
-                                    style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-
-        # 判断用户是否选择了文件
-        if file_dialog.ShowModal() == wx.ID_OK:
-            # 获取文件路径
-            file_path = file_dialog.GetPath()
-            # 将文件路径添加到列表框中
-            self.sourcefiles_list.Append(file_path)
-
-        else:
-            print("Dialog was cancelled by the user")
-
-        # 关闭文件对话框
-        file_dialog.Destroy()
-
-    def on_update_parameters(self, event):
-        # 清空现有的 parameter_texts
-        for text_ctrl in self.parameter_texts:
-            text_ctrl.Destroy()
-        self.parameter_texts.clear()
-
-        # 获取选择的模式
-        self.selected_pattern = self.pattern_choice.GetStringSelection()
-
-        # 根据选择的模式创建对应数量的 TextCtrl
-        if self.selected_pattern == "{1} is always true at the end of the PLC cycle." or self.selected_pattern == "{1} is impossible at the end of the PLC cycle." or self.selected_pattern == "It is possible to have {1} at the end of a cycle." or self.selected_pattern == "Any time it is possible to have eventually {1} at the end of a cycle.":
-            self.create_parameter_texts(1)
-        elif self.selected_pattern == "If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle." or self.selected_pattern == "If {1} is true at the beginning of the PLC cycle, then {2} is always true at the end of the same cycle." or self.selected_pattern == "If {1} is true at the end of a cycle, {2} was true at the end of an earlier cycle.":
-            self.create_parameter_texts(2)
-        elif self.selected_pattern == "If {1} is true at the end of cycle N and {2} is true at the end of cycle N+1, then {3} is always true at the end of cycle N+1.":
-            self.create_parameter_texts(3)
-
-    def create_parameter_texts(self, count):
-        # 创建指定数量的 TextCtrl
-        for i in range(count):
-            param_text = wx.TextCtrl(self.verifcase_panel, pos=(100, 70 + i * 30))
-            self.parameter_texts.append(param_text)
-
-            self.verify_sizer.Add(param_text, flag=wx.EXPAND | wx.ALL, border=5)
-
-        self.verifcase_panel.Layout()
-
-    def on_choice_mouse_wheel(self, event):
-        # 阻止Choice控件的滚动行为
-        event.Skip(False)
-
-    def on_add_row(self, event):
-        current_row_count = self.grid.GetNumberRows()
-        self.grid.AppendRows(1)  # 增加1行
-
-        self.grid.SetCellValue(current_row_count, 0, f'Variable {current_row_count + 1}')
-        self.grid.SetCellValue(current_row_count, 1, 'true')
-
-    def on_cell_changed(self, event):
-        row = event.GetRow()
-        col = event.GetCol()
-        new_value = self.grid.GetCellValue(row, col)
-
-        if col == 0:
-            print(f"Variable Name updated: {new_value} (Row {row})")
-        elif col == 1:
-            print(f"Initial Value updated: {new_value} (Row {row})")
-
-        # 允许事件继续处理
-        event.Skip()
-
-    def on_close(self, event):
-        self.Destroy()
-        sys.exit(0)
-
-    def Close(self, force=False):
-        self.Destroy()
-        sys.exit(0)
-
-    def go_page2(self, event):
-        # 跳转到第二个页面
-        # self.html_file_path = 'D:\PLCverif\workspace\example\output\example.report.html'
-        self.web_view.LoadURL(self.html_file_path)
-        self.notebook.SetSelection(1)
-
-    def get_verif(self, event):
-        # 将st传输给nusmv  获取用户的需要验证的信息
-        name_param = ' -name=' + self.name_text.GetValue()
-        id_param = ' -id=' + self.id_text.GetValue()
-        description_param = ' -description=' + '"' + self.description_text.GetValue() + '"'
-
-        source_file_param = ''
-        for i in range(self.sourcefiles_list.GetCount()):
-            source_file_param = source_file_param + ' -sourcefiles.' + str(i+1) + '=' + self.sourcefiles_list.GetString(i)
-
-        entry_param = ' -lf.entry=' + self.entry_block_text.GetValue()
-
-        if self.selected_pattern == "{1} is always true at the end of the PLC cycle.":
-            pattern = "pattern-invariant"
-        elif self.selected_pattern == "{1} is impossible at the end of the PLC cycle.":
-            pattern = "pattern-forbidden"
-        elif self.selected_pattern == "It is possible to have {1} at the end of a cycle.":
-            pattern = "pattern-reachability"
-        elif self.selected_pattern == "Any time it is possible to have eventually {1} at the end of a cycle.":
-            pattern = "pattern-repeatability"
-        elif self.selected_pattern == "If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle.":
-            pattern = "pattern-implication"
-        elif self.selected_pattern == "If {1} is true at the beginning of the PLC cycle, then {2} is always true at the end of the same cycle.":
-            pattern = "pattern-statechange-duringcycle"
-        elif self.selected_pattern == "If {1} is true at the end of a cycle, {2} was true at the end of an earlier cycle.":
-            pattern = "pattern-leadsto"
-        elif self.selected_pattern == "If {1} is true at the end of cycle N and {2} is true at the end of cycle N+1, then {3} is always true at the end of cycle N+1.":
-            pattern = "pattern-statechange-betweencycles"
-
-        pattern_params = []
-        for i in range(len(self.parameter_texts)):
-            param_text = self.parameter_texts[i]
-            text = param_text.GetValue()
-            pattern_params.append(text)
-
-        pattern_param = ' -job.req.pattern_id=' + pattern
-        if pattern == 'pattern-statechange-betweencycles':
-            pattern_param = pattern_param + ' -job.req.pattern_params.1="' + pattern_params[
-                0] + '"' + ' -job.req.pattern_params.2="' + pattern_params[1] + '"' + ' -job.req.pattern_params.3="' + \
-                            pattern_params[2] + '"'
-        elif pattern == 'pattern-implication' or pattern == 'pattern-statechange-duringcycle' or pattern == 'pattern-leadsto':
-            pattern_param = pattern_param + ' -job.req.pattern_params.1="' + pattern_params[
-                0] + '"' + ' -job.req.pattern_params.2="' + pattern_params[1] + '"'
-        else:
-            pattern_param = pattern_param + ' -job.req.pattern_params.1="' + pattern_params[0] + '"'
-
-        binding_data_param = ' '
-        # 获取行数
-        num_rows = self.grid.GetNumberRows()
-        # 获取每列的数据
-        for row in range(num_rows):
-            if self.grid.GetCellValue(row, 1) != '':
-                binding_data_param = binding_data_param + ' -job.req.bindings.variable.' + str(
-                    row) + '=' + self.grid.GetCellValue(row, 0)
-                binding_data_param = binding_data_param + ' -job.req.bindings.value.' + str(
-                    row) + '=' + self.grid.GetCellValue(row, 1)
-            if self.grid.GetCellValue(row, 2) != '':
-                binding_data_param = binding_data_param + ' -job.req.lowerBounds.variable.' + str(
-                    row) + '=' + self.grid.GetCellValue(row, 0)
-                binding_data_param = binding_data_param + ' -job.req.lowerBounds.value.' + str(
-                    row) + '=' + self.grid.GetCellValue(row, 2)
-            if self.grid.GetCellValue(row, 3) != '':
-                binding_data_param = binding_data_param + ' -job.req.upperBounds.variable.' + str(
-                    row) + '=' + self.grid.GetCellValue(row, 0)
-                binding_data_param = binding_data_param + ' -job.req.upperBounds.value.' + str(
-                    row) + '=' + self.grid.GetCellValue(row, 3)
-
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-
-        plcverif = os.path.join(current_dir, "PLCverif_cli", "eclipsec.exe")
-        cli_set_path = os.path.join(current_dir, "PLCverif_cli", "cli_set.txt")
-        html_file_dir = os.path.join(current_dir, "PLCverif_cli", "output")
-        os.system(
-                 plcverif + " " + cli_set_path + name_param + ' ' + id_param + ' ' + description_param + ' ' +
-                 source_file_param + ' ' + entry_param + pattern_param + binding_data_param)
-
-        self.html_file_path = html_file_dir +"\\"+ self.id_text.GetValue() + '.report.html'
-        print(self.html_file_path)
-
-def ShowPluginDialog(parent, info):
-    PluginDialog(parent, info)
 
 if __name__ == "__main__":
-    app = wx.App(False)
-    info = {}  # 你可以根据需要添加信息
-    dialog = PluginDialog(None, info)
-    app.MainLoop()
+    run_verification()

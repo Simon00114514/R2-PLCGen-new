@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import subprocess
 
-# 需求细化阶段的脚本列表
+# Refinement Phase Scirpts
 REQUIREMENT_SCRIPTS = [
     'R2-PLCGen/UseCase_Agent.py',
     'R2-PLCGen/Pattern_Agent.py',
@@ -10,7 +10,7 @@ REQUIREMENT_SCRIPTS = [
     'R2-PLCGen/Req_Agent.py',
 ]
 
-# 代码生成阶段的脚本列表
+# Code Generaion Phase Scripts
 CODE_GENERATION_SCRIPTS = [
     'R2-PLCGen/Code_Agent.py',
     'R2-PLCGen/Debug_Agent.py',
@@ -24,9 +24,8 @@ while True:
     for script_index, script in enumerate(REQUIREMENT_SCRIPTS):
         print(f"\nRunning {script} (Script {script_index + 1}/{len(REQUIREMENT_SCRIPTS)} of current iteration)...")
         try:
-            # 使用 check=True，如果脚本失败会抛出 CalledProcessError
-            # 为了能看到输出，可以添加 capture_output=True, text=True，但错误处理会更复杂些
-            # 为了简单，先保持你原始的调用方式
+            # Use check=True,If it fails, turn CalledProcessError
+            # If you want to see the output, add capture_output=True, text=True
             result = subprocess.run(['python', script], check=True)
             print(f"[SUCCESS] {script} completed with return code {result.returncode}.")
 
@@ -42,7 +41,7 @@ while True:
 
         except subprocess.CalledProcessError as e:
             print(f"[ERROR] {script} failed with return code {e.returncode}.")
-            # 如果你想看到失败时的输出，可以这样做：
+            # If you wanna see the details in failue:
             # if e.stdout:
             #     print(f"STDOUT on error:\n{e.stdout.decode(errors='replace')}")
             # if e.stderr:
@@ -53,17 +52,16 @@ while True:
                                         "or any other key to skip to user input for this iteration: ").lower()
             if user_choice_on_fail == 's':
                 print("Workflow stopped due to script failure.")
-                exit() # 直接退出程序
-            break # 中断当前迭代的后续脚本
+                exit() # exit
+            break # break down workflow
 
     if not all_scripts_successful_this_iteration:
         print("\nNot all scripts in this refinement iteration were successful.")
-        # 即使失败，也给用户选择的机会
     else:
         print("\nAll scripts in this refinement iteration completed successfully.")
 
 
-    # 在 R2IL_ReqAgent.py (或列表最后一个脚本) 运行完后询问用户是否继续当前阶段
+    # One iteration complete, choose to refine another time or just exit
     user_input = input("\nRequirement refinement iteration completed. \n"
                        "Enter 'end' or 'leave' to finalize requirements and proceed to code generation.\n"
                        "Enter 'retry' to re-run this refinement iteration.\n"
@@ -71,17 +69,16 @@ while True:
 
     if user_input.lower() in ["leave", "end"]:
         print("\n--- Requirement Refinement Phase Concluded ---")
-        break  # 退出 while 循环，准备进入代码生成阶段
+        break 
     elif user_input.lower() == 'retry':
         print("Retrying current refinement iteration.")
-        # iteration 不自增，直接 continue
         continue
     else:
         refinement_iteration += 1
         print("Starting next refinement iteration.")
 
 
-# --- 代码生成阶段 ---
+# --- Code Generation ---
 print("\n\n--- Starting Code Generation Phase ---")
 all_code_gen_successful = True
 for script in CODE_GENERATION_SCRIPTS:
@@ -97,7 +94,7 @@ for script in CODE_GENERATION_SCRIPTS:
                                     "or any other key to continue with next code generation script (if any): ").lower()
         if user_choice_on_fail == 's':
             print("Code generation stopped due to script failure.")
-            break # 中断代码生成阶段
+            break 
 if all_code_gen_successful:
     print("\n--- Code Generation Phase Completed Successfully ---")
 else:

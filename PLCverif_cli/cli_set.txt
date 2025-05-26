@@ -26,7 +26,7 @@
 -lf.compiler = Step7v55
 -lf.entry = ConveyorBeltControl
 -name = ""
--output = PLCverif_cli/output
+-output = R2-PLCGen_output
 -reductions.0 = basic_reductions
 -reductions.0.ExpressionPropagation_maxage = 50
 -reductions.0.ExpressionPropagation_maxexprsize = 100
@@ -34,5 +34,5 @@
 -reductions.0.fine_logging = false
 -reductions.0.print_vardep_graph = false
 -reductions.0.show_progress = false
--sourcefiles.0 = D:\project\PLCGEN-MIL\builtin.scl
--sourcefiles.1 = D:\project\PLCGEN-MIL\source.scl
+-sourcefiles.0 = D:\\project\\R2-PLCGen\\R2-PLCGen\\builtin.scl
+-sourcefiles.1 = D:\\project\\R2-PLCGen\\R2-PLCGen\\Modify_Code.scl

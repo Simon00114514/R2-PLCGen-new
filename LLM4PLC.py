@@ -6,7 +6,7 @@ scripts = [
     'LLM4PLC/LLM4PLC_Code.py',
 ]
 
-# 按顺序运行每个脚本
+# Execute the Scripts sequentially...
 for script in scripts:
     print(f'Running {script}...')
     result = subprocess.run(['python', script], check=True)

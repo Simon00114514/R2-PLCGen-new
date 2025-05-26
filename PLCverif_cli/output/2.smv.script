@@ -1,6 +1,0 @@
-set on_failure_script_quits
-set traces_hiding_prefix ___
-set default_trace_plugin 1
-go
-check_ctlspec -o "D:\verif_plugin_exe\plcverif_plugin\pythonProject\PLCverif_cli\output\2.smv.cex"
-quit
