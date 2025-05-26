@@ -1,0 +1,53 @@
+PROGRAM DistillationTowerControl
+VAR_INPUT
+    levelSensor : INT; (* 实际液位传感器读数 *)
+END_VAR
+
+VAR_OUTPUT
+    valveOpen : BOOL; (* 阀门开关状态，TRUE为打开，FALSE为关闭 *)
+END_VAR
+
+VAR
+    low_threshold : INT := 10; (* 最低液位阈值 *)
+    high_threshold : INT := 90; (* 最高液位阈值 *)
+    setpoint : INT := 50; (* 设定的液位目标值 *)
+    pidError : INT; (* PID误差 *)
+    integral : INT; (* 积分项 *)
+    derivative : INT; (* 微分项 *)
+    lastError : INT; (* 上一次的误差 *)
+    controlCycle : INT := 1; (* 控制周期，单位秒 *)
+    previousValveState : BOOL; (* 上一次的阀门状态 *)
+    errorThreshold : INT ; (* 误差阈值，用于决定是否保持阀门状态 *)
+END_VAR
+
+errorThreshold := 5;
+(* PID控制计算 *)
+pidError := setpoint - levelSensor;
+integral := integral + pidError * controlCycle;
+derivative := (pidError - lastError) / controlCycle;
+(* 注意：由于我们不再使用模拟信号控制阀门，PID输出将用于决定阀门开关状态 *)
+lastError := pidError;
+
+(* 根据液位调整阀门 *)
+IF levelSensor < low_threshold THEN
+    valveOpen := TRUE; (* 打开阀门 *)
+ELSIF levelSensor > high_threshold THEN
+    valveOpen := FALSE; (* 关闭阀门 *)
+ELSE
+    (* 如果液位在阈值范围内，根据PID控制结果决定是否改变阀门状态 *)
+    (* 由于没有ABS函数，我们手动计算绝对值 *)
+    IF pidError < 0 THEN
+        pidError := -pidError; (* 如果误差为负，取其正值 *)
+    END_IF;
+    
+    IF pidError < errorThreshold THEN
+        valveOpen := previousValveState; (* 保持原状态 *)
+    ELSE
+        valveOpen := NOT previousValveState; (* 如果误差较大，则改变状态 *)
+    END_IF;
+END_IF;
+
+(* 记录当前阀门状态以便下次循环使用 *)
+previousValveState := valveOpen;
+
+END_PROGRAM

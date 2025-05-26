@@ -1,0 +1,51 @@
+PROGRAM WaterPumpControl
+VAR_INPUT
+    start_pb_pressed : BOOL; // 操作员按下的启动按钮
+    stop_pb_pressed : BOOL; // 操作员按下的停止按钮
+    set_issued : BOOL; // 维护人员发出的SET指令
+    reset_issued : BOOL; // 维护人员发出的RESET指令
+    water_level : REAL; // 水位传感器读数
+    high_water_level : REAL; // 高水位阈值
+    discharge_pb_pressed : BOOL; // 操作员按下的排放按钮
+END_VAR
+
+VAR_OUTPUT
+    motor_on : BOOL; // 电机状态
+    valve_open : BOOL; // 排放阀状态
+END_VAR
+
+VAR
+    locked : BOOL := FALSE; // 水泵锁定状态
+END_VAR
+
+(* 控制逻辑代码 *)
+IF reset_issued THEN
+    locked := FALSE;
+END_IF;
+
+IF set_issued THEN
+    locked := TRUE;
+END_IF;
+
+IF NOT locked THEN
+    IF start_pb_pressed AND water_level < high_water_level THEN
+        motor_on := TRUE;
+    END_IF;
+
+    IF stop_pb_pressed THEN
+        motor_on := FALSE;
+    END_IF;
+END_IF;
+
+IF water_level >= high_water_level THEN
+    motor_on := FALSE; // 如果水位达到高水位，自动停止水泵
+END_IF;
+
+(* 排放储罐逻辑 *)
+IF discharge_pb_pressed THEN
+    valve_open := TRUE; // 按下排放按钮，打开排放阀
+ELSE
+    valve_open := FALSE; // 未按下排放按钮，关闭排放阀
+END_IF;
+
+END_PROGRAM
