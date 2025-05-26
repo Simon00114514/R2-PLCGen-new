@@ -1,0 +1,66 @@
+PROGRAM SprayStationControl
+VAR
+    // Input variables
+    SprayButton   : BOOL;    // Operator push button for spraying
+    StopButton    : BOOL;    // Button to request the conveyor to stop
+    VehicleSensor : BOOL;    // Sensor indicating the presence of a car
+
+    // Output variables
+    Conveyor      : BOOL;    // Controls the conveyor (TRUE = running; FALSE = stopped)
+    Spray         : BOOL;    // Controls the spray device (TRUE = active spraying; FALSE = idle)
+
+    // Internal variables
+    SprayingActive: BOOL := FALSE;    // Indicates an active spray cycle
+    // Timer instance for the 3-second spray cycle (TON timer as per IEC 61131-3)
+    SprayTimer    : TON;         
+END_VAR
+
+// Initialization: ensure conveyor runs by default and spraying is off.
+Conveyor := TRUE;
+Spray := FALSE;
+
+// Primary Logic 鈥� Use a series of mutually exclusive conditions
+
+// 1. STOP condition: if the stop request is active and a vehicle is present,
+//    always ensure the conveyor is stopped.
+IF StopButton AND VehicleSensor THEN
+    Conveyor := FALSE;
+    
+// 2. SPRAY initiation: if the spray button is pressed, a vehicle is present,
+//    and no spray cycle is in progress, start the spray cycle.
+ELSIF SprayButton AND VehicleSensor AND NOT SprayingActive THEN
+    SprayingActive := TRUE;
+    // Start the spray cycle timer; ensuring it runs during the cycle.
+    SprayTimer(IN := TRUE, PT := T#3s);
+    Spray := TRUE;
+    Conveyor := FALSE;
+    
+// 3. SPRAY cycle in progress: monitor timer when spray cycle is active.
+ELSIF SprayingActive THEN
+    // Continue running the timer (the function block is re-invoked each cycle)
+    SprayTimer(IN := TRUE, PT := T#3s);
+    
+    // When the timer reaches its preset (3 seconds), complete the cycle.
+    IF SprayTimer.Q THEN
+        Spray := FALSE;          // Stop spraying
+        SprayingActive := FALSE; // Clear the active flag
+        SprayTimer(IN := FALSE); // Reset the timer
+        
+        // Reset the spray button to prevent retriggering without a new press.
+        SprayButton := FALSE;
+        
+        // After spray cycle, resume the conveyor if the stop condition is not present.
+        IF NOT (StopButton AND VehicleSensor) THEN
+            Conveyor := TRUE;
+        END_IF;
+    END_IF;
+    
+// 4. Normal operation: if no stop or spray commands are active,
+//    ensure the conveyor is running.
+ELSE
+    IF NOT (StopButton AND VehicleSensor) THEN
+        Conveyor := TRUE;
+    END_IF;
+END_IF;
+
+END_PROGRAM

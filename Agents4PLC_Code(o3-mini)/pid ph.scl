@@ -1,0 +1,122 @@
+PROGRAM PH_Regulation_PID
+VAR
+  // Sensor Inputs (scaled by factor 10; e.g., 70 represents pH 7.0)
+  pH_Meas          : INT;       // pH sensor reading (scaled)
+  LiquidLevelAlarm : BOOL;      // TRUE if the upper liquid level is reached
+  
+  // PID Tuning Parameters (scaled by 10)
+  Setpoint         : INT := 70; // Desired pH target (7.0)
+  Kp               : INT := 12; // Proportional gain (1.2)
+  Ki               : INT := 5;  // Integral gain (0.5)
+  Kd               : INT := 1;  // Derivative gain (0.1)
+  
+  // PID internal variables (scaled values)
+  error            : INT;       // Difference between setpoint and measured pH
+  integral         : INT := 0;  // Accumulated error over time
+  derivative       : INT;       // Change in error over time
+  prevError        : INT := 0;  // Error from previous cycle
+  PID_Output       : INT;       // Computed PID controller output
+  
+  // Sampling interval (1 represents 0.1 sec)
+  SampleTime       : INT := 1;
+  
+  // Anti-windup limits for the integral term (scaled; 卤1000 represents 卤100.0)
+  Integral_Min     : INT := -1000;
+  Integral_Max     : INT :=  1000;
+  
+  // Optional output saturation limits (scaled; 1000 represents maximum injection rate)
+  Out_Min          : INT := 0;
+  Out_Max          : INT := 1000;
+  
+  // Injection output command variables (scaled values)
+  Injection_Alkaline : INT;   // Injection command for the alkaline solution
+  Injection_Acid     : INT;   // Injection command for the acidic solution
+  
+  // Boolean flags indicating whether each injection is active
+  Injection_Alkaline_Active : BOOL;
+  Injection_Acid_Active     : BOOL;
+END_VAR
+
+//------------------------------
+// PID Calculation Section
+//------------------------------
+error := Setpoint - pH_Meas;  // Calculate difference between target and measured pH
+
+// Accumulate the integral term and apply anti-windup clamping
+integral := integral + error * SampleTime;
+IF integral > Integral_Max THEN
+  integral := Integral_Max;
+ELSIF integral < Integral_Min THEN
+  integral := Integral_Min;
+END_IF;
+
+// Calculate the derivative term (using integer division)
+derivative := (error - prevError) DIV SampleTime;
+
+// Compute PID output as sum of proportional, integral, and derivative components
+PID_Output := Kp * error + Ki * integral + Kd * derivative;
+
+// Clamp the PID output to defined physical limits
+IF PID_Output > Out_Max THEN
+  PID_Output := Out_Max;
+ELSIF PID_Output < Out_Min THEN
+  PID_Output := Out_Min;
+END_IF;
+
+// Update previous error for next cycle
+prevError := error;
+
+//------------------------------
+// Injection Control Logic
+//------------------------------
+// When pH is too low (pH < 5.0, i.e. below 50 in scaled units), increase alkaline injection.
+IF pH_Meas < 50 THEN
+  Injection_Alkaline := PID_Output;
+  IF Injection_Alkaline < 0 THEN
+    Injection_Alkaline := 0;
+  END_IF;
+  Injection_Acid := 0;
+
+// When pH is too high (pH > 8.0, i.e. above 80 in scaled units), increase acidic injection.
+// In this branch, the PID output is inverted so that a negative error triggers a positive command.
+ELSIF pH_Meas > 80 THEN
+  Injection_Acid := -PID_Output;
+  IF Injection_Acid < 0 THEN
+    Injection_Acid := 0;
+  END_IF;
+  Injection_Alkaline := 0;
+
+// When the pH is within the acceptable range (between 5.0 and 8.0), no correction is applied.
+ELSE
+  Injection_Alkaline := 0;
+  Injection_Acid := 0;
+END_IF;
+
+//------------------------------
+// Boolean Status Update for Injections
+//------------------------------
+// Set the boolean status flags based on whether the injection command is active (greater than zero).
+IF Injection_Alkaline > 0 THEN
+  Injection_Alkaline_Active := TRUE;
+ELSE
+  Injection_Alkaline_Active := FALSE;
+END_IF;
+
+IF Injection_Acid > 0 THEN
+  Injection_Acid_Active := TRUE;
+ELSE
+  Injection_Acid_Active := FALSE;
+END_IF;
+
+//------------------------------
+// Liquid Level Safety Interlock
+//------------------------------
+// When the upper liquid level alarm is active, immediately stop all injections.
+IF LiquidLevelAlarm THEN
+  Injection_Alkaline := 0;
+  Injection_Acid := 0;
+  Injection_Alkaline_Active := FALSE;
+  Injection_Acid_Active := FALSE;
+END_IF;
+
+END_PROGRAM

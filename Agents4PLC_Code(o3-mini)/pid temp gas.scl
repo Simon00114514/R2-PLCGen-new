@@ -1,0 +1,100 @@
+FUNCTION_BLOCK PID_Control
+VAR_INPUT
+    Temp_Meas     : REAL;     (* Current internal temperature measurement *)
+    Temp_SetPoint : REAL;     (* Desired temperature setpoint *)
+    Kp            : REAL;     (* Proportional gain *)
+    Ki            : REAL;     (* Integral gain *)
+    Kd            : REAL;     (* Derivative gain *)
+    T_sample      : TIME;     (* Sample time in milliseconds *)
+END_VAR
+
+VAR_OUTPUT
+    ValveOpen     : REAL;     (* Computed valve opening command (0.0 to 100.0) *)
+END_VAR
+
+VAR
+    Err         : REAL;          (* Current error: setpoint minus measured temperature *)
+    Int_Err     : REAL := 0.0;     (* Accumulated integral error (initialized) *)
+    Prev_Err    : REAL := 0.0;     (* Previous cycle error for derivative calculation *)
+    Deriv_Err   : REAL;          (* Calculated derivative term *)
+    Temp_PID    : REAL;          (* Raw PID output before saturation *)
+    sampleSec   : REAL;          (* Sample time converted to seconds *)
+    Max_Output  : REAL := 100.0;   (* Maximum allowed output *)
+    Min_Output  : REAL := 0.0;     (* Minimum allowed output *)
+END_VAR
+
+(* Convert sample time from TIME (in ms) to seconds.
+   T_sample/T#1ms yields the number of milliseconds as an integer.
+   Dividing by 1000.0 converts milliseconds to seconds.
+*)
+sampleSec := REAL(T_sample / T#1ms) / 1000.0;
+IF sampleSec <= 0.0 THEN
+    sampleSec := 0.001;  (* Fallback to a small positive value to avoid division by zero *)
+END_IF
+
+(* Calculate error (positive when measured temperature is below setpoint) *)
+Err := Temp_SetPoint - Temp_Meas;
+
+(* Update the integral term *)
+Int_Err := Int_Err + (Ki * Err * sampleSec);
+
+(* Calculate the derivative term *)
+Deriv_Err := Kd * (Err - Prev_Err) / sampleSec;
+
+(* Combine the PID components *)
+Temp_PID := (Kp * Err) + Int_Err + Deriv_Err;
+
+(* Apply anti-windup and saturation limits *)
+IF Temp_PID > Max_Output THEN
+    Temp_PID := Max_Output;
+    IF Int_Err > (Max_Output - (Kp * Err + Deriv_Err)) THEN
+        Int_Err := Max_Output - (Kp * Err + Deriv_Err);
+    END_IF
+ELSIF Temp_PID < Min_Output THEN
+    Temp_PID := Min_Output;
+    IF Int_Err < (Min_Output - (Kp * Err + Deriv_Err)) THEN
+        Int_Err := Min_Output - (Kp * Err + Deriv_Err);
+    END_IF
+END_IF
+
+(* Update previous error for the next cycle *)
+Prev_Err := Err;
+
+(* Assign the final saturated output to ValveOpen *)
+ValveOpen := Temp_PID;
+
+(* Main Program: GasTurbineTempControl *)
+PROGRAM GasTurbineTempControl
+VAR
+    PID1         : PID_Control;    (* Instance of the PID controller function block *)
+    CurrentTemp  : REAL;           (* Current internal temperature measurement *)
+    SetPoint     : REAL;           (* Desired temperature setpoint *)
+    Command      : REAL;           (* Output: Inlet valve command *)
+    CycleTime    : TIME := T#100ms;  (* Sample time: 100 milliseconds *)
+END_VAR
+
+(* Configure PID parameters; adjust these values as needed *)
+PID1.Kp := 1.5;
+PID1.Ki := 0.5;
+PID1.Kd := 0.1;
+PID1.T_sample := CycleTime;
+
+(* Set the desired temperature setpoint (example value) *)
+SetPoint := 750.0;
+
+(* Retrieve current temperature measurement.
+   Replace the hardcoded value with actual sensor input as necessary.
+*)
+CurrentTemp := 720.0;
+
+(* Provide inputs to the PID controller instance *)
+PID1.Temp_Meas := CurrentTemp;
+PID1.Temp_SetPoint := SetPoint;
+
+(* Execute the PID control logic (this will execute cyclically) *)
+PID1();
+
+(* Retrieve the computed valve opening command for actuator control *)
+Command := PID1.ValveOpen;
+
+END_PROGRAM

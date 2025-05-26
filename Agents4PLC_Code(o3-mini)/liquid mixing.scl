@@ -1,0 +1,118 @@
+PROGRAM LiquidMixingApp
+(*
+  Description:
+    Implements a liquid mixing application:
+    - When S1 is pressed, pure liquid 1 is poured and its volume is tracked in vol1.
+    - When S2 is pressed, pure liquid 2 is poured and its volume is tracked in vol2.
+    - The overall tank level (Level) is the sum of vol1 and vol2.
+    - Pouring (i.e., effective S1 and S2 actions) is allowed only if Level is below MAX_LEVEL.
+    - When Level reaches or exceeds MAX_LEVEL, the pouring commands (S1 and S2) are 鈥渢urned off鈥�.
+    - When S3 is pressed, the system initiates a mixing/discharge mode:
+         鈥� Pouring is disabled.
+         鈥� The stirring motor (M) is activated.
+         鈥� The discharge valve (V1) is opened.
+         鈥� The overall Level is decremented until the tank is empty,
+           at which point vol1 and vol2 are reset.
+*)
+
+(* --- I/O Declaration --- *)
+VAR
+    (* Operator inputs *)
+    S1           : BOOL;  (* Button to pour liquid 1 *)
+    S2           : BOOL;  (* Button to pour liquid 2 *)
+    S3           : BOOL;  (* Button to initiate mixing/discharge *)
+
+    (* Outputs *)
+    M            : BOOL;  (* Stirring motor *)
+    V1           : BOOL;  (* Discharge valve *)
+
+    (* Process variables *)
+    Level        : INT;   (* Overall liquid level in the tank: vol1 + vol2 *)
+
+    (* Internal control variables *)
+    mixingActive : BOOL;  (* TRUE when mixing/discharge is in progress *)
+    vol1         : INT;   (* Volume of liquid 1 in the tank *)
+    vol2         : INT;   (* Volume of liquid 2 in the tank *)
+    effectiveS1  : BOOL;  (* Effective command for pouring liquid 1 *)
+    effectiveS2  : BOOL;  (* Effective command for pouring liquid 2 *)
+END_VAR
+
+(* --- Constant Definitions --- *)
+VAR CONSTANT
+    MAX_LEVEL      : INT := 100;  (* Maximum allowable combined liquid level *)
+    POUR_INCREMENT : INT := 1;    (* Volume increment per pouring event for each liquid *)
+    DISCHARGE_RATE : INT := 2;    (* Level decrement during discharge per cycle *)
+END_VAR
+
+(* --- Main Program Cycle --- *)
+
+(* Compute the overall tank level *)
+Level := vol1 + vol2;
+
+(* Determine effective pouring commands.
+   If Level is at or above MAX_LEVEL, then pouring actions are disabled. *)
+IF Level >= MAX_LEVEL THEN
+    effectiveS1 := FALSE;
+    effectiveS2 := FALSE;
+ELSE
+    effectiveS1 := S1;
+    effectiveS2 := S2;
+END_IF;
+
+(* Initiate mixing/discharge mode if S3 is pressed *)
+IF S3 THEN
+    mixingActive := TRUE;
+END_IF;
+
+IF mixingActive THEN
+    (* Mixing/Discharge Mode: ignore pouring actions *)
+    M := TRUE;      (* Activate stirring motor *)
+    V1 := TRUE;     (* Open discharge valve *)
+
+    (* Decrease the overall liquid level *)
+    IF Level > 0 THEN
+        Level := Level - DISCHARGE_RATE;
+        IF Level < 0 THEN
+            Level := 0;  (* Ensure Level does not become negative *)
+        END_IF;
+    END_IF;
+
+    (* When the tank becomes empty, reset mixing/discharge mode and liquid volumes *)
+    IF Level = 0 THEN
+        mixingActive := FALSE;
+        M := FALSE;
+        V1 := FALSE;
+        vol1 := 0;
+        vol2 := 0;
+    END_IF;
+ELSE
+    (* Pouring Mode: *)
+    V1 := FALSE;   (* Ensure the discharge valve is closed *)
+
+    (* Pour liquid 1 if effectiveS1 is TRUE and overall level is below maximum *)
+    IF effectiveS1 THEN
+        vol1 := vol1 + POUR_INCREMENT;
+    END_IF;
+
+    (* Pour liquid 2 if effectiveS2 is TRUE and overall level is below maximum *)
+    IF effectiveS2 THEN
+        vol2 := vol2 + POUR_INCREMENT;
+    END_IF;
+
+    (* Update overall level after pouring actions *)
+    Level := vol1 + vol2;
+
+    (* In case Level is increased above MAX_LEVEL, cap it *)
+    IF Level > MAX_LEVEL THEN
+        Level := MAX_LEVEL;
+    END_IF;
+
+    (* Optional: run stirring motor if any liquid is present in the tank *)
+    IF Level > 0 THEN
+        M := TRUE;
+    ELSE
+        M := FALSE;
+    END_IF;
+END_IF;
+
+END_PROGRAM

@@ -1,0 +1,38 @@
+PROGRAM FeedForwardControl
+(* IEC 61131鈥3 Structured Text Program for Feedforward Control *)
+
+VAR_INPUT
+    SensorLoad : INT;  // Input Variable: Sensor鈥恜redicted load provided by an external sensor.
+END_VAR
+
+VAR_OUTPUT
+    ConveyorSpeed : INT;  // Output Variable: Updated conveyor belt speed.
+END_VAR
+
+VAR
+    UpperThreshold : INT := 80;   // Upper load limit
+    LowerThreshold : INT := 20;   // Lower load limit
+    SpeedStep      : INT := 5;    // Speed adjustment step
+    MinSpeed       : INT := 0;    // Minimum allowed speed
+    MaxSpeed       : INT := 100;  // Maximum allowed speed
+END_VAR
+
+// Main control logic
+IF SensorLoad > UpperThreshold THEN
+    // If sensor input indicates high load, decrease the speed.
+    ConveyorSpeed := ConveyorSpeed - SpeedStep;
+ELSIF SensorLoad < LowerThreshold THEN
+    // If sensor input indicates low load, increase the speed.
+    ConveyorSpeed := ConveyorSpeed + SpeedStep;
+ELSE
+	ConveyorSpeed := ConveyorSpeed;
+END_IF;
+
+// Enforce speed boundaries
+IF ConveyorSpeed < MinSpeed THEN
+    ConveyorSpeed := MinSpeed;
+ELSIF ConveyorSpeed > MaxSpeed THEN
+    ConveyorSpeed := MaxSpeed;
+END_IF;
+
+END_PROGRAM

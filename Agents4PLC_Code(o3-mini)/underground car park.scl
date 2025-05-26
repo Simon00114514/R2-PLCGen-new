@@ -1,0 +1,93 @@
+PROGRAM ParkingLotControl
+  VAR
+    (* Sensor Inputs *)
+    X1      : BOOL;   (* Photoelectric switch at ground floor entrance/exit *)
+    X2      : BOOL;   (* Photoelectric switch at basement entrance/exit *)
+
+    (* One-scan pulse outputs from rising edge detection *)
+    M1      : BOOL;   (* One-scan pulse when a rising edge occurs on X1 *)
+    M3      : BOOL;   (* One-scan pulse when a rising edge occurs on X2 *)
+
+    (* Intermediate process flags *)
+    M20     : BOOL;   (* Flag: vehicle entering from ground floor *)
+    M30     : BOOL;   (* Flag: vehicle entering from basement *)
+
+    (* Output devices *)
+    Y1      : BOOL;   (* Red light *)
+    Y2      : BOOL;   (* Green light *)
+
+    (* Internal state for the passage control state machine *)
+    state   : INT;    (* 0 = Idle, 1 = GroundEntry, 2 = BasementEntry *)
+
+    (* Variables for edge detection *)
+    prevX1  : BOOL;   (* Last scan value for sensor X1 *)
+    prevX2  : BOOL;   (* Last scan value for sensor X2 *)
+
+    (* Initialization flag *)
+    init    : BOOL;   (* Used for one-time initial setup *)
+  END_VAR
+
+  (* Initialization on first scan *)
+  IF NOT init THEN
+    state := 0;           (* Start in Idle state *)
+    Y1 := FALSE;          (* Red light off *)
+    Y2 := TRUE;           (* Green light on *)
+    M20 := FALSE;
+    M30 := FALSE;
+    init := TRUE;
+  END_IF;
+
+  (* Edge detection for one-scan pulses based on sensor inputs *)
+  M1 := X1 AND NOT prevX1;   (* Rising edge on ground floor sensor *)
+  M3 := X2 AND NOT prevX2;   (* Rising edge on basement sensor *)
+
+  (* State machine to control passage and traffic lights *)
+  CASE state OF
+    0: (* Idle State *)
+       (* In Idle, ensure green lights are on and clear internal flags *)
+       Y1 := FALSE;
+       Y2 := TRUE;
+       M20 := FALSE;
+       M30 := FALSE;
+       
+       (* If a new event is detected, move to the corresponding state *)
+       IF M1 THEN
+         state := 1;      (* GroundEntry state *)
+         M20 := TRUE;
+       ELSIF M3 THEN
+         state := 2;      (* BasementEntry state *)
+         M30 := TRUE;
+       END_IF;
+       
+    1: (* GroundEntry state *)
+       (* Set lights: red on, green off *)
+       Y1 := TRUE;
+       Y2 := FALSE;
+       
+       (* Remain in this state until sensor X1 indicates the vehicle has passed *)
+       IF NOT X1 THEN
+         state := 0;      (* Return to Idle once the vehicle clears the sensor *)
+         M20 := FALSE;
+       END_IF;
+       
+    2: (* BasementEntry state *)
+       (* Set lights: red on, green off *)
+       Y1 := TRUE;
+       Y2 := FALSE;
+       
+       (* Remain in this state until sensor X2 indicates the vehicle has passed *)
+       IF NOT X2 THEN
+         state := 0;      (* Return to Idle once the vehicle clears the sensor *)
+         M30 := FALSE;
+       END_IF;
+       
+    ELSE
+       (* Default back to Idle *)
+       state := 0;
+  END_CASE;
+
+  (* Update previous sensor values for next cycle's edge detection *)
+  prevX1 := X1;
+  prevX2 := X2;
+
+END_PROGRAM
