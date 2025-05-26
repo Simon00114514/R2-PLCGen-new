@@ -6,7 +6,7 @@ scripts = [
     'Agents4PLC/Agents4PLC_Debugger.py',
 ]
 
-# 按顺序运行每个脚本
+# Execute each scripts
 for script in scripts:
     print(f'Running {script}...')
     result = subprocess.run(['python', script], check=True)
