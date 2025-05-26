@@ -1,0 +1,24 @@
+ PROGRAM TwoWaySwitch
+VAR
+    // Inputs: push buttons at the bottom and top of the staircase
+    Btn1 : BOOL;    
+    Btn2 : BOOL;
+    
+    // Output: current state of the staircase light
+    Light : BOOL;
+    
+    // Internal variables for edge detection (store previous input states)
+    PrevBtn1 : BOOL := FALSE;
+    PrevBtn2 : BOOL := FALSE;
+END_VAR
+
+// Check for a rising edge on either button and toggle the light accordingly
+IF (Btn1 AND NOT PrevBtn1) OR (Btn2 AND NOT PrevBtn2) THEN
+    Light := NOT Light;
+END_IF;
+
+// Update previous states for the next cycle
+PrevBtn1 := Btn1;
+PrevBtn2 := Btn2;
+
+END_PROGRAM

@@ -1,0 +1,117 @@
+PROGRAM PLC_AutoCarWash
+
+VAR CONSTANT
+    STATE_IDLE   : INT := 0;
+    STATE_START  : INT := 1;
+    STATE_SPRAY  : INT := 2;
+    STATE_SCRUB  : INT := 3;
+    STATE_DRY    : INT := 4;
+    STATE_FAULT  : INT := 5;
+END_VAR
+
+VAR
+    // Process state (initialized to idle)
+    State : INT := STATE_IDLE;
+    
+    // Sensor inputs (replace with actual I/O mapping)
+    SensorVehicle   : BOOL := FALSE;  // TRUE when a vehicle is present
+    SensorPersonnel : BOOL := FALSE;  // TRUE if a person is detected in the car wash area
+    
+    // Outputs (to be linked to hardware outputs or HMI)
+    Out_Start  : BOOL;  // Activates initial functions (e.g., open bay door)
+    Out_Spray  : BOOL;  // Controls water spray
+    Out_Scrub  : BOOL;  // Activates scrubbing mechanism
+    Out_Dry    : BOOL;  // Controls drying system
+    Out_Alarm  : BOOL;  // Signals an alarm condition
+    
+    // Timer instances using TON function blocks (assumed available on your platform)
+    tStart : TON;
+    tSpray : TON;
+    tScrub : TON;
+    tDry   : TON;
+END_VAR
+
+// Always check for the personnel presence; if detected, force a fault state.
+IF SensorPersonnel THEN
+    State := STATE_FAULT;
+END_IF;
+
+CASE State OF
+
+    STATE_IDLE:
+        // Ensure all outputs are deactivated in idle.
+        Out_Start := FALSE;
+        Out_Spray := FALSE;
+        Out_Scrub := FALSE;
+        Out_Dry   := FALSE;
+        Out_Alarm := FALSE;
+        
+        // Begin process only when a vehicle is present and no personnel is sensed.
+        IF SensorVehicle AND (NOT SensorPersonnel) THEN
+            State := STATE_START;
+            // Start the initial delay (e.g., bay door open delay).
+            tStart(IN := TRUE, PT := T#2s);
+        END_IF;
+    
+    STATE_START:
+        Out_Start := TRUE;  // Activate initial functions (e.g., open bay door)
+        tStart(IN := TRUE);
+        IF tStart.Q THEN
+            // Transition to the spray stage after a delay.
+            State := STATE_SPRAY;
+            tStart(IN := FALSE);  // Reset timer
+            tSpray(IN := TRUE, PT := T#5s);  // Start spray stage (5-second duration)
+        END_IF;
+    
+    STATE_SPRAY:
+        Out_Start := FALSE;
+        Out_Spray := TRUE;  // Activate spraying
+        tSpray(IN := TRUE);
+        IF tSpray.Q THEN
+            // Transition to the scrubbing stage.
+            State := STATE_SCRUB;
+            tSpray(IN := FALSE);  // Reset spray timer
+            tScrub(IN := TRUE, PT := T#4s);  // Start scrubbing (4-second duration)
+        END_IF;
+    
+    STATE_SCRUB:
+        Out_Spray := FALSE;
+        Out_Scrub := TRUE;  // Activate scrubbing mechanism
+        tScrub(IN := TRUE);
+        IF tScrub.Q THEN
+            // Transition to the drying stage.
+            State := STATE_DRY;
+            tScrub(IN := FALSE);  // Reset scrubbing timer
+            tDry(IN := TRUE, PT := T#3s);  // Start drying (3-second duration)
+        END_IF;
+    
+    STATE_DRY:
+        Out_Scrub := FALSE;
+        Out_Dry   := TRUE;  // Activate drying system
+        tDry(IN := TRUE);
+        IF tDry.Q THEN
+            tDry(IN := FALSE);  // Reset drying timer
+            Out_Dry := FALSE;
+            // Process complete; return to idle.
+            State := STATE_IDLE;
+        END_IF;
+    
+    STATE_FAULT:
+        // Immediately ensure all process outputs are off.
+        Out_Start := FALSE;
+        Out_Spray := FALSE;
+        Out_Scrub := FALSE;
+        Out_Dry   := FALSE;
+        Out_Alarm := TRUE;  // Activate alarm
+        
+        // Remain in fault state until both sensors are inactive.
+        IF (NOT SensorPersonnel) AND (NOT SensorVehicle) THEN
+            Out_Alarm := FALSE;
+            State := STATE_IDLE;
+        END_IF;
+    
+    ELSE
+        State := STATE_IDLE;  // Fallback to idle if state is unrecognized.
+END_CASE;
+
+END_PROGRAM

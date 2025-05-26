@@ -1,0 +1,113 @@
+PROGRAM PID_FlowControl
+(*
+  This program implements PID-controlled dosing flow adjustment for a chlorine dosing process
+  in water treatment. The code uses integer arithmetic with a scaling factor of 100 to simulate
+  fractional values (e.g., 300 represents 3.00). The control loop is executed every 100 ms.
+
+  Control strategy:
+    - If the measured concentration (scaled) is below the target (300), the error is negative,
+      causing the controller to decrease the flow rate.
+    - If the measured concentration is above 300, the controller increases the flow rate.
+    - When the error is within a tolerance (5, corresponding to 0.05), no adjustment is made.
+*)
+VAR
+    // External Inputs (scaled values; e.g., 300 represents 3.00 ppm)
+    MeasuredConcentration : INT;    // Process concentration from the sensor, scaled by 100
+    Enable                : BOOL;   // Activates the PID control loop
+
+    // Process Output (scaled; e.g., 100 represents 1.00, 10000 represents 100.00)
+    FlowRate              : INT;    // Adjusted dosing flow rate
+
+    // PID Controller Internal Variables (scaled)
+    SetPoint              : INT := 300;   // Target concentration (3.00 ppm scaled)
+    Error                 : INT;          // Difference between measured value and setpoint
+    LastError             : INT;          // Previous cycle error
+    Integral              : INT;          // Integral accumulator
+    Derivative            : INT;          // Difference error accumulator
+    PID_Output            : INT;          // Computed output adjustment (scaled)
+
+    // PID Tuning Constants (scaled; original Kp=1.5, Ki=0.5, Kd=0.2)
+    // Values are given in hundredths so that later the sum is divided by 100.
+    Kp                    : INT := 150;   // Proportional gain (represents 1.5)
+    Ki                    : INT := 50;    // Integral gain (represents 0.5)
+    Kd                    : INT := 20;    // Derivative gain (represents 0.2)
+
+    // Tolerance (scaled; 5 represents 0.05)
+    Tolerance             : INT := 5;     
+
+    // Base Flow Rate for steady dosing (scaled; 100 represents 1.00)
+    BaseFlowRate          : INT := 100;   
+
+    // Internal flag for first scan initialization
+    FirstScan             : BOOL := TRUE;
+
+    // Anti-windup limit for the integral term (scaled; 1000 represents 10.00)
+    Integral_Limit        : INT := 1000;  
+
+    // Sampling period in milliseconds (fixed at 100, though the calculations below assume a constant
+    // sample period and hence absorb the sample time into the gains).
+    SampleTime            : INT := 100; 
+END_VAR
+
+// Main Control Loop
+IF Enable THEN
+
+    // Initialization on first cycle when enabled
+    IF FirstScan THEN
+        Integral  := 0;
+        LastError := 0;
+        FlowRate  := BaseFlowRate;
+        FirstScan := FALSE;
+    END_IF;
+
+    // Compute error between measured concentration and the setpoint.
+    // Both numbers use the scaling factor of 100.
+    Error := MeasuredConcentration - SetPoint;
+
+    // Update the integral term. As sample time is fixed, we add the raw error.
+    Integral := Integral + Error;
+
+    // Anti-windup: clamp the integral term so it does not exceed its defined bounds.
+    IF Integral > Integral_Limit THEN
+        Integral := Integral_Limit;
+    ELSIF Integral < -Integral_Limit THEN
+        Integral := -Integral_Limit;
+    END_IF;
+
+    // Compute the derivative term as the difference between the current and previous error.
+    Derivative := Error - LastError;
+
+    // Calculate the PID output adjustment.
+    // The gains have been scaled so that the final result is divided by 100.
+    PID_Output := ((Kp * Error) + (Ki * Integral) + (Kd * Derivative)) / 100;
+
+    // When the error is within the acceptable tolerance, do not adjust the flow rate.
+    IF ABS(Error) < Tolerance THEN
+        // Optionally reset the integral term to avoid windup.
+        Integral := 0;
+        // FlowRate remains unchanged.
+    ELSE
+        // Adjust the flow rate based on the PID output.
+        FlowRate := FlowRate + PID_Output;
+    END_IF;
+
+    // Enforce saturation limits on FlowRate to keep it within safe operating boundaries.
+    IF FlowRate < 0 THEN
+        FlowRate := 0;
+    ELSIF FlowRate > 10000 THEN  // 10000 represents 100.00
+        FlowRate := 10000;
+    END_IF;
+
+    // Save the current error for use in the next cycle's derivative calculation.
+    LastError := Error;
+
+ELSE
+    // When the control loop is disabled, revert to the base flow rate and prepare for reinitialization.
+    FlowRate  := BaseFlowRate;
+    FirstScan := TRUE;
+END_IF;
+
+(*
+  Note: This program is intended to be executed cyclically every 100 milliseconds.
+*)
+END_PROGRAM
