@@ -1,0 +1,124 @@
+Each use case should be further refined and validated to ensure completeness and correctness. Errors in requirements should be identified and addressed during the refinement process.
+Agent: Use case name: Coffee Machine Operation
+
+1. Actor:
+- User (Barista or Customer)
+
+2. Use case:
+- Prepare Coffee with Milk
+- Prepare Coffee without Milk
+- Emergency Stop
+
+3. System boundary:
+- Coffee Machine Interface
+
+4. Relationships among actors:
+- The User interacts directly with the Coffee Machine Interface.
+- There are no other actors, so there are no relationships like inclusion, extension, or generalization in this context.
+
+Use case specification for "Prepare Coffee with Milk":
+
+Brief Description:
+This use case allows the user to prepare a coffee with milk by filling the mixer with coffee and milk up to a predefined level, mixing them, and then dispensing the beverage.
+
+Event Flow:
+Basic Flow:
+- Preconditions: The coffee machine is powered on, and all tanks and valves are operational.
+- The user selects the coffee and milk mode using the appropriate button.
+- The coffee and milk valves open to fill the mixer.
+- Once the mixer reaches the maximum level (130ml), the coffee and milk valves close.
+- The mixer operates for four seconds.
+- Postconditions: The output valve opens, and the coffee with milk is dispensed.
+
+Alternative Flow:
+- Preconditions: The coffee machine is powered on, but there is an issue with the tanks or valves.
+- The user selects the coffee and milk mode using the appropriate button.
+- The system detects an issue and does not proceed with the operation.
+- Postconditions: The system remains in a safe state, awaiting further user input or maintenance.
+
+Use Case Scenario:
+- A user approaches the coffee machine and selects the coffee with milk option. The machine performs the sequence of operations as described in the basic flow.
+
+Special Requirements:
+- The system must comply with safety regulations for food and beverage appliances.
+- The mixer must operate precisely for four seconds to ensure consistent beverage quality.
+- The system should be easy to use and maintain.
+
+Preconditions:
+- The coffee machine is turned on and in idle mode.
+- All ingredients (coffee, milk) are sufficiently stocked.
+- All tanks, valves, and the mixer are operational.
+
+Postconditions:
+- The coffee with milk is prepared and ready for consumption.
+- The system returns to idle mode, ready for the next operation.
+
+Use case specification for "Prepare Coffee without Milk":
+
+Brief Description:
+This use case allows the user to prepare a coffee without milk by filling the mixer with coffee up to a predefined level and then dispensing the beverage.
+
+Event Flow:
+Basic Flow:
+- Preconditions: The coffee machine is powered on, and all tanks and valves are operational.
+- The user selects the coffee-only mode using the appropriate button.
+- The coffee valve opens to fill the mixer.
+- Once the mixer reaches the maximum level (130ml), the coffee valve closes.
+- The output valve opens, and the coffee is dispensed.
+- Postconditions: The coffee without milk is dispensed.
+
+Alternative Flow:
+- Preconditions: The coffee machine is powered on, but there is an issue with the coffee tank or valve.
+- The user selects the coffee-only mode using the appropriate button.
+- The system detects an issue and does not proceed with the operation.
+- Postconditions: The system remains in a safe state, awaiting further user input or maintenance.
+
+Use Case Scenario:
+- A user selects the coffee-only option. The machine performs the sequence of operations as described in the basic flow.
+
+Special Requirements:
+- The system must comply with safety regulations for food and beverage appliances.
+- The system should be easy to use and maintain.
+
+Preconditions:
+- The coffee machine is turned on and in idle mode.
+- Coffee is sufficiently stocked.
+- The coffee tank and valve are operational.
+
+Postconditions:
+- The coffee without milk is prepared and ready for consumption.
+- The system returns to idle mode, ready for the next operation.
+
+Use case specification for "Emergency Stop":
+
+Brief Description:
+This use case allows the user to immediately halt all operations of the coffee machine in case of an emergency or malfunction.
+
+Event Flow:
+Basic Flow:
+- Preconditions: The coffee machine is powered on and in either idle or operational mode.
+- The user presses the emergency stop button.
+- All valves close, and the mixer stops immediately.
+- Postconditions: The coffee machine is in a safe, stopped state.
+
+Alternative Flow:
+- Not applicable, as the emergency stop is a singular action with no alternatives.
+
+Use Case Scenario:
+- During operation, the user notices an issue and presses the emergency stop button, ceasing all operations.
+
+Special Requirements:
+- The emergency stop function must be fail-safe and responsive at all times.
+
+Preconditions:
+- The coffee machine is turned on.
+
+Postconditions:
+- The coffee machine is stopped and requires a reset or maintenance check before resuming normal operations.
+
+Priority of Use Cases:
+1. Emergency Stop - Highest priority due to safety concerns.
+2. Prepare Coffee with Milk - High priority as it is a primary function of the machine.
+3. Prepare Coffee without Milk - High priority as it is a primary function of the machine.
+
+The properties mentioned in the initial requirement, such as the three tanks, three valves, mixer, and four buttons, are reflected in the use case design through the description of the system boundary and the event flows. The constraints P0 are addressed within the event flows and special requirements, ensuring that the system behaves as expected under different scenarios.

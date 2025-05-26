@@ -1,0 +1,14 @@
+Based on the task provided, here are the use cases for the structured text program for a spray station:
+
+{
+  1: "User can initiate the spray process by pressing a button.",
+  2: "System stops the conveyor belt when the spray button is pressed.",
+  3: "System detects the presence of a car using a sensor.",
+  4: "System activates the spray for 3 seconds when the button is pressed and the car is detected.",
+  5: "System ensures that the spray does not activate unless both the button is pressed and the car is detected.",
+  6: "System stops the spray after 3 seconds.",
+  7: "System resets the spray button to its initial state after the spraying process is completed.",
+  8: "System restarts the conveyor belt after the spraying process is completed."
+}
+
+These use cases outline the interactions between the user, the system, and the machinery involved in the spray station operation. They translate the technical requirements into clear, user-centric scenarios that guide the development of the program.

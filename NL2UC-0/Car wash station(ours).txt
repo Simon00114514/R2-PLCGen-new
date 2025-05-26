@@ -1,0 +1,62 @@
+Agent: Use case name: Automated Car Wash Operation
+
+1. Actor:
+- Car Sensor (detects the presence of a vehicle)
+- Personnel Sensor (detects the presence of people)
+
+2. Use case-i:
+- UC1: Start Car Wash
+- UC2: Stop Car Wash and Sound Alarm
+
+3. System boundary:
+- The PLC program that controls the car wash station.
+
+4. Relationships among actors:
+- Inclusion: Not applicable as there are no use cases that are included within other use cases.
+- Extension: UC2 extends UC1 when a person is detected during the car wash operation.
+- Generalization: Not applicable as there are no generalizations among actors.
+
+Use case specification for UC1: Start Car Wash
+
+（1）Brief Description: This use case describes the process where the car wash station initiates the washing sequence when a vehicle is present and no people are detected in the washing area.
+
+（2）Event Flow:
+- Basic Flow:
+  - Preconditions: The car sensor must detect a vehicle, and the personnel sensor must not detect any person.
+  - Postconditions: The car wash sequence is initiated.
+- Alternative Flow:
+  - Preconditions: The personnel sensor detects a person during the car wash sequence.
+  - Postconditions: The car wash sequence is stopped, and UC2 is triggered.
+
+（3）Use Case Scenario: A vehicle arrives at the washing station, the car sensor detects the vehicle, the personnel sensor confirms no presence of people, and the car wash sequence starts.
+
+（4）Special Requirements: The system must comply with IEC 61131-3 standards, ensure the safety of personnel by accurately detecting human presence, and be capable of operating with only one vehicle in the washing station at a time.
+
+（5）Preconditions: The car wash station is in idle mode, ready to receive a vehicle.
+
+（6）Postconditions: The vehicle has been washed, or the car wash sequence has been interrupted if a person is detected.
+
+Use case specification for UC2: Stop Car Wash and Sound Alarm
+
+（1）Brief Description: This use case describes the emergency protocol where the car wash operation is halted, and an alarm is sounded when a person is detected in the washing area during the car wash sequence.
+
+（2）Event Flow:
+- Basic Flow:
+  - Preconditions: The personnel sensor detects a person during the car wash sequence.
+  - Postconditions: The car wash sequence is stopped, and an alarm is sounded.
+- Alternative Flow: Not applicable as this use case is triggered as an alternative flow of UC1.
+
+（3）Use Case Scenario: During the car wash operation, the personnel sensor detects a person in the washing area, which triggers the system to stop the car wash and sound an alarm.
+
+（4）Special Requirements: The system must respond immediately to the detection of a person to ensure safety, and the alarm must be audible and comply with safety standards.
+
+（5）Preconditions: The car wash sequence is in progress.
+
+（6）Postconditions: The car wash sequence is halted, and the alarm is active.
+
+Priority Arrangement:
+- UC1: Start Car Wash is the primary use case as it represents the standard operation of the system.
+- UC2: Stop Car Wash and Sound Alarm is secondary in priority as it is an emergency response to an exceptional condition.
+
+Errors and Deficiencies:
+- No errors are identified in the requirements provided. However, the requirements should specify the behavior of the system once the alarm has been sounded. For example, should the system reset automatically, or require manual intervention? This logic has been filled in reasonably by assuming that the system requires manual reset after an alarm.

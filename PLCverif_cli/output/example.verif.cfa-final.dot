@@ -1,0 +1,79 @@
+digraph G {
+	vars_declaration_pseudonode_network [
+		label="VARIABLES\l__GLOBAL_TIME = 0\linstance/state = 0\linstance/Vehicle_Sensor = false\linstance/Spray_Button = false\linstance/Stop_Button = false\linstance/Conveyor = true\linstance/Sprayer = false\linstance/resetSprayButton = false\linstance/sprayDuration/IN = false\linstance/sprayDuration/Q = false\linstance/sprayDuration/due_set = false\linstance/sprayDuration/due = 0\lT_CYCLE = 0\lEoC = false\lBoC = false\l",
+		fillcolor="lightgray", shape="rectangle"];
+	subgraph clusterverificationLoop_VerificationLoop {
+		node [style="filled"];
+		style=bold;
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="verificationLoop.VerificationLoop";
+		
+		annotations_pseudonode_verificationLoop_VerificationLoop [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_verificationLoop_VerificationLoop [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		end_verificationLoop_VerificationLoop [label="end", color="black", fillcolor="cadetblue1", style=bold, shape="ellipse"];
+		loop_start_verificationLoop_VerificationLoop [label="loop_start", color="black", fillcolor="white", shape="ellipse"];
+		prepare_BoC_verificationLoop_VerificationLoop [label="prepare_BoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		l_main_call_verificationLoop_VerificationLoop [label="l_main_call", color="black", fillcolor="white", shape="ellipse"];
+		prepare_EoC_verificationLoop_VerificationLoop [label="prepare_EoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		verificationLoop_VerificationLoop_l1_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l1", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l2", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l4_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l4", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l10_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l10", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l12", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l19_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l19", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l29_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l29", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_l38_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l38", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l5_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_l5\l", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l17_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_l17\l", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_init1_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_init1\l", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l51_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_l51\l", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l171_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_l171\l", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l52_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_l52\l", color="black", fillcolor="white", shape="ellipse"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l172_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_instance_SpraySt\lationControl_l172\l", color="black", fillcolor="white", shape="ellipse"];
+		x28_verificationLoop_VerificationLoop [label="x", color="black", fillcolor="white", shape="ellipse"];
+		x36_verificationLoop_VerificationLoop [label="x", color="black", fillcolor="white", shape="ellipse"];
+		x56_verificationLoop_VerificationLoop [label="x", color="black", fillcolor="white", shape="ellipse"];
+		init_verificationLoop_VerificationLoop -> loop_start_verificationLoop_VerificationLoop [color="black", label=""];
+		loop_start_verificationLoop_VerificationLoop -> prepare_BoC_verificationLoop_VerificationLoop [color="blue", label="T_CYCLE := NONDETERMINISTIC of signed int32\lBoC := true (*)\l"];
+		prepare_BoC_verificationLoop_VerificationLoop -> l_main_call_verificationLoop_VerificationLoop [color="blue", label="BoC := false (*)"];
+		verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop -> prepare_EoC_verificationLoop_VerificationLoop [color="blue", label="__GLOBAL_TIME := (__GLOBAL_TIME + T_CYCLE)\lEoC := true (*)\l"];
+		prepare_EoC_verificationLoop_VerificationLoop -> loop_start_verificationLoop_VerificationLoop [color="blue", label="EoC := false (*)"];
+		verificationLoop_VerificationLoop_l1_verificationLoop_VerificationLoop -> x36_verificationLoop_VerificationLoop [color="black", label="[(! (instance/state = 0))]\linstance/Conveyor := ((instance/state = 1) || ((! \l(instance/state = 1)) && instance/Conveyor))\linstance/Sprayer := ((! (instance/state = 1)) && i\lnstance/Sprayer)\l"];
+		verificationLoop_VerificationLoop_l1_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l10_verificationLoop_VerificationLoop [color="black", label="[((instance/state = 0) && (instance/Vehicle_Sensor\l && (! instance/Stop_Button)))]\linstance/state := 1\l"];
+		verificationLoop_VerificationLoop_l1_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l10_verificationLoop_VerificationLoop [color="black", label="[((instance/state = 0) && (! (instance/Vehicle_Sen\lsor && (! instance/Stop_Button))))]\l"];
+		verificationLoop_VerificationLoop_l10_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop [color="black", label=""];
+		verificationLoop_VerificationLoop_l4_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop [color="black", label="[(! (instance/state = 1))]\linstance/Sprayer := (((instance/state = 2) && inst\lance/Sprayer) || ((! (instance/state = 2)) && ((! \l(instance/state = 3)) && instance/Sprayer)))\l"];
+		verificationLoop_VerificationLoop_l4_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_init1_verificationLoop_VerificationLoop [color="black", label="[((instance/state = 1) && instance/Spray_Button)]\linstance/state := 2\l"];
+		verificationLoop_VerificationLoop_l4_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l19_verificationLoop_VerificationLoop [color="black", label="[((instance/state = 1) && (! instance/Spray_Button\l))]\l"];
+		verificationLoop_VerificationLoop_l19_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop [color="black", label=""];
+		verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l52_verificationLoop_VerificationLoop [color="black", label="[((instance/state = 2) && instance/sprayDuration/Q\l)]\linstance/state := 3\linstance/sprayDuration/Q := ((__GLOBAL_TIME <= ins\ltance/sprayDuration/due) && instance/sprayDuration\l/due_set)\l"];
+		verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l29_verificationLoop_VerificationLoop [color="black", label="[((instance/state = 2) && (! instance/sprayDuratio\ln/Q))]\l"];
+		verificationLoop_VerificationLoop_l29_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop [color="black", label=""];
+		verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop [color="black", label="[((! (instance/state = 2)) && (! (instance/state =\l 3)))]\linstance/state := 0\l"];
+		verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l38_verificationLoop_VerificationLoop [color="black", label="[((! (instance/state = 2)) && ((instance/state = 3\l) && instance/resetSprayButton))]\linstance/resetSprayButton := false\linstance/state := 0\l"];
+		verificationLoop_VerificationLoop_l12_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l38_verificationLoop_VerificationLoop [color="black", label="[((! (instance/state = 2)) && ((instance/state = 3\l) && (! instance/resetSprayButton)))]\l"];
+		verificationLoop_VerificationLoop_l38_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l2_verificationLoop_VerificationLoop [color="black", label=""];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l5_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l17_verificationLoop_VerificationLoop [color="black", label="[((__GLOBAL_TIME <= instance/sprayDuration/due) &&\l instance/sprayDuration/due_set)]\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l5_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l17_verificationLoop_VerificationLoop [color="black", label="[(! ((__GLOBAL_TIME <= instance/sprayDuration/due)\l && instance/sprayDuration/due_set))]\linstance/sprayDuration/due_set := false\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l17_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l1_verificationLoop_VerificationLoop [color="black", label="instance/Conveyor := ((instance/state = 0) || ((! \l(instance/state = 0)) && instance/Conveyor))\linstance/Sprayer := ((! (instance/state = 0)) && i\lnstance/Sprayer)\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_init1_verificationLoop_VerificationLoop -> x28_verificationLoop_VerificationLoop [color="black", label="[(instance/sprayDuration/IN && (! instance/sprayDu\lration/Q))]\linstance/sprayDuration/due := (__GLOBAL_TIME + 300\l0)\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_init1_verificationLoop_VerificationLoop -> x28_verificationLoop_VerificationLoop [color="black", label="[(! (instance/sprayDuration/IN && (! instance/spra\lyDuration/Q)))]\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l51_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l171_verificationLoop_VerificationLoop [color="black", label="[((__GLOBAL_TIME <= instance/sprayDuration/due) &&\l instance/sprayDuration/due_set)]\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l51_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l171_verificationLoop_VerificationLoop [color="black", label="[(! ((__GLOBAL_TIME <= instance/sprayDuration/due)\l && instance/sprayDuration/due_set))]\linstance/sprayDuration/due_set := false\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l171_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l19_verificationLoop_VerificationLoop [color="black", label=""];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l52_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l172_verificationLoop_VerificationLoop [color="black", label="[((__GLOBAL_TIME <= instance/sprayDuration/due) &&\l instance/sprayDuration/due_set)]\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l52_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l172_verificationLoop_VerificationLoop [color="black", label="[(! ((__GLOBAL_TIME <= instance/sprayDuration/due)\l && instance/sprayDuration/due_set))]\linstance/sprayDuration/due_set := false\l"];
+		verificationLoop_VerificationLoop_instance_SprayStationControl_l172_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l29_verificationLoop_VerificationLoop [color="black", label=""];
+		l_main_call_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l5_verificationLoop_VerificationLoop [color="black", label="instance/sprayDuration/IN := false\linstance/sprayDuration/Q := ((__GLOBAL_TIME <= ins\ltance/sprayDuration/due) && instance/sprayDuration\l/due_set)\l"];
+		x28_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_instance_SprayStationControl_l51_verificationLoop_VerificationLoop [color="black", label="instance/sprayDuration/Q := ((__GLOBAL_TIME <= ins\ltance/sprayDuration/due) && instance/sprayDuration\l/due_set)\l"];
+		x36_verificationLoop_VerificationLoop -> x56_verificationLoop_VerificationLoop [color="black", label="instance/Conveyor := (((instance/state = 1) && ins\ltance/Conveyor) || ((! (instance/state = 1)) && ((\l! (instance/state = 2)) && instance/Conveyor)))\linstance/Sprayer := (((instance/state = 1) && inst\lance/Sprayer) || ((! (instance/state = 1)) && ((in\lstance/state = 2) || ((! (instance/state = 2)) && \linstance/Sprayer))))\linstance/sprayDuration/due_set := (((instance/stat\le = 1) && ((instance/Spray_Button && ((((instance/\lstate = 1) && instance/Spray_Button) && (! instanc\le/sprayDuration/Q)) || ((! (((instance/state = 1) \l&& instance/Spray_Button) && (! instance/sprayDura\ltion/Q))) && instance/sprayDuration/due_set))) || \l((! instance/Spray_Button) && instance/sprayDurati\lon/due_set))) || ((! (instance/state = 1)) && inst\lance/sprayDuration/due_set))\linstance/resetSprayButton := (((instance/state = 1\l) && instance/resetSprayButton) || ((! (instance/s\ltate = 1)) && (((instance/state = 2) && (instance/\lsprayDuration/Q || ((! instance/sprayDuration/Q) &\l& instance/resetSprayButton))) || ((! (instance/st\late = 2)) && instance/resetSprayButton))))\linstance/sprayDuration/IN := (((instance/state = 1\l) && ((instance/state = 1) && instance/Spray_Butto\ln)) || ((! (instance/state = 1)) && ((! (instance/\lstate = 2)) && ((instance/state = 1) && instance/S\lpray_Button))))\l"];
+		x56_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l4_verificationLoop_VerificationLoop [color="black", label="instance/Conveyor := (((instance/state = 1) && ins\ltance/Conveyor) || ((! (instance/state = 1)) && ((\l(instance/state = 2) && instance/Conveyor) || ((! \l(instance/state = 2)) && ((instance/state = 3) || \l((! (instance/state = 3)) && instance/Conveyor))))\l))\l"];
+	}
+}
+

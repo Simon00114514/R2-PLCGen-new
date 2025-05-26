@@ -1,0 +1,279 @@
+digraph G {
+	subgraph cluster__global454992345 {
+		node [shape="folder", style="filled"];
+		//label="_global";
+		_global454992345 [label="_global"];
+		_global454992345 -> __GLOBAL_TIME2012231958;
+		__GLOBAL_TIME2012231958 [label = "(F) __GLOBAL_TIME : signed int32", fillcolor="white" ];
+		_global454992345 -> instance884858691;
+		instance884858691 [label = "(F) instance : _global/SprayStationControl", fillcolor="white" ];
+		_global454992345 -> T_CYCLE161234158;
+		T_CYCLE161234158 [label = "(F) T_CYCLE : signed int32", fillcolor="white" ];
+		_global454992345 -> verificationLoop1039948229;
+		verificationLoop1039948229 [label = "(F) verificationLoop : _global/VerificationLoopDS", fillcolor="white" , peripheries=2];
+		_global454992345 -> EoC1641059445;
+		EoC1641059445 [label = "(F) EoC : bool", fillcolor="white" ];
+		_global454992345 -> BoC1063573827;
+		BoC1063573827 [label = "(F) BoC : bool", fillcolor="white" ];
+		_global454992345 -> SprayStationControl2074201534;
+		subgraph cluster_SprayStationControl2074201534 {
+			node [shape="folder", style="filled"];
+			//label="SprayStationControl";
+			SprayStationControl2074201534 [label="SprayStationControl"];
+			SprayStationControl2074201534 -> state287303969;
+			state287303969 [label = "(F) state : signed int16", fillcolor="white" ];
+			SprayStationControl2074201534 -> prevState12691277;
+			prevState12691277 [label = "(F) prevState : signed int16", fillcolor="white" ];
+			SprayStationControl2074201534 -> Vehicle_Sensor496695089;
+			Vehicle_Sensor496695089 [label = "(F) Vehicle_Sensor : bool", fillcolor="white" ];
+			SprayStationControl2074201534 -> Spray_Button1590075830;
+			Spray_Button1590075830 [label = "(F) Spray_Button : bool", fillcolor="white" ];
+			SprayStationControl2074201534 -> Stop_Button385041270;
+			Stop_Button385041270 [label = "(F) Stop_Button : bool", fillcolor="white" ];
+			SprayStationControl2074201534 -> Conveyor677696333;
+			Conveyor677696333 [label = "(F) Conveyor : bool", fillcolor="white" ];
+			SprayStationControl2074201534 -> Sprayer784934449;
+			Sprayer784934449 [label = "(F) Sprayer : bool", fillcolor="white" ];
+			SprayStationControl2074201534 -> resetSprayButton965121190;
+			resetSprayButton965121190 [label = "(F) resetSprayButton : bool", fillcolor="white" ];
+			SprayStationControl2074201534 -> sprayDuration1545984685;
+			sprayDuration1545984685 [label = "(F) sprayDuration : _global/TP", fillcolor="white" ];
+			
+			annotations_pseudonode_SprayStationControl2074201534 [
+				label="ANNOTATIONS\lstate : direction=LOCAL\lstate : PLC type=INT\lprevState : direction=LOCAL\lprevState : PLC type=INT\lVehicle_Sensor : direction=LOCAL\lVehicle_Sensor : PLC type=BOOL\lSpray_Button : direction=LOCAL\lSpray_Button : PLC type=BOOL\lStop_Button : direction=LOCAL\lStop_Button : PLC type=BOOL\lConveyor : direction=LOCAL\lConveyor : PLC type=BOOL\lSprayer : direction=LOCAL\lSprayer : PLC type=BOOL\lresetSprayButton : direction=LOCAL\lresetSprayButton : PLC type=BOOL\lsprayDuration : direction=LOCAL\l",
+				fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+			initamt_pseudonode_SprayStationControl2074201534 [
+				label="INITIAL\lstate := 0\lprevState := 0\lVehicle_Sensor := false\lSpray_Button := false\lStop_Button := false\lConveyor := true\lSprayer := false\lresetSprayButton := false\l",
+				fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+		}
+		_global454992345 -> TP1746150957;
+		subgraph cluster_TP1746150957 {
+			node [shape="folder", style="filled"];
+			//label="TP";
+			TP1746150957 [label="TP"];
+			TP1746150957 -> PT1683246820;
+			PT1683246820 [label = "(F) PT : signed int32", fillcolor="white" ];
+			TP1746150957 -> IN1934424193;
+			IN1934424193 [label = "(F) IN : bool", fillcolor="white" ];
+			TP1746150957 -> Q183354406;
+			Q183354406 [label = "(F) Q : bool", fillcolor="white" ];
+			TP1746150957 -> ET806566417;
+			ET806566417 [label = "(F) ET : signed int32", fillcolor="white" ];
+			TP1746150957 -> old_in1445567246;
+			old_in1445567246 [label = "(F) old_in : bool", fillcolor="white" ];
+			TP1746150957 -> due_set566447096;
+			due_set566447096 [label = "(F) due_set : bool", fillcolor="white" ];
+			TP1746150957 -> due263969036;
+			due263969036 [label = "(F) due : signed int32", fillcolor="white" ];
+			
+			annotations_pseudonode_TP1746150957 [
+				label="ANNOTATIONS\lPT : direction=INPUT\lPT : PLC type=TIME\lIN : direction=INPUT\lIN : PLC type=BOOL\lQ : direction=OUTPUT\lQ : PLC type=BOOL\lET : direction=OUTPUT\lET : PLC type=TIME\lold_in : direction=LOCAL\lold_in : PLC type=BOOL\ldue_set : direction=LOCAL\ldue_set : PLC type=BOOL\ldue : direction=LOCAL\ldue : PLC type=TIME\l",
+				fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+			initamt_pseudonode_TP1746150957 [
+				label="INITIAL\lPT := 0\lIN := false\lQ := false\lET := 0\lold_in := false\ldue_set := false\ldue := 0\l",
+				fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+		}
+		_global454992345 -> VerificationLoopDS228035257;
+		subgraph cluster_VerificationLoopDS228035257 {
+			node [shape="folder", style="filled"];
+			//label="VerificationLoopDS";
+			VerificationLoopDS228035257 [label="VerificationLoopDS"];
+			
+			annotations_pseudonode_VerificationLoopDS228035257 [
+				label="ANNOTATIONS",
+				fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+			initamt_pseudonode_VerificationLoopDS228035257 [
+				label="INITIAL",
+				fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+		}
+		
+		annotations_pseudonode__global454992345 [
+			label="ANNOTATIONS\l__GLOBAL_TIME : direction=LOCAL\l__GLOBAL_TIME : PLC type=TIME\lT_CYCLE : direction=INPUT\lEoC : generated\lBoC : generated\l",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		initamt_pseudonode__global454992345 [
+			label="INITIAL\l__GLOBAL_TIME := 0\lT_CYCLE := 0\lEoC := false\lBoC := false\l",
+			fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+	}
+	subgraph clusterSprayStationControl {
+		node [style="filled"];
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="SprayStationControl : SprayStationControl";
+		
+		annotations_pseudonode_SprayStationControl [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_SprayStationControl [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		l1_SprayStationControl [label="l1", color="black", fillcolor="white", shape="ellipse"];
+		l2_SprayStationControl [label="l2", color="black", fillcolor="white", style=bold, shape="ellipse"];
+		l3_SprayStationControl [label="l3", color="black", fillcolor="white", shape="ellipse"];
+		l4_SprayStationControl [label="l4", color="black", fillcolor="white", shape="ellipse"];
+		l5_SprayStationControl [label="l5", color="black", fillcolor="white", shape="ellipse"];
+		l6_SprayStationControl [label="l6", color="black", fillcolor="white", shape="ellipse"];
+		l7_SprayStationControl [label="l7", color="black", fillcolor="white", shape="ellipse"];
+		l8_SprayStationControl [label="l8", color="black", fillcolor="white", shape="ellipse"];
+		l9_SprayStationControl [label="l9", color="black", fillcolor="white", shape="ellipse"];
+		l10_SprayStationControl [label="l10", color="black", fillcolor="white", shape="ellipse"];
+		l11_SprayStationControl [label="l11", color="black", fillcolor="white", shape="ellipse"];
+		l12_SprayStationControl [label="l12", color="black", fillcolor="white", shape="ellipse"];
+		l13_SprayStationControl [label="l13", color="black", fillcolor="white", shape="ellipse"];
+		l14_SprayStationControl [label="l14", color="black", fillcolor="white", shape="ellipse"];
+		l15_SprayStationControl [label="l15", color="black", fillcolor="white", shape="ellipse"];
+		l16_SprayStationControl [label="l16", color="black", fillcolor="white", shape="ellipse"];
+		l17_SprayStationControl [label="l17", color="black", fillcolor="white", shape="ellipse"];
+		l18_SprayStationControl [label="l18", color="black", fillcolor="white", shape="ellipse"];
+		l19_SprayStationControl [label="l19", color="black", fillcolor="white", shape="ellipse"];
+		l20_SprayStationControl [label="l20", color="black", fillcolor="white", shape="ellipse"];
+		l21_SprayStationControl [label="l21", color="black", fillcolor="white", shape="ellipse"];
+		l22_SprayStationControl [label="l22", color="black", fillcolor="white", shape="ellipse"];
+		l23_SprayStationControl [label="l23", color="black", fillcolor="white", shape="ellipse"];
+		l24_SprayStationControl [label="l24", color="black", fillcolor="white", shape="ellipse"];
+		l25_SprayStationControl [label="l25", color="black", fillcolor="white", shape="ellipse"];
+		l26_SprayStationControl [label="l26", color="black", fillcolor="white", shape="ellipse"];
+		l27_SprayStationControl [label="l27", color="black", fillcolor="white", shape="ellipse"];
+		l28_SprayStationControl [label="l28", color="black", fillcolor="white", shape="ellipse"];
+		l29_SprayStationControl [label="l29", color="black", fillcolor="white", shape="ellipse"];
+		l30_SprayStationControl [label="l30", color="black", fillcolor="white", shape="ellipse"];
+		l31_SprayStationControl [label="l31", color="black", fillcolor="white", shape="ellipse"];
+		l32_SprayStationControl [label="l32", color="black", fillcolor="white", shape="ellipse"];
+		l33_SprayStationControl [label="l33", color="black", fillcolor="white", shape="ellipse"];
+		l34_SprayStationControl [label="l34", color="black", fillcolor="white", shape="ellipse"];
+		l35_SprayStationControl [label="l35", color="black", fillcolor="white", shape="ellipse"];
+		l36_SprayStationControl [label="l36", color="black", fillcolor="white", shape="ellipse"];
+		l37_SprayStationControl [label="l37", color="black", fillcolor="white", shape="ellipse"];
+		l38_SprayStationControl [label="l38", color="black", fillcolor="white", shape="ellipse"];
+		l39_SprayStationControl [label="l39", color="black", fillcolor="white", shape="ellipse"];
+		init_SprayStationControl -> l1_SprayStationControl [color="black", label="CALL: TP:sprayDuration(\l   IN: IN := false\l, PT := 3000\l   OUT: )\l"];
+		l1_SprayStationControl -> l3_SprayStationControl [color="black", label="[(state = 0)]"];
+		l1_SprayStationControl -> l4_SprayStationControl [color="black", label="[ELSE]"];
+		l3_SprayStationControl -> l5_SprayStationControl [color="black", label="Conveyor := true"];
+		l5_SprayStationControl -> l6_SprayStationControl [color="black", label="Sprayer := false"];
+		l6_SprayStationControl -> l7_SprayStationControl [color="black", label="[(Vehicle_Sensor && (! Stop_Button))]"];
+		l7_SprayStationControl -> l8_SprayStationControl [color="black", label="state := 1"];
+		l6_SprayStationControl -> l9_SprayStationControl [color="black", label="[ELSE]"];
+		l8_SprayStationControl -> l10_SprayStationControl [color="black", label=""];
+		l9_SprayStationControl -> l10_SprayStationControl [color="black", label=""];
+		l10_SprayStationControl -> l2_SprayStationControl [color="black", label=""];
+		l4_SprayStationControl -> l11_SprayStationControl [color="black", label="[(state = 1)]"];
+		l4_SprayStationControl -> l12_SprayStationControl [color="black", label="[ELSE]"];
+		l11_SprayStationControl -> l13_SprayStationControl [color="black", label="Conveyor := true"];
+		l13_SprayStationControl -> l14_SprayStationControl [color="black", label="Sprayer := false"];
+		l14_SprayStationControl -> l15_SprayStationControl [color="black", label="[Spray_Button]"];
+		l15_SprayStationControl -> l16_SprayStationControl [color="black", label="state := 2"];
+		l16_SprayStationControl -> l17_SprayStationControl [color="black", label="CALL: TP:sprayDuration(\l   IN: IN := true\l   OUT: )\l"];
+		l14_SprayStationControl -> l18_SprayStationControl [color="black", label="[ELSE]"];
+		l17_SprayStationControl -> l19_SprayStationControl [color="black", label=""];
+		l18_SprayStationControl -> l19_SprayStationControl [color="black", label=""];
+		l19_SprayStationControl -> l2_SprayStationControl [color="black", label=""];
+		l12_SprayStationControl -> l20_SprayStationControl [color="black", label="[(state = 2)]"];
+		l12_SprayStationControl -> l21_SprayStationControl [color="black", label="[ELSE]"];
+		l20_SprayStationControl -> l22_SprayStationControl [color="black", label="Conveyor := false"];
+		l22_SprayStationControl -> l23_SprayStationControl [color="black", label="Sprayer := true"];
+		l23_SprayStationControl -> l24_SprayStationControl [color="black", label="[sprayDuration/Q]"];
+		l24_SprayStationControl -> l25_SprayStationControl [color="black", label="state := 3"];
+		l25_SprayStationControl -> l26_SprayStationControl [color="black", label="resetSprayButton := true"];
+		l26_SprayStationControl -> l27_SprayStationControl [color="black", label="CALL: TP:sprayDuration(\l   IN: IN := false\l   OUT: )\l"];
+		l23_SprayStationControl -> l28_SprayStationControl [color="black", label="[ELSE]"];
+		l27_SprayStationControl -> l29_SprayStationControl [color="black", label=""];
+		l28_SprayStationControl -> l29_SprayStationControl [color="black", label=""];
+		l29_SprayStationControl -> l2_SprayStationControl [color="black", label=""];
+		l21_SprayStationControl -> l30_SprayStationControl [color="black", label="[(state = 3)]"];
+		l21_SprayStationControl -> l31_SprayStationControl [color="black", label="[ELSE]"];
+		l30_SprayStationControl -> l32_SprayStationControl [color="black", label="Conveyor := true"];
+		l32_SprayStationControl -> l33_SprayStationControl [color="black", label="Sprayer := false"];
+		l33_SprayStationControl -> l34_SprayStationControl [color="black", label="[resetSprayButton]"];
+		l34_SprayStationControl -> l35_SprayStationControl [color="black", label="resetSprayButton := false"];
+		l35_SprayStationControl -> l36_SprayStationControl [color="black", label="state := 0"];
+		l33_SprayStationControl -> l37_SprayStationControl [color="black", label="[ELSE]"];
+		l36_SprayStationControl -> l38_SprayStationControl [color="black", label=""];
+		l37_SprayStationControl -> l38_SprayStationControl [color="black", label=""];
+		l38_SprayStationControl -> l2_SprayStationControl [color="black", label=""];
+		l31_SprayStationControl -> l39_SprayStationControl [color="black", label="state := 0"];
+		l39_SprayStationControl -> l2_SprayStationControl [color="black", label=""];
+	}
+	subgraph clusterTP {
+		node [style="filled"];
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="TP : TP";
+		
+		annotations_pseudonode_TP [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_TP [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		l1_TP [label="l1", color="black", fillcolor="white", shape="ellipse"];
+		l2_TP [label="l2", color="black", fillcolor="white", shape="ellipse"];
+		l3_TP [label="l3", color="black", fillcolor="white", shape="ellipse"];
+		l4_TP [label="l4", color="black", fillcolor="white", shape="ellipse"];
+		l5_TP [label="l5", color="black", fillcolor="white", shape="ellipse"];
+		l6_TP [label="l6", color="black", fillcolor="white", shape="ellipse"];
+		l7_TP [label="l7", color="black", fillcolor="white", shape="ellipse"];
+		l8_TP [label="l8", color="black", fillcolor="white", shape="ellipse"];
+		l9_TP [label="l9", color="black", fillcolor="white", shape="ellipse"];
+		l10_TP [label="l10", color="black", fillcolor="white", shape="ellipse"];
+		l11_TP [label="l11", color="black", fillcolor="white", shape="ellipse"];
+		l12_TP [label="l12", color="black", fillcolor="white", shape="ellipse"];
+		l13_TP [label="l13", color="black", fillcolor="white", shape="ellipse"];
+		l14_TP [label="l14", color="black", fillcolor="white", shape="ellipse"];
+		l15_TP [label="l15", color="black", fillcolor="white", shape="ellipse"];
+		l16_TP [label="l16", color="black", fillcolor="white", shape="ellipse"];
+		l17_TP [label="l17", color="black", fillcolor="white", shape="ellipse"];
+		l18_TP [label="l18", color="black", fillcolor="white", style=bold, shape="ellipse"];
+		init_TP -> l1_TP [color="black", label="[((IN && (! old_in)) && (! Q))]"];
+		l1_TP -> l2_TP [color="black", label="due := (__GLOBAL_TIME + PT)"];
+		l2_TP -> l3_TP [color="black", label="due_set := true"];
+		init_TP -> l4_TP [color="black", label="[ELSE]"];
+		l3_TP -> l5_TP [color="black", label=""];
+		l4_TP -> l5_TP [color="black", label=""];
+		l5_TP -> l6_TP [color="black", label="[((__GLOBAL_TIME <= due) && due_set)]"];
+		l6_TP -> l7_TP [color="black", label="Q := true"];
+		l7_TP -> l8_TP [color="black", label="ET := (PT - (due - __GLOBAL_TIME))"];
+		l5_TP -> l9_TP [color="black", label="[ELSE]"];
+		l9_TP -> l10_TP [color="black", label="Q := false"];
+		l10_TP -> l11_TP [color="black", label="due_set := false"];
+		l11_TP -> l12_TP [color="black", label="[IN]"];
+		l12_TP -> l13_TP [color="black", label="ET := PT"];
+		l11_TP -> l14_TP [color="black", label="[ELSE]"];
+		l14_TP -> l15_TP [color="black", label="ET := 0"];
+		l13_TP -> l16_TP [color="black", label=""];
+		l15_TP -> l16_TP [color="black", label=""];
+		l8_TP -> l17_TP [color="black", label=""];
+		l16_TP -> l17_TP [color="black", label=""];
+		l17_TP -> l18_TP [color="black", label="old_in := IN"];
+	}
+	subgraph clusterVerificationLoop {
+		node [style="filled"];
+		style=bold;
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="VerificationLoop : VerificationLoopDS";
+		
+		annotations_pseudonode_VerificationLoop [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_VerificationLoop [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		end_VerificationLoop [label="end", color="black", fillcolor="cadetblue1", style=bold, shape="ellipse"];
+		loop_start_VerificationLoop [label="loop_start", color="black", fillcolor="white", shape="ellipse"];
+		prepare_BoC_VerificationLoop [label="prepare_BoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		l_main_call_VerificationLoop [label="l_main_call", color="black", fillcolor="white", shape="ellipse"];
+		callEnd_VerificationLoop [label="callEnd", color="black", fillcolor="white", shape="ellipse"];
+		prepare_EoC_VerificationLoop [label="prepare_EoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		init_VerificationLoop -> loop_start_VerificationLoop [color="black", label=""];
+		loop_start_VerificationLoop -> prepare_BoC_VerificationLoop [color="blue", label="T_CYCLE := NONDETERMINISTIC of signed int32\lBoC := true (*)\l"];
+		prepare_BoC_VerificationLoop -> l_main_call_VerificationLoop [color="blue", label="BoC := false (*)"];
+		l_main_call_VerificationLoop -> callEnd_VerificationLoop [color="black", label="CALL: SprayStationControl:instance(\l   IN:    OUT: )\l"];
+		callEnd_VerificationLoop -> prepare_EoC_VerificationLoop [color="blue", label="__GLOBAL_TIME := (__GLOBAL_TIME + T_CYCLE)\lEoC := true (*)\l"];
+		prepare_EoC_VerificationLoop -> loop_start_VerificationLoop [color="blue", label="EoC := false (*)"];
+		loop_start_VerificationLoop -> end_VerificationLoop [color="black", label="[false]"];
+	}
+}
+

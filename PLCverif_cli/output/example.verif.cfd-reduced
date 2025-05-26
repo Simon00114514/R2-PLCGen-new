@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfadeclaration:CfaNetworkDeclaration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cfadeclaration="cern.plcverif.base.models.cfa.cfadeclaration" xmlns:expr="cern.plcverif.base.models.expr" xmi:id="network" name="network" displayName="network" mainAutomaton="network_VerificationLoop">
+  <automata xmi:id="network_SprayStationControl" name="SprayStationControl" displayName="SprayStationControl" initialLocation="network_SprayStationControl_init" endLocation="network_SprayStationControl_l2">
+    <locations xmi:id="network_SprayStationControl_init" name="init" displayName="init" frozen="true" outgoing="network_SprayStationControl_t1"/>
+    <locations xmi:id="network_SprayStationControl_l1" name="l1" displayName="l1" incoming="network_SprayStationControl_t1" outgoing="network_SprayStationControl_t2 network_SprayStationControl_t3"/>
+    <locations xmi:id="network_SprayStationControl_l2" name="l2" displayName="l2" incoming="network_SprayStationControl_t11 network_SprayStationControl_t22 network_SprayStationControl_t34 network_SprayStationControl_t45 network_SprayStationControl_t36"/>
+    <locations xmi:id="network_SprayStationControl_l4" name="l4" displayName="l4" incoming="network_SprayStationControl_t3" outgoing="network_SprayStationControl_t12 network_SprayStationControl_t13"/>
+    <locations xmi:id="network_SprayStationControl_l6" name="l6" displayName="l6" incoming="network_SprayStationControl_t2" outgoing="network_SprayStationControl_t6 network_SprayStationControl_t8"/>
+    <locations xmi:id="network_SprayStationControl_l10" name="l10" displayName="l10" incoming="network_SprayStationControl_t8 network_SprayStationControl_t6" outgoing="network_SprayStationControl_t11"/>
+    <locations xmi:id="network_SprayStationControl_l12" name="l12" displayName="l12" incoming="network_SprayStationControl_t13" outgoing="network_SprayStationControl_t23 network_SprayStationControl_t24"/>
+    <locations xmi:id="network_SprayStationControl_l14" name="l14" displayName="l14" incoming="network_SprayStationControl_t12" outgoing="network_SprayStationControl_t16 network_SprayStationControl_t19"/>
+    <locations xmi:id="network_SprayStationControl_l16" name="l16" displayName="l16" incoming="network_SprayStationControl_t16" outgoing="network_SprayStationControl_t18"/>
+    <locations xmi:id="network_SprayStationControl_l17" name="l17" displayName="l17" incoming="network_SprayStationControl_t18" outgoing="network_SprayStationControl_t20"/>
+    <locations xmi:id="network_SprayStationControl_l19" name="l19" displayName="l19" incoming="network_SprayStationControl_t20 network_SprayStationControl_t19" outgoing="network_SprayStationControl_t22"/>
+    <locations xmi:id="network_SprayStationControl_l21" name="l21" displayName="l21" incoming="network_SprayStationControl_t24" outgoing="network_SprayStationControl_t35 network_SprayStationControl_t36"/>
+    <locations xmi:id="network_SprayStationControl_l23" name="l23" displayName="l23" incoming="network_SprayStationControl_t23" outgoing="network_SprayStationControl_t27 network_SprayStationControl_t31"/>
+    <locations xmi:id="network_SprayStationControl_l26" name="l26" displayName="l26" incoming="network_SprayStationControl_t27" outgoing="network_SprayStationControl_t30"/>
+    <locations xmi:id="network_SprayStationControl_l27" name="l27" displayName="l27" incoming="network_SprayStationControl_t30" outgoing="network_SprayStationControl_t32"/>
+    <locations xmi:id="network_SprayStationControl_l29" name="l29" displayName="l29" incoming="network_SprayStationControl_t32 network_SprayStationControl_t31" outgoing="network_SprayStationControl_t34"/>
+    <locations xmi:id="network_SprayStationControl_l33" name="l33" displayName="l33" incoming="network_SprayStationControl_t35" outgoing="network_SprayStationControl_t39 network_SprayStationControl_t42"/>
+    <locations xmi:id="network_SprayStationControl_l38" name="l38" displayName="l38" incoming="network_SprayStationControl_t42 network_SprayStationControl_t39" outgoing="network_SprayStationControl_t45"/>
+    <transitions xsi:type="cfadeclaration:CallTransition" xmi:id="network_SprayStationControl_t1" name="t1" displayName="t1" source="network_SprayStationControl_init" target="network_SprayStationControl_l1">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id0" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id1"/>
+      </condition>
+      <calls xmi:id="id2" calledAutomaton="network_TP">
+        <calleeContext xsi:type="cfadeclaration:FieldRef" xmi:id="id3" field="network__global_SprayStationControl_sprayDuration"/>
+        <inputAssignments xmi:id="id4">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id5" field="network__global_TP_IN"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id6" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id7"/>
+          </rightValue>
+        </inputAssignments>
+        <inputAssignments xmi:id="id8">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id9" field="network__global_TP_PT"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id10" value="3000">
+            <type xsi:type="expr:IntType" xmi:id="id11" signed="true" bits="32"/>
+          </rightValue>
+        </inputAssignments>
+      </calls>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t2" name="t2" displayName="t2" source="network_SprayStationControl_l1" target="network_SprayStationControl_l6">
+      <condition xsi:type="expr:ComparisonExpression" xmi:id="id12">
+        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id13" field="network__global_SprayStationControl_state"/>
+        <rightOperand xsi:type="expr:IntLiteral" xmi:id="id14" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id15" signed="true" bits="16"/>
+        </rightOperand>
+        <type xsi:type="expr:BoolType" xmi:id="id16"/>
+      </condition>
+      <assignments xmi:id="id17">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id18" field="network__global_SprayStationControl_Conveyor"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id19" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id20"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id21">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id22" field="network__global_SprayStationControl_Sprayer"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id23" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id24"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t3" name="t3" displayName="t3" source="network_SprayStationControl_l1" target="network_SprayStationControl_l4">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id25">
+        <operand xsi:type="expr:ComparisonExpression" xmi:id="id26">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id27" field="network__global_SprayStationControl_state"/>
+          <rightOperand xsi:type="expr:IntLiteral" xmi:id="id28" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id29" signed="true" bits="16"/>
+          </rightOperand>
+          <type xsi:type="expr:BoolType" xmi:id="id30"/>
+        </operand>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t6" name="t6" displayName="t6" source="network_SprayStationControl_l6" target="network_SprayStationControl_l10">
+      <condition xsi:type="expr:BinaryLogicExpression" xmi:id="id31">
+        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id32" field="network__global_SprayStationControl_Vehicle_Sensor"/>
+        <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id33">
+          <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id34" field="network__global_SprayStationControl_Stop_Button"/>
+        </rightOperand>
+      </condition>
+      <assignments xmi:id="id35">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id36" field="network__global_SprayStationControl_state"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id37" value="1">
+          <type xsi:type="expr:IntType" xmi:id="id38" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t8" name="t8" displayName="t8" source="network_SprayStationControl_l6" target="network_SprayStationControl_l10">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id39">
+        <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id40">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id41" field="network__global_SprayStationControl_Vehicle_Sensor"/>
+          <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id42">
+            <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id43" field="network__global_SprayStationControl_Stop_Button"/>
+          </rightOperand>
+        </operand>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t11" name="t11" displayName="t11" source="network_SprayStationControl_l10" target="network_SprayStationControl_l2">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id44" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id45"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t12" name="t12" displayName="t12" source="network_SprayStationControl_l4" target="network_SprayStationControl_l14">
+      <condition xsi:type="expr:ComparisonExpression" xmi:id="id46">
+        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id47" field="network__global_SprayStationControl_state"/>
+        <rightOperand xsi:type="expr:IntLiteral" xmi:id="id48" value="1">
+          <type xsi:type="expr:IntType" xmi:id="id49" signed="true" bits="16"/>
+        </rightOperand>
+        <type xsi:type="expr:BoolType" xmi:id="id50"/>
+      </condition>
+      <assignments xmi:id="id51">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id52" field="network__global_SprayStationControl_Conveyor"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id53" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id54"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id55">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id56" field="network__global_SprayStationControl_Sprayer"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id57" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id58"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t13" name="t13" displayName="t13" source="network_SprayStationControl_l4" target="network_SprayStationControl_l12">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id59">
+        <operand xsi:type="expr:ComparisonExpression" xmi:id="id60">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id61" field="network__global_SprayStationControl_state"/>
+          <rightOperand xsi:type="expr:IntLiteral" xmi:id="id62" value="1">
+            <type xsi:type="expr:IntType" xmi:id="id63" signed="true" bits="16"/>
+          </rightOperand>
+          <type xsi:type="expr:BoolType" xmi:id="id64"/>
+        </operand>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t16" name="t16" displayName="t16" source="network_SprayStationControl_l14" target="network_SprayStationControl_l16">
+      <condition xsi:type="cfadeclaration:FieldRef" xmi:id="id65" field="network__global_SprayStationControl_Spray_Button"/>
+      <assignments xmi:id="id66">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id67" field="network__global_SprayStationControl_state"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id68" value="2">
+          <type xsi:type="expr:IntType" xmi:id="id69" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:CallTransition" xmi:id="network_SprayStationControl_t18" name="t18" displayName="t18" source="network_SprayStationControl_l16" target="network_SprayStationControl_l17">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id70" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id71"/>
+      </condition>
+      <calls xmi:id="id72" calledAutomaton="network_TP">
+        <calleeContext xsi:type="cfadeclaration:FieldRef" xmi:id="id73" field="network__global_SprayStationControl_sprayDuration"/>
+        <inputAssignments xmi:id="id74">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id75" field="network__global_TP_IN"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id76" value="true">
+            <type xsi:type="expr:BoolType" xmi:id="id77"/>
+          </rightValue>
+        </inputAssignments>
+      </calls>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t19" name="t19" displayName="t19" source="network_SprayStationControl_l14" target="network_SprayStationControl_l19">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id78">
+        <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id79" field="network__global_SprayStationControl_Spray_Button"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t20" name="t20" displayName="t20" source="network_SprayStationControl_l17" target="network_SprayStationControl_l19">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id80" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id81"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t22" name="t22" displayName="t22" source="network_SprayStationControl_l19" target="network_SprayStationControl_l2">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id82" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id83"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t23" name="t23" displayName="t23" source="network_SprayStationControl_l12" target="network_SprayStationControl_l23">
+      <condition xsi:type="expr:ComparisonExpression" xmi:id="id84">
+        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id85" field="network__global_SprayStationControl_state"/>
+        <rightOperand xsi:type="expr:IntLiteral" xmi:id="id86" value="2">
+          <type xsi:type="expr:IntType" xmi:id="id87" signed="true" bits="16"/>
+        </rightOperand>
+        <type xsi:type="expr:BoolType" xmi:id="id88"/>
+      </condition>
+      <assignments xmi:id="id89">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id90" field="network__global_SprayStationControl_Conveyor"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id91" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id92"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id93">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id94" field="network__global_SprayStationControl_Sprayer"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id95" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id96"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t24" name="t24" displayName="t24" source="network_SprayStationControl_l12" target="network_SprayStationControl_l21">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id97">
+        <operand xsi:type="expr:ComparisonExpression" xmi:id="id98">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id99" field="network__global_SprayStationControl_state"/>
+          <rightOperand xsi:type="expr:IntLiteral" xmi:id="id100" value="2">
+            <type xsi:type="expr:IntType" xmi:id="id101" signed="true" bits="16"/>
+          </rightOperand>
+          <type xsi:type="expr:BoolType" xmi:id="id102"/>
+        </operand>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t27" name="t27" displayName="t27" source="network_SprayStationControl_l23" target="network_SprayStationControl_l26">
+      <condition xsi:type="cfadeclaration:FieldRef" xmi:id="id103" field="network__global_TP_Q">
+        <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id104" field="network__global_SprayStationControl_sprayDuration"/>
+      </condition>
+      <assignments xmi:id="id105">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id106" field="network__global_SprayStationControl_state"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id107" value="3">
+          <type xsi:type="expr:IntType" xmi:id="id108" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id109">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id110" field="network__global_SprayStationControl_resetSprayButton"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id111" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id112"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:CallTransition" xmi:id="network_SprayStationControl_t30" name="t30" displayName="t30" source="network_SprayStationControl_l26" target="network_SprayStationControl_l27">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id113" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id114"/>
+      </condition>
+      <calls xmi:id="id115" calledAutomaton="network_TP">
+        <calleeContext xsi:type="cfadeclaration:FieldRef" xmi:id="id116" field="network__global_SprayStationControl_sprayDuration"/>
+        <inputAssignments xmi:id="id117">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id118" field="network__global_TP_IN"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id119" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id120"/>
+          </rightValue>
+        </inputAssignments>
+      </calls>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t31" name="t31" displayName="t31" source="network_SprayStationControl_l23" target="network_SprayStationControl_l29">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id121">
+        <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id122" field="network__global_TP_Q">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id123" field="network__global_SprayStationControl_sprayDuration"/>
+        </operand>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t32" name="t32" displayName="t32" source="network_SprayStationControl_l27" target="network_SprayStationControl_l29">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id124" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id125"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t34" name="t34" displayName="t34" source="network_SprayStationControl_l29" target="network_SprayStationControl_l2">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id126" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id127"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t35" name="t35" displayName="t35" source="network_SprayStationControl_l21" target="network_SprayStationControl_l33">
+      <condition xsi:type="expr:ComparisonExpression" xmi:id="id128">
+        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id129" field="network__global_SprayStationControl_state"/>
+        <rightOperand xsi:type="expr:IntLiteral" xmi:id="id130" value="3">
+          <type xsi:type="expr:IntType" xmi:id="id131" signed="true" bits="16"/>
+        </rightOperand>
+        <type xsi:type="expr:BoolType" xmi:id="id132"/>
+      </condition>
+      <assignments xmi:id="id133">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id134" field="network__global_SprayStationControl_Conveyor"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id135" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id136"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id137">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id138" field="network__global_SprayStationControl_Sprayer"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id139" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id140"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t36" name="t36" displayName="t36" source="network_SprayStationControl_l21" target="network_SprayStationControl_l2">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id141">
+        <operand xsi:type="expr:ComparisonExpression" xmi:id="id142">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id143" field="network__global_SprayStationControl_state"/>
+          <rightOperand xsi:type="expr:IntLiteral" xmi:id="id144" value="3">
+            <type xsi:type="expr:IntType" xmi:id="id145" signed="true" bits="16"/>
+          </rightOperand>
+          <type xsi:type="expr:BoolType" xmi:id="id146"/>
+        </operand>
+      </condition>
+      <assignments xmi:id="id147">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id148" field="network__global_SprayStationControl_state"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id149" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id150" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t39" name="t39" displayName="t39" source="network_SprayStationControl_l33" target="network_SprayStationControl_l38">
+      <condition xsi:type="cfadeclaration:FieldRef" xmi:id="id151" field="network__global_SprayStationControl_resetSprayButton"/>
+      <assignments xmi:id="id152">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id153" field="network__global_SprayStationControl_resetSprayButton"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id154" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id155"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id156">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id157" field="network__global_SprayStationControl_state"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id158" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id159" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t42" name="t42" displayName="t42" source="network_SprayStationControl_l33" target="network_SprayStationControl_l38">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id160">
+        <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id161" field="network__global_SprayStationControl_resetSprayButton"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_SprayStationControl_t45" name="t45" displayName="t45" source="network_SprayStationControl_l38" target="network_SprayStationControl_l2">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id162" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id163"/>
+      </condition>
+    </transitions>
+    <localDataStructure xmi:id="id164" definition="network__global_SprayStationControl"/>
+  </automata>
+  <automata xmi:id="network_TP" name="TP" displayName="TP" initialLocation="network_TP_init" endLocation="network_TP_l18">
+    <locations xmi:id="network_TP_init" name="init" displayName="init" frozen="true" outgoing="network_TP_t1 network_TP_t4"/>
+    <locations xmi:id="network_TP_l5" name="l5" displayName="l5" incoming="network_TP_t4 network_TP_t1" outgoing="network_TP_t7 network_TP_t10"/>
+    <locations xmi:id="network_TP_l11" name="l11" displayName="l11" incoming="network_TP_t10" outgoing="network_TP_t13 network_TP_t15"/>
+    <locations xmi:id="network_TP_l16" name="l16" displayName="l16" incoming="network_TP_t13 network_TP_t15" outgoing="network_TP_t20"/>
+    <locations xmi:id="network_TP_l17" name="l17" displayName="l17" incoming="network_TP_t20 network_TP_t7" outgoing="network_TP_t21"/>
+    <locations xmi:id="network_TP_l18" name="l18" displayName="l18" incoming="network_TP_t21"/>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t1" name="t1" displayName="t1" source="network_TP_init" target="network_TP_l5">
+      <condition xsi:type="expr:BinaryLogicExpression" xmi:id="id165">
+        <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id166">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id167" field="network__global_TP_IN"/>
+          <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id168">
+            <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id169" field="network__global_TP_old_in"/>
+          </rightOperand>
+        </leftOperand>
+        <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id170">
+          <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id171" field="network__global_TP_Q"/>
+        </rightOperand>
+      </condition>
+      <assignments xmi:id="id172">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id173" field="network__global_TP_due"/>
+        <rightValue xsi:type="expr:BinaryArithmeticExpression" xmi:id="id174">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id175" field="network__global___GLOBAL_TIME"/>
+          <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id176" field="network__global_TP_PT"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id177">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id178" field="network__global_TP_due_set"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id179" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id180"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t4" name="t4" displayName="t4" source="network_TP_init" target="network_TP_l5">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id181">
+        <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id182">
+          <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id183">
+            <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id184" field="network__global_TP_IN"/>
+            <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id185">
+              <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id186" field="network__global_TP_old_in"/>
+            </rightOperand>
+          </leftOperand>
+          <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id187">
+            <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id188" field="network__global_TP_Q"/>
+          </rightOperand>
+        </operand>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t7" name="t7" displayName="t7" source="network_TP_l5" target="network_TP_l17">
+      <condition xsi:type="expr:BinaryLogicExpression" xmi:id="id189">
+        <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id190" operator="LESS_EQ">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id191" field="network__global___GLOBAL_TIME"/>
+          <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id192" field="network__global_TP_due"/>
+          <type xsi:type="expr:BoolType" xmi:id="id193"/>
+        </leftOperand>
+        <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id194" field="network__global_TP_due_set"/>
+      </condition>
+      <assignments xmi:id="id195">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id196" field="network__global_TP_Q"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id197" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id198"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id199">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id200" field="network__global_TP_ET"/>
+        <rightValue xsi:type="expr:BinaryArithmeticExpression" xmi:id="id201" operator="MINUS">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id202" field="network__global_TP_PT"/>
+          <rightOperand xsi:type="expr:BinaryArithmeticExpression" xmi:id="id203" operator="MINUS">
+            <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id204" field="network__global_TP_due"/>
+            <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id205" field="network__global___GLOBAL_TIME"/>
+          </rightOperand>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t10" name="t10" displayName="t10" source="network_TP_l5" target="network_TP_l11">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id206">
+        <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id207">
+          <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id208" operator="LESS_EQ">
+            <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id209" field="network__global___GLOBAL_TIME"/>
+            <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id210" field="network__global_TP_due"/>
+            <type xsi:type="expr:BoolType" xmi:id="id211"/>
+          </leftOperand>
+          <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id212" field="network__global_TP_due_set"/>
+        </operand>
+      </condition>
+      <assignments xmi:id="id213">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id214" field="network__global_TP_Q"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id215" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id216"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id217">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id218" field="network__global_TP_due_set"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id219" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id220"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t13" name="t13" displayName="t13" source="network_TP_l11" target="network_TP_l16">
+      <condition xsi:type="cfadeclaration:FieldRef" xmi:id="id221" field="network__global_TP_IN"/>
+      <assignments xmi:id="id222">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id223" field="network__global_TP_ET"/>
+        <rightValue xsi:type="cfadeclaration:FieldRef" xmi:id="id224" field="network__global_TP_PT"/>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t15" name="t15" displayName="t15" source="network_TP_l11" target="network_TP_l16">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id225">
+        <operand xsi:type="cfadeclaration:FieldRef" xmi:id="id226" field="network__global_TP_IN"/>
+      </condition>
+      <assignments xmi:id="id227">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id228" field="network__global_TP_ET"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id229" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id230" signed="true" bits="32"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t20" name="t20" displayName="t20" source="network_TP_l16" target="network_TP_l17">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id231" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id232"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_TP_t21" name="t21" displayName="t21" source="network_TP_l17" target="network_TP_l18">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id233" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id234"/>
+      </condition>
+      <assignments xmi:id="id235">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id236" field="network__global_TP_old_in"/>
+        <rightValue xsi:type="cfadeclaration:FieldRef" xmi:id="id237" field="network__global_TP_IN"/>
+      </assignments>
+    </transitions>
+    <localDataStructure xmi:id="id238" definition="network__global_TP"/>
+  </automata>
+  <automata xmi:id="network_VerificationLoop" name="VerificationLoop" displayName="VerificationLoop" initialLocation="network_VerificationLoop_init" endLocation="network_VerificationLoop_end">
+    <locations xmi:id="network_VerificationLoop_init" name="init" displayName="init" frozen="true" outgoing="network_VerificationLoop_t_params"/>
+    <locations xmi:id="network_VerificationLoop_end" name="end" displayName="end" frozen="true" incoming="network_VerificationLoop_end1"/>
+    <locations xmi:id="network_VerificationLoop_loop_start" name="loop_start" displayName="loop_start" incoming="network_VerificationLoop_t_params network_VerificationLoop_restart" outgoing="network_VerificationLoop_set_BoC network_VerificationLoop_end1"/>
+    <locations xmi:id="network_VerificationLoop_prepare_BoC" name="prepare_BoC" displayName="prepare_BoC" frozen="true" incoming="network_VerificationLoop_set_BoC" outgoing="network_VerificationLoop_t_inputs"/>
+    <locations xmi:id="network_VerificationLoop_l_main_call" name="l_main_call" displayName="l_main_call" incoming="network_VerificationLoop_t_inputs" outgoing="network_VerificationLoop_main_call"/>
+    <locations xmi:id="network_VerificationLoop_callEnd" name="callEnd" displayName="callEnd" incoming="network_VerificationLoop_main_call" outgoing="network_VerificationLoop_set_EoC"/>
+    <locations xmi:id="network_VerificationLoop_prepare_EoC" name="prepare_EoC" displayName="prepare_EoC" frozen="true" incoming="network_VerificationLoop_set_EoC" outgoing="network_VerificationLoop_restart"/>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_t_params" name="t_params" displayName="t_params" source="network_VerificationLoop_init" target="network_VerificationLoop_loop_start">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id239" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id240"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_set_BoC" name="set_BoC" displayName="set_BoC" frozen="true" source="network_VerificationLoop_loop_start" target="network_VerificationLoop_prepare_BoC">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id241" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id242"/>
+      </condition>
+      <assignments xmi:id="id243">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id244" field="network__global_T_CYCLE"/>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id245">
+          <type xsi:type="expr:IntType" xmi:id="id246" signed="true" bits="32"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id247" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id248" frozen="true" field="network__global_BoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id249" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id250"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_t_inputs" name="t_inputs" displayName="t_inputs" frozen="true" source="network_VerificationLoop_prepare_BoC" target="network_VerificationLoop_l_main_call">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id251" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id252"/>
+      </condition>
+      <assignments xmi:id="id253" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id254" frozen="true" field="network__global_BoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id255" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id256"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:CallTransition" xmi:id="network_VerificationLoop_main_call" name="main_call" displayName="main_call" source="network_VerificationLoop_l_main_call" target="network_VerificationLoop_callEnd">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id257" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id258"/>
+      </condition>
+      <calls xmi:id="id259" calledAutomaton="network_SprayStationControl">
+        <calleeContext xsi:type="cfadeclaration:FieldRef" xmi:id="id260" field="network__global_instance"/>
+      </calls>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_set_EoC" name="set_EoC" displayName="set_EoC" frozen="true" source="network_VerificationLoop_callEnd" target="network_VerificationLoop_prepare_EoC">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id261" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id262"/>
+      </condition>
+      <assignments xmi:id="id263">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id264" field="network__global___GLOBAL_TIME"/>
+        <rightValue xsi:type="expr:BinaryArithmeticExpression" xmi:id="id265">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id266" field="network__global___GLOBAL_TIME"/>
+          <rightOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id267" field="network__global_T_CYCLE"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id268" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id269" frozen="true" field="network__global_EoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id270" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id271"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_restart" name="restart" displayName="restart" frozen="true" source="network_VerificationLoop_prepare_EoC" target="network_VerificationLoop_loop_start">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id272" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id273"/>
+      </condition>
+      <assignments xmi:id="id274" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id275" frozen="true" field="network__global_EoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id276" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id277"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_end1" name="end1" displayName="end" source="network_VerificationLoop_loop_start" target="network_VerificationLoop_end">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id278" value="false">
+        <type xsi:type="expr:BoolType" xmi:id="id279"/>
+      </condition>
+    </transitions>
+    <localDataStructure xmi:id="id280" definition="network__global_VerificationLoopDS"/>
+  </automata>
+  <rootDataStructure xmi:id="network__global" name="_global" displayName="_global">
+    <fields xmi:id="network__global___GLOBAL_TIME" name="__GLOBAL_TIME" displayName="__GLOBAL_TIME">
+      <type xsi:type="expr:IntType" xmi:id="id281" signed="true" bits="32"/>
+      <initialAssignments xmi:id="id282">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id283" field="network__global___GLOBAL_TIME"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id284" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id285" signed="true" bits="32"/>
+        </rightValue>
+      </initialAssignments>
+      <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id286" direction="LOCAL"/>
+      <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id287" plcDataType="TIME"/>
+    </fields>
+    <fields xmi:id="network__global_instance" name="instance" displayName="instance">
+      <type xsi:type="cfadeclaration:DataStructureRef" xmi:id="id288" definition="network__global_SprayStationControl"/>
+    </fields>
+    <fields xmi:id="network__global_T_CYCLE" name="T_CYCLE" displayName="T_CYCLE">
+      <type xsi:type="expr:IntType" xmi:id="id289" signed="true" bits="32"/>
+      <initialAssignments xmi:id="id290">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id291" field="network__global_T_CYCLE"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id292" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id293" signed="true" bits="32"/>
+        </rightValue>
+      </initialAssignments>
+      <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id294"/>
+    </fields>
+    <fields xmi:id="network__global_verificationLoop" name="verificationLoop" displayName="verificationLoop">
+      <type xsi:type="cfadeclaration:DataStructureRef" xmi:id="id295" definition="network__global_VerificationLoopDS"/>
+    </fields>
+    <fields xmi:id="network__global_EoC" name="EoC" displayName="EoC" frozen="true">
+      <type xsi:type="expr:BoolType" xmi:id="id296"/>
+      <initialAssignments xmi:id="id297">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id298" field="network__global_EoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id299" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id300"/>
+        </rightValue>
+      </initialAssignments>
+      <annotations xsi:type="cfadeclaration:InternalGeneratedFieldAnnotation" xmi:id="id301"/>
+    </fields>
+    <fields xmi:id="network__global_BoC" name="BoC" displayName="BoC" frozen="true">
+      <type xsi:type="expr:BoolType" xmi:id="id302"/>
+      <initialAssignments xmi:id="id303">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id304" field="network__global_BoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id305" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id306"/>
+        </rightValue>
+      </initialAssignments>
+      <annotations xsi:type="cfadeclaration:InternalGeneratedFieldAnnotation" xmi:id="id307"/>
+    </fields>
+    <complexTypes xmi:id="network__global_SprayStationControl" name="SprayStationControl" displayName="SprayStationControl">
+      <fields xmi:id="network__global_SprayStationControl_state" name="state" displayName="state">
+        <type xsi:type="expr:IntType" xmi:id="id308" signed="true" bits="16"/>
+        <initialAssignments xmi:id="id309">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id310" field="network__global_SprayStationControl_state"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id311" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id312" signed="true" bits="16"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id313" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id314" plcDataType="INT"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_prevState" name="prevState" displayName="prevState">
+        <type xsi:type="expr:IntType" xmi:id="id315" signed="true" bits="16"/>
+        <initialAssignments xmi:id="id316">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id317" field="network__global_SprayStationControl_prevState"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id318" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id319" signed="true" bits="16"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id320" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id321" plcDataType="INT"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_Vehicle_Sensor" name="Vehicle_Sensor" displayName="Vehicle_Sensor">
+        <type xsi:type="expr:BoolType" xmi:id="id322"/>
+        <initialAssignments xmi:id="id323">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id324" field="network__global_SprayStationControl_Vehicle_Sensor"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id325" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id326"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id327" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id328" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_Spray_Button" name="Spray_Button" displayName="Spray_Button">
+        <type xsi:type="expr:BoolType" xmi:id="id329"/>
+        <initialAssignments xmi:id="id330">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id331" field="network__global_SprayStationControl_Spray_Button"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id332" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id333"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id334" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id335" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_Stop_Button" name="Stop_Button" displayName="Stop_Button">
+        <type xsi:type="expr:BoolType" xmi:id="id336"/>
+        <initialAssignments xmi:id="id337">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id338" field="network__global_SprayStationControl_Stop_Button"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id339" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id340"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id341" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id342" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_Conveyor" name="Conveyor" displayName="Conveyor">
+        <type xsi:type="expr:BoolType" xmi:id="id343"/>
+        <initialAssignments xmi:id="id344">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id345" field="network__global_SprayStationControl_Conveyor"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id346" value="true">
+            <type xsi:type="expr:BoolType" xmi:id="id347"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id348" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id349" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_Sprayer" name="Sprayer" displayName="Sprayer">
+        <type xsi:type="expr:BoolType" xmi:id="id350"/>
+        <initialAssignments xmi:id="id351">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id352" field="network__global_SprayStationControl_Sprayer"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id353" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id354"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id355" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id356" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_resetSprayButton" name="resetSprayButton" displayName="resetSprayButton">
+        <type xsi:type="expr:BoolType" xmi:id="id357"/>
+        <initialAssignments xmi:id="id358">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id359" field="network__global_SprayStationControl_resetSprayButton"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id360" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id361"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id362" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id363" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_SprayStationControl_sprayDuration" name="sprayDuration" displayName="sprayDuration">
+        <type xsi:type="cfadeclaration:DataStructureRef" xmi:id="id364" definition="network__global_TP"/>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id365" direction="LOCAL"/>
+      </fields>
+    </complexTypes>
+    <complexTypes xmi:id="network__global_TP" name="TP" displayName="TP">
+      <fields xmi:id="network__global_TP_PT" name="PT" displayName="PT">
+        <type xsi:type="expr:IntType" xmi:id="id366" signed="true" bits="32"/>
+        <initialAssignments xmi:id="id367">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id368" field="network__global_TP_PT"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id369" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id370" signed="true" bits="32"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id371"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id372" plcDataType="TIME"/>
+      </fields>
+      <fields xmi:id="network__global_TP_IN" name="IN" displayName="IN">
+        <type xsi:type="expr:BoolType" xmi:id="id373"/>
+        <initialAssignments xmi:id="id374">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id375" field="network__global_TP_IN"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id376" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id377"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id378"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id379" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_TP_Q" name="Q" displayName="Q">
+        <type xsi:type="expr:BoolType" xmi:id="id380"/>
+        <initialAssignments xmi:id="id381">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id382" field="network__global_TP_Q"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id383" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id384"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id385" direction="OUTPUT"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id386" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_TP_ET" name="ET" displayName="ET">
+        <type xsi:type="expr:IntType" xmi:id="id387" signed="true" bits="32"/>
+        <initialAssignments xmi:id="id388">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id389" field="network__global_TP_ET"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id390" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id391" signed="true" bits="32"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id392" direction="OUTPUT"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id393" plcDataType="TIME"/>
+      </fields>
+      <fields xmi:id="network__global_TP_old_in" name="old_in" displayName="old_in">
+        <type xsi:type="expr:BoolType" xmi:id="id394"/>
+        <initialAssignments xmi:id="id395">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id396" field="network__global_TP_old_in"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id397" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id398"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id399" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id400" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_TP_due_set" name="due_set" displayName="due_set">
+        <type xsi:type="expr:BoolType" xmi:id="id401"/>
+        <initialAssignments xmi:id="id402">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id403" field="network__global_TP_due_set"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id404" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id405"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id406" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id407" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_TP_due" name="due" displayName="due">
+        <type xsi:type="expr:IntType" xmi:id="id408" signed="true" bits="32"/>
+        <initialAssignments xmi:id="id409">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id410" field="network__global_TP_due"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id411" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id412" signed="true" bits="32"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id413" direction="LOCAL"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id414" plcDataType="TIME"/>
+      </fields>
+    </complexTypes>
+    <complexTypes xmi:id="network__global_VerificationLoopDS" name="VerificationLoopDS" displayName="VerificationLoopDS"/>
+  </rootDataStructure>
+  <mainContext xsi:type="cfadeclaration:FieldRef" xmi:id="id415" field="network__global_verificationLoop"/>
+</cfadeclaration:CfaNetworkDeclaration>

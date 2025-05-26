@@ -1,0 +1,19 @@
+Agent: Task: Create a self-contained function block named ABS_VALUE in IEC 61131-3 that takes a numerical input and produces its absolute value, ensuring the output is always zero or positive.
+
+Retrieved Information: In IEC 61131-3 Structured Text, function blocks can encapsulate logic by declaring input and output variables. To compute an absolute value, the code checks if the input is negative; if so, it multiplies it by -1, otherwise it passes the input directly. This guarantees the output is always greater than or equal to 0.
+
+Coding Plan:
+Task 1: Define the function block:
+ • Create a function block named ABS_VALUE.
+Task 2: Declare variables:
+ • Inside the function block, declare an input variable (e.g., X) that holds the numeric value (preferably of type REAL).
+ • Declare an output variable (e.g., Y) that will return the absolute value (type REAL).
+Task 3: Implement the absolute value logic:
+ • Use an IF statement to check if X is less than 0.
+  – If true, assign Y the value of -X.
+  – Otherwise, assign Y the value of X.
+Task 4: Finalize the function block:
+ • Close the IF statement and complete the function block definition.
+ • Ensure the function block is self-contained so it can be instantiated directly in a PLC program.
+
+This coding plan provides a clear set of steps to implement a self-contained function block that calculates the absolute value according to IEC 61131-3 standards.

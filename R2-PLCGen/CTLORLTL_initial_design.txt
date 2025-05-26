@@ -1,0 +1,11 @@
+约束：
+1. 行人按钮按下时，如果没有来车且当前是红灯，则切换为绿灯
+AG(pedestrianButtonPressed & !vehicleDetected & light_red -> AX(light_green))
+2.检测到来车时，立即切换为黄灯，然后切换为红灯
+AG((vehicleDetected -> AX(light_yellow)) -> AF(light_red))
+3.交通灯正常周期切换（绿->黄->红）
+AG(light_green -> AF(light_yellow)) & AG(light_yellow -> AF(light_red)) & AG(light_red -> AF(light_green))
+4.同时只存在一个灯开启
+AG(!(light_red & light_green) & !(light_red & light_yellow) & !(light_green & light_yellow))
+5. 紧急来车优先级高于行人按钮
+AG(Emergen_vehicleDetected & pedestrianButtonPressed -> AX(light_red))

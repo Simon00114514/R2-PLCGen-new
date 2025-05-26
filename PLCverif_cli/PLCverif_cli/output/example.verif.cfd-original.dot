@@ -1,0 +1,140 @@
+digraph G {
+	subgraph cluster__global1316928159 {
+		node [shape="folder", style="filled"];
+		//label="_global";
+		_global1316928159 [label="_global"];
+		_global1316928159 -> instance1436434279;
+		instance1436434279 [label = "(F) instance : _global/ConveyorBeltControl", fillcolor="white" ];
+		_global1316928159 -> verificationLoop1330798099;
+		verificationLoop1330798099 [label = "(F) verificationLoop : _global/VerificationLoopDS", fillcolor="white" , peripheries=2];
+		_global1316928159 -> EoC776817954;
+		EoC776817954 [label = "(F) EoC : bool", fillcolor="white" ];
+		_global1316928159 -> BoC2002534484;
+		BoC2002534484 [label = "(F) BoC : bool", fillcolor="white" ];
+		_global1316928159 -> ConveyorBeltControl771169248;
+		subgraph cluster_ConveyorBeltControl771169248 {
+			node [shape="folder", style="filled"];
+			//label="ConveyorBeltControl";
+			ConveyorBeltControl771169248 [label="ConveyorBeltControl"];
+			ConveyorBeltControl771169248 -> Start314462083;
+			Start314462083 [label = "(F) Start : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> StopStation1239817939;
+			StopStation1239817939 [label = "(F) StopStation1 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> StopStation2912677905;
+			StopStation2912677905 [label = "(F) StopStation2 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> StopStation3385635874;
+			StopStation3385635874 [label = "(F) StopStation3 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> Sensor11900806101;
+			Sensor11900806101 [label = "(F) Sensor1 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> Sensor21791604331;
+			Sensor21791604331 [label = "(F) Sensor2 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> Sensor31122108119;
+			Sensor31122108119 [label = "(F) Sensor3 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> Sensor41289092166;
+			Sensor41289092166 [label = "(F) Sensor4 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> Sensor5211992147;
+			Sensor5211992147 [label = "(F) Sensor5 : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> BeltActive1608757336;
+			BeltActive1608757336 [label = "(F) BeltActive : bool", fillcolor="white" ];
+			ConveyorBeltControl771169248 -> BeltSpeed320706431;
+			BeltSpeed320706431 [label = "(F) BeltSpeed : signed int16", fillcolor="white" ];
+			
+			annotations_pseudonode_ConveyorBeltControl771169248 [
+				label="ANNOTATIONS\lStart : direction=INPUT\lStart : PLC type=BOOL\lStopStation1 : direction=INPUT\lStopStation1 : PLC type=BOOL\lStopStation2 : direction=INPUT\lStopStation2 : PLC type=BOOL\lStopStation3 : direction=INPUT\lStopStation3 : PLC type=BOOL\lSensor1 : direction=INPUT\lSensor1 : PLC type=BOOL\lSensor2 : direction=INPUT\lSensor2 : PLC type=BOOL\lSensor3 : direction=INPUT\lSensor3 : PLC type=BOOL\lSensor4 : direction=INPUT\lSensor4 : PLC type=BOOL\lSensor5 : direction=INPUT\lSensor5 : PLC type=BOOL\lBeltActive : direction=OUTPUT\lBeltActive : PLC type=BOOL\lBeltSpeed : direction=OUTPUT\lBeltSpeed : PLC type=INT\l",
+				fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+			initamt_pseudonode_ConveyorBeltControl771169248 [
+				label="INITIAL\lStart := false\lStopStation1 := false\lStopStation2 := false\lStopStation3 := false\lSensor1 := false\lSensor2 := false\lSensor3 := false\lSensor4 := false\lSensor5 := false\lBeltActive := false\lBeltSpeed := 0\l",
+				fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+		}
+		_global1316928159 -> VerificationLoopDS953107607;
+		subgraph cluster_VerificationLoopDS953107607 {
+			node [shape="folder", style="filled"];
+			//label="VerificationLoopDS";
+			VerificationLoopDS953107607 [label="VerificationLoopDS"];
+			
+			annotations_pseudonode_VerificationLoopDS953107607 [
+				label="ANNOTATIONS",
+				fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+			initamt_pseudonode_VerificationLoopDS953107607 [
+				label="INITIAL",
+				fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+		}
+		
+		annotations_pseudonode__global1316928159 [
+			label="ANNOTATIONS\lEoC : generated\lBoC : generated\l",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		initamt_pseudonode__global1316928159 [
+			label="INITIAL\lEoC := false\lBoC := false\l",
+			fontsize=9, margin="0.04,0.04", fillcolor="lightyellow", shape="rectangle", style="dashed"];
+	}
+	subgraph clusterConveyorBeltControl {
+		node [style="filled"];
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="ConveyorBeltControl : ConveyorBeltControl";
+		
+		annotations_pseudonode_ConveyorBeltControl [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_ConveyorBeltControl [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		l1_ConveyorBeltControl [label="l1", color="black", fillcolor="white", shape="ellipse"];
+		l2_ConveyorBeltControl [label="l2", color="black", fillcolor="white", shape="ellipse"];
+		l3_ConveyorBeltControl [label="l3", color="black", fillcolor="white", shape="ellipse"];
+		l4_ConveyorBeltControl [label="l4", color="black", fillcolor="white", shape="ellipse"];
+		l5_ConveyorBeltControl [label="l5", color="black", fillcolor="white", shape="ellipse"];
+		l6_ConveyorBeltControl [label="l6", color="black", fillcolor="white", shape="ellipse"];
+		l7_ConveyorBeltControl [label="l7", color="black", fillcolor="white", shape="ellipse"];
+		l8_ConveyorBeltControl [label="l8", color="black", fillcolor="white", shape="ellipse"];
+		l9_ConveyorBeltControl [label="l9", color="black", fillcolor="white", shape="ellipse"];
+		l10_ConveyorBeltControl [label="l10", color="black", fillcolor="white", shape="ellipse"];
+		l11_ConveyorBeltControl [label="l11", color="black", fillcolor="white", shape="ellipse"];
+		l12_ConveyorBeltControl [label="l12", color="black", fillcolor="white", style=bold, shape="ellipse"];
+		init_ConveyorBeltControl -> l1_ConveyorBeltControl [color="black", label="[(((StopStation1 = true) || (StopStation2 = true))\l || (StopStation3 = true))]\l"];
+		l1_ConveyorBeltControl -> l2_ConveyorBeltControl [color="black", label="BeltActive := false"];
+		init_ConveyorBeltControl -> l3_ConveyorBeltControl [color="black", label="[((! (((StopStation1 = true) || (StopStation2 = tr\lue)) || (StopStation3 = true))) && ((Start = true)\l && (((((Sensor1 = true) || (Sensor2 = true)) || (\lSensor3 = true)) || (Sensor4 = true)) || (Sensor5 \l= true))))]\l"];
+		l3_ConveyorBeltControl -> l4_ConveyorBeltControl [color="black", label="BeltActive := true"];
+		init_ConveyorBeltControl -> l5_ConveyorBeltControl [color="black", label="[ELSE]"];
+		l5_ConveyorBeltControl -> l6_ConveyorBeltControl [color="black", label="BeltActive := false"];
+		l2_ConveyorBeltControl -> l7_ConveyorBeltControl [color="black", label=""];
+		l4_ConveyorBeltControl -> l7_ConveyorBeltControl [color="black", label=""];
+		l6_ConveyorBeltControl -> l7_ConveyorBeltControl [color="black", label=""];
+		l7_ConveyorBeltControl -> l8_ConveyorBeltControl [color="black", label="[(BeltActive = true)]"];
+		l8_ConveyorBeltControl -> l9_ConveyorBeltControl [color="black", label="BeltSpeed := 2"];
+		l7_ConveyorBeltControl -> l10_ConveyorBeltControl [color="black", label="[ELSE]"];
+		l10_ConveyorBeltControl -> l11_ConveyorBeltControl [color="black", label="BeltSpeed := 0"];
+		l9_ConveyorBeltControl -> l12_ConveyorBeltControl [color="black", label=""];
+		l11_ConveyorBeltControl -> l12_ConveyorBeltControl [color="black", label=""];
+	}
+	subgraph clusterVerificationLoop {
+		node [style="filled"];
+		style=bold;
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="VerificationLoop : VerificationLoopDS";
+		
+		annotations_pseudonode_VerificationLoop [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_VerificationLoop [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		end_VerificationLoop [label="end", color="black", fillcolor="cadetblue1", style=bold, shape="ellipse"];
+		loop_start_VerificationLoop [label="loop_start", color="black", fillcolor="white", shape="ellipse"];
+		prepare_BoC_VerificationLoop [label="prepare_BoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		l_main_call_VerificationLoop [label="l_main_call", color="black", fillcolor="white", shape="ellipse"];
+		callEnd_VerificationLoop [label="callEnd", color="black", fillcolor="white", shape="ellipse"];
+		prepare_EoC_VerificationLoop [label="prepare_EoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		init_VerificationLoop -> loop_start_VerificationLoop [color="black", label=""];
+		loop_start_VerificationLoop -> prepare_BoC_VerificationLoop [color="blue", label="instance/Sensor1 := NONDETERMINISTIC of bool\linstance/Sensor2 := NONDETERMINISTIC of bool\linstance/Sensor3 := NONDETERMINISTIC of bool\linstance/Sensor4 := NONDETERMINISTIC of bool\linstance/Sensor5 := NONDETERMINISTIC of bool\linstance/Start := NONDETERMINISTIC of bool\linstance/StopStation1 := NONDETERMINISTIC of bool\linstance/StopStation2 := NONDETERMINISTIC of bool\linstance/StopStation3 := NONDETERMINISTIC of bool\lBoC := true (*)\l"];
+		prepare_BoC_VerificationLoop -> l_main_call_VerificationLoop [color="blue", label="BoC := false (*)"];
+		l_main_call_VerificationLoop -> callEnd_VerificationLoop [color="black", label="CALL: ConveyorBeltControl:instance(\l   IN:    OUT: )\l"];
+		callEnd_VerificationLoop -> prepare_EoC_VerificationLoop [color="blue", label="EoC := true (*)"];
+		prepare_EoC_VerificationLoop -> loop_start_VerificationLoop [color="blue", label="EoC := false (*)"];
+		loop_start_VerificationLoop -> end_VerificationLoop [color="black", label="[false]"];
+	}
+}
+

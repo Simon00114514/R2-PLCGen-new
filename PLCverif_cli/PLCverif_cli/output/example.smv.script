@@ -1,0 +1,6 @@
+set on_failure_script_quits
+set traces_hiding_prefix ___
+set default_trace_plugin 1
+go
+check_ctlspec -o "D:\project\PLCGEN-MIL\PLCverif_cli\PLCverif_cli\output\example.smv.cex"
+quit

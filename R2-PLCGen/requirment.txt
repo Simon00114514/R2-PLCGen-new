@@ -1,0 +1,7 @@
+Write a standalone 61131-3 Structured Text program, not a function block, to control a traffic light system. The system should respond to pedestrian button presses and the presence of emergency vehicles, granting them priority.
+Constraints:
+1.When the pedestrian button is pressed, if there are no approaching vehicles and the current light is red, switch to green.
+2.When an approaching vehicle is detected, immediately switch to yellow, then to red.
+3.The traffic lights should cycle normally (green -> yellow -> red).
+4.Only one light should be on at any given time.
+5.Emergency vehicles have higher priority than pedestrian button presses.

@@ -1,0 +1,157 @@
+Three ST code structures follows:
+
+1.FUNCTION_BLOCK Structure:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+FUNCTION_BLOCK name
+VAR_INPUT
+END_VAR
+
+VAR_OUTPUT
+
+END_VAR
+
+VAR
+
+END_VAR
+
+(* code *)
+
+END_FUNCTION_BLOCK
+
+
+2.PROGRAM Structure:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+PROGRAM name
+VAR_INPUT
+END_VAR
+
+VAR_OUTPUT
+
+END_VAR
+
+VAR
+
+END_VAR
+
+(* code *)
+
+END_PROGRAM
+
+3.FUNCTION Structure:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+FUNCTION name
+VAR_INPUT
+END_VAR
+
+VAR_OUTPUT
+(* DEFINE OUTPUT VARIABLES)
+END_VAR
+
+VAR
+(* DEFINE OUTPUT VARIABLES)
+END_VAR
+
+(* code *)
+
+END_FUNCTION
+
+[ATTENTION! ALWAYS REMEMBER THIS!]
+IF
+(* CASE PART)
+END_IF; [CANNOT IGNORE 'END_IF;' WHILE USING 'IF', ALSO, CANNOT IGNORE 'ELSE' WHILE USING 'IF', YOU HAVE TO LIST ALL THE POSSIBILITIES]
+[ATTENTION! ALWAYS REMEMBER THIS!]
+CONST
+(* DEFINE CONST VARIABLE)
+END_CONST [CANNOT IGNORE 'END_CONST;' WHILE USING 'CONST']
+
+
+[Code Design Guidelines]
+4.IF-ELSE and FOR Structures:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+IF
+(* code) [NEVER USE 'BEGIN','END' IN THIS BLOCK]
+ELSE
+(* code) [NEVER USE 'BEGIN','END' IN THIS BLOCK]
+END_IF;
+[NEVER IGNORE ";" AT THE END OF "END_IF"]
+
+FOR
+(* code) [NEVER USE 'BEGIN','END' IN THIS BLOCK]
+END_FOR;
+[NEVER IGNORE ";" AT THE END OF "END_FOR"]
+
+
+5.IF-THEN-ELSE Structure:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+IF objectDetected = TRUE(REMEMBER TO ADD 'TRUE' OR 'FALSE' WHILE USING 'IF + bool TYPE variables') THEN
+    (* IF VARIABLE = TRUE OR FALSE, PROCEED STEP 1 *)
+ELSE
+    (* ELSE SITUATION, PROCEED STEP 2 *)
+END_IF;
+
+[EXAMPLE]:
+    IF NOT objectDetected = TRUE OR userStopRequest = TRUE THEN
+        currentState := 3; (* If no object detected or user requests stop, transition to stop state *)
+    END_IF;
+
+6.CASE Structure:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+CASE state OF
+...
+END_CASE;
+(* NEVER FORGET ";" AT THE END OF "END_CASE")
+
+[Naming Problems warning!]
+7.FUNCTION and PROGRAM Naming:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+FUNCTION MyABS : REAL
+...
+END_FUNCTION
+(* DEFINITION OF FUNCTION MUST NOT BE IN PROGRAM)
+
+PROGRAM TemperatureControl
+...
+END_PROGRAM
+(NEVER USE ";" BEHIND "END_PROGRAM" AND NEVER FORGET TO ADD "END_PROGRAM" WHILE USING "PROGRAM")
+
+[Special Warnings]
+8.General Guidelines:
+[ATTENTION! ALWAYS REMEMBER THIS!]
+(1)NEVER USE ANY FUNCTION BLOCK/VARIABLES/... WITHOUT DEFINING!
+(2)NEVER USE "BEGIN...END" IN "CASE...END_CASE"
+(3)WHEN DEFINING A NEW VARIABLE, DEFINE IT IN 'VAR...END_VAR' OR 'VAR_INPUT...END_VAR' OR 'VAR_OUTPUT...END_VAR'
+(4)DO NOT USE ";" BEHIND "END_PROGRAM"!
+(5)NEVER USE "dt" AS A NAME OF A VARIABLE! AND NEVER GIVE A VARIABLE NAME AS: "timer"!
+(6)IN ST LANGUAGE, NEVER USE FUNCTIONS LIKE: 'TO_REAL', 'ABS', 'LIMIT' WITHOUT DEFINING FIRST, MAKE SURE "DEFINE FIRST, USE SECOND"!
+(7)NEVER USE 'STRING' TYPE VARIABLES IN YOUR CODE!
+(8)USE "ELSIF" WHILE USING "IF...END_IF;" , NOT "ELSEIF"!
+(9)NEVER USE "METHOD" AS A NAME OF A KEYWORDS! IT DOES NOT EXIST IN ST LANGUAGE!
+(10)NEVER USE PYTHON OR C++ GRAMMAR IN ST CODE,SUCH AS: "DINT(VARIABLE)" OR "INT(VARIABLE)" OR "REAL(VARIABLE)"!)，AVOID EMPLOYING NON-EXISTENT FUNCTION INVOCATION FORMS FOR TYPE CONVERSION OR OTHER SIMILAR BEHAVIORS etc.
+(11)The loop variable like "i" must be defined in VAR...END_VAR first, and then used in the loop(TYPE:INT).
+(12) SCL 'For' statement belike:
+'FOR' initialization_variable 'TO' final_value
+'DO'
+'END_FOR';
+(13) SCL 'While' statement belike:
+'WHILE' condition 'DO'
+      statements= SclStatementlist
+'END_WHILE';
+(14) SCL 'Repeat' statement belike:
+'REPEAT'
+      statements= SclStatementlist
+'UNTIL' exitcondition=Expression 'END_REPEAT';
+(15) SCL 'GOTO' statement belike:
+'GOTO' labelname=Identifier;
+Warning:Currently unsupported TIA Portal specific features:
+THIS[#var]
+slice accesses (e.g. "Engine".Motor.W1 )
+VARIANT , DB_ANY
+REGION , END_REGION
+System and hardware data types are not supported (e.g. IEC_TIMER , SSL_HEADER , HW_SUBMODULE , OB_ANY ),
+C#123 (BCD) and B#(127,200) formats for WORD values, see [S7v14] pp. 3455
+B#(127,200,0,0) format for DWORD and LWORD values, see [S7v14] pp. 3457-3458
+Use of typed constants, e.g. test : INT := 1;
+Using VARR_CONSTANT ... END_VAR instead of CONST ... END_CONST is supported.
+New style of function block instance calling
+Member variables of a shared DB need to be surrounded by STRUCT ... END_STRUCT (as in old STEP 7). The
+VAR ... END_VAR (as in TIA Portal) is not supported yet.

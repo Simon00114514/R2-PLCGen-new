@@ -1,0 +1,17 @@
+Agent: SPEC AG((light = green & no_external_requests) -> AF(light = yellow));
+SPEC AG((light = yellow & no_external_requests) -> AF(light = red));
+SPEC AG((light = red & no_external_requests) -> AF(light = green));
+SPEC AG(!((light = green & light = yellow) | (light = green & light = red) | (light = yellow & light = red)));
+SPEC AG(EF(light = green | light = yellow | light = red));
+
+SPEC AG((pedestrian_button_pressed & light = red & no_vehicle_detected & !emergency_vehicle_detected & sensors_ok) -> (light = green));
+SPEC AG(!(pedestrian_button_pressed & light = red & vehicle_detected & light = green));
+
+SPEC AG((vehicle_detected & !emergency_vehicle_detected & sensors_ok) -> AF(light = yellow));
+SPEC AG((light = yellow & vehicle_detected & timer = t_warn) -> (light = red));
+
+SPEC AG((emergency_vehicle_detected & sensors_ok) -> emergency_state);
+SPEC AG((emergency_vehicle_detected & pedestrian_button_pressed & sensors_ok) -> AX(light = red));
+
+SPEC AG(sensor_failure_detected -> (safe_state & alert_maintenance));
+SPEC AG((sensor_failure_detected & active_use_case) -> suspend_current_operation);

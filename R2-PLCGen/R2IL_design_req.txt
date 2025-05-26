@@ -1,0 +1,175 @@
+### Use Case Design
+
+1. Use Case Name:
+Traffic Light Control System Operation
+
+2. Actors:
+• Pedestrian  
+• Vehicle  
+• Emergency Vehicle
+
+3. Use Cases:
+[UC-1]: Normal Traffic Light Cycle – Cycle the traffic lights through the sequence green → yellow → red under stable conditions.  
+[UC-2]: Process Pedestrian Request – When a pedestrian presses the button under safe conditions (the light is red, no vehicles or emergency vehicles are detected), change the light to green. Note that any detection of an emergency event immediately cancels this request.  
+[UC-3]: Process Approaching Vehicle – When a vehicle is detected, transition the current light to yellow and then to red, ensuring a safe interruption to the normal cycle.  
+[UC-4]: Process Emergency Vehicle Request – When an emergency vehicle is detected, immediately override any current operation. This use case explicitly checks for any concurrent pedestrian requests; if both are present, the system cancels the pedestrian request and forces a red light in the next state.  
+[UC-5]: Handle System/Sensor Failure – Monitor sensor and system errors. When a failure is detected, suspend any active use case, transition the traffic lights to a safe state, and alert maintenance.
+
+4. System Boundary:
+IEC 61131-3 Structured Text Program – Traffic Light Controller
+
+5. Relationships Among Actors:
+• Pedestrians activate UC-2 by pressing the pedestrian button.  
+• Vehicles and Emergency Vehicles are detected via sensors that trigger UC-3 and UC-4 respectively.  
+• The Normal Traffic Light Cycle (UC-1) is continuously running in the background but can be overridden by any event that initiates UC-2, UC-3, or UC-4.  
+• UC-5 is invoked automatically whenever a sensor or system error is detected, suspending any ongoing operations.
+
+6. Detailed Descriptive Information for Each Use Case:
+
+Use Case: UC-1 Normal Traffic Light Cycle  
+(1) Brief Description:  
+Continuously cycle the traffic lights through green → yellow → red under stable, unperturbed conditions.  
+(2) Preconditions:  
+– The system is active.  
+– No external events (pedestrian, vehicle, or emergency vehicle requests) are pending.  
+(3) Event Flow:  
+• Basic Flow:  
+  1. The system displays green for a preset duration.  
+  2. The light transitions to yellow after the green interval.  
+  3. The light changes to red following the yellow phase.  
+  4. The cycle then repeats from green.  
+• Alternative Flow:  
+  – If any external sensor input (pedestrian, vehicle, or emergency vehicle) is detected during any phase, the normal cycle is suspended and control shifts to the corresponding use case.  
+(4) Post Conditions:  
+– The system resumes standard cyclic operation after handling any interruptions.  
+(5) Special Requirements:  
+– Only one traffic light may be active at any given time.  
+– Timing intervals should be strictly enforced.
+
+Use Case: UC-2 Process Pedestrian Request  
+(1) Brief Description:  
+Respond to a pedestrian’s button press by transitioning the light from red to green, assuming safe conditions are met.  
+(2) Preconditions:  
+– The pedestrian button is pressed.  
+– The current light is red.  
+– No vehicles or emergency vehicles are detected by the sensors.  
+(3) Event Flow:  
+• Basic Flow:  
+  1. Pedestrian presses the button.  
+  2. The system verifies that the light is red and that there are no approaching vehicles or emergency vehicle events.  
+  3. The light is switched to green to allow pedestrian crossing.  
+  4. Once the pedestrian crossing interval ends, the system returns to the normal cycle.  
+• Alternative Flow:  
+  – If a vehicle is detected following the button press, or if an emergency event occurs concurrently, the pedestrian request is cancelled and control is handed off to UC-3 or UC-4, as applicable.  
+(4) Post Conditions:  
+– The traffic light is set to green for pedestrian crossing if conditions are safe.  
+– The system resumes the normal cycle after the crossing is complete.
+(5) Special Requirements:  
+– This use case is immediately overridden by both vehicle and emergency vehicle events.
+
+Use Case: UC-3 Process Approaching Vehicle  
+(1) Brief Description:  
+Immediately respond to the detection of an approaching vehicle by transitioning the traffic light to yellow and then to red.  
+(2) Preconditions:  
+– A vehicle is detected via sensor input.  
+– No emergency vehicle request is currently active.  
+(3) Event Flow:  
+• Basic Flow:  
+  1. The vehicle sensor detects an approaching vehicle.  
+  2. The system transitions the current light to yellow as a caution signal.  
+  3. The light then rapidly transitions to red to stop traffic.  
+  4. Following the vehicle event, the normal cycle resumes.  
+• Alternative Flow:  
+  – If vehicles are detected in rapid succession, the red phase is extended to ensure safety.  
+(4) Post Conditions:  
+– The traffic light remains red long enough to ensure vehicular stoppage.  
+– The system resumes the standard cycling once the threat has passed.
+(5) Special Requirements:  
+– The system’s reaction time must be minimal.
+
+Use Case: UC-4 Process Emergency Vehicle Request  
+(1) Brief Description:  
+Provide immediate and exclusive processing for emergency vehicles by overriding all other operations.  
+(2) Preconditions:  
+– An emergency vehicle is detected via reliable sensors.  
+(3) Event Flow:  
+• Basic Flow:  
+  1. The emergency vehicle is detected by the sensor.  
+  2. Any ongoing operations—including pedestrian and vehicle processing—are preempted immediately.  
+  3. The system transitions the lights to a state optimized for emergency passage. For instance, if a pedestrian button is pressed concurrently, the system forces a red light in the next state to ensure safety.  
+  4. After the emergency vehicle has passed and sensor functionality is verified, the system reverts to the normal cycle.
+• Alternative Flow:  
+  – If a pedestrian request is raised during the emergency event, the system cancels the request and enforces a red light in the subsequent state.  
+  – If sensor or system errors occur during emergency handling, UC-5 is invoked.
+(4) Post Conditions:  
+– Exclusive clearance is provided to the emergency vehicle.  
+– The system maintains a forced red light when an emergency and a pedestrian event occur concurrently, before safely returning to the normal cycle.
+(5) Special Requirements:  
+– Emergency requests always override any pedestrian or vehicular requests.
+
+Use Case: UC-5 Handle System/Sensor Failure  
+(1) Brief Description:  
+Detect and manage any sensor or system errors by transitioning to a safe state and alerting maintenance.  
+(2) Preconditions:  
+– A sensor or system error is detected.  
+(3) Event Flow:  
+• Basic Flow:  
+  1. The system continuously monitors sensor and system performance.  
+  2. Upon detection of an error, the current operation is suspended.  
+  3. The traffic light transitions to a predetermined safe state ensuring no conflicting signals.  
+  4. Maintenance is alerted to the failure.  
+  5. Once the error is resolved and sensors are confirmed operational, the system resumes the normal cycle.
+(4) Post Conditions:  
+– The system is in a safe state until errors are corrected.  
+– Service personnel are notified of the issue.
+(5) Special Requirements:  
+– The current operation is suspended immediately upon error detection to ensure safety.
+
+7. Priority of Use Cases:
+• [UC-4 Process Emergency Vehicle Request]: High  
+• [UC-3 Process Approaching Vehicle]: High  
+• [UC-2 Process Pedestrian Request]: Medium  
+• [UC-1 Normal Traffic Light Cycle]: Low  
+• [UC-5 Handle System/Sensor Failure]: Critical (for safety and maintenance)
+
+8. Data Requirements:
+[D-1]: Sensor data indicating vehicle presence.  
+[D-2]: Status of the pedestrian button (pressed/released).  
+[D-3]: Sensor data indicating emergency vehicle detection.  
+[D-4]: Configured timing intervals for transitioning between lights.  
+[D-5]: Current state indicator for the traffic light.  
+[D-6]: Sensor/system status for detecting error states.
+
+9. Business Rules:
+[B-1]: Only one traffic light may be illuminated at a given time.  
+[B-2]: Emergency vehicle requests override any pedestrian or vehicle events.  
+[B-3]: The traffic light cycle (green → yellow → red) is always completed unless interrupted by a higher-priority event.  
+[B-4]: In the event of concurrent emergency and pedestrian requests, the system forces a red light for safety before any further transitions.
+
+### Specifications Design
+
+SPEC AG((light = green & no_external_requests) -> AF(light = yellow));
+SPEC AG((light = yellow & no_external_requests) -> AF(light = red));
+SPEC AG((light = red & no_external_requests) -> AF(light = green));
+SPEC AG(!( (light = green & light = yellow) | (light = green & light = red) | (light = yellow & light = red) ));
+SPEC AG(EF(light = green | light = yellow | light = red));
+
+SPEC AG((pedestrian_button_pressed & light = red & no_vehicle_detected & !emergency_vehicle_detected & sensors_ok) -> (light = green));
+SPEC AG((pedestrian_button_pressed & light = red & no_vehicle_detected & !emergency_vehicle_detected & sensors_ok & AX(acknowledgement)) -> AX(light = green));
+SPEC AG(!(pedestrian_button_pressed & light = red & vehicle_detected & (light = green)));
+
+SPEC AG((vehicle_detected & !emergency_vehicle_detected & sensors_ok) -> AF(light = yellow));
+SPEC AG((light = yellow & vehicle_detected) -> (light = red));
+SPEC AG((vehicle_detected & light = yellow & timer = t_warn) -> (light = red));
+
+SPEC AG((emergency_vehicle_detected & sensors_ok) -> emergency_state);
+SPEC AG(emergency_vehicle_detected & sensors_ok -> emergency_state);
+SPEC G((emergency_state) -> O(emergency_vehicle_detected));
+SPEC AG((!emergency_vehicle_detected & emergency_state & AF(return_to_normal)) -> AF(normal_cycle));
+
+* New specification to enforce red light when emergency vehicle and pedestrian button are detected concurrently:
+SPEC AG((emergency_vehicle_detected & pedestrian_button_pressed & sensors_ok) -> AX(light = red));
+
+SPEC AG(sensor_failure_detected -> safe_state);
+SPEC AG(sensor_failure_detected -> alert_maintenance);
+SPEC AG((sensor_failure_detected & active_use_case) -> suspend_current_operation);

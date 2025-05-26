@@ -1,0 +1,29 @@
+-- specification AG (EoC -> instance_a = FALSE)  is false
+-- as demonstrated by the following execution sequence
+Trace Description: CTL Counterexample 
+Trace Type: Counterexample 
+  -> State: 1.1 <-
+    loc = init_pv
+    instance_a = FALSE
+    EoC = FALSE
+    BoC = FALSE
+  -> State: 1.2 <-
+    loc = loop_start
+    instance_a = FALSE
+    EoC = FALSE
+    BoC = FALSE
+  -> State: 1.3 <-
+    loc = prepare_BoC
+    instance_a = TRUE
+    EoC = FALSE
+    BoC = TRUE
+  -> State: 1.4 <-
+    loc = l_main_call
+    instance_a = TRUE
+    EoC = FALSE
+    BoC = FALSE
+  -> State: 1.5 <-
+    loc = prepare_EoC
+    instance_a = TRUE
+    EoC = TRUE
+    BoC = FALSE

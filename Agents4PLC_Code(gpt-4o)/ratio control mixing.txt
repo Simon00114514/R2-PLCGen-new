@@ -1,0 +1,22 @@
+PROGRAM MixingControl
+VAR
+    Reactant1 : REAL; (* Input rate of Reactant 1 *)
+    Reactant2 : REAL; (* Input rate of Reactant 2 *)
+    Ratio : REAL; (* Ratio of Reactant 1 to Reactant 2 *)
+END_VAR
+
+Reactant1 := 100.0; (* Initial input rate of Reactant 1 *)
+Reactant2 := 1.0; (* Initial input rate of Reactant 2 *)
+
+WHILE TRUE DO
+    Ratio := Reactant1 / Reactant2; (* Calculate the ratio *)
+
+    IF Ratio > 102.0 THEN
+        Reactant1 := Reactant1 - 0.1; (* Decrease the input rate of Reactant 1 *)
+    ELSIF Ratio < 98.0 THEN
+        Reactant1 := Reactant1 + 0.1; (* Increase the input rate of Reactant 1 *)
+    ELSE
+        (* Maintain the current input rate *)
+    END_IF;
+END_WHILE;
+END_PROGRAM

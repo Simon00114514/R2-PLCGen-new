@@ -1,0 +1,94 @@
+### Use Case Design
+
+1. Use Case Name:
+Traffic Light Control System Operation
+
+2. Actor:
+• Pedestrian  
+• Vehicle  
+• Emergency Vehicle
+
+3. Use Cases:
+[UC-1]: Normal Traffic Light Cycle – Cycle the traffic lights in the order green → yellow → red under stable conditions.  
+[UC-2]: Process Pedestrian Request – When a pedestrian presses the button in safe conditions (light is red, no vehicles or emergency vehicles are detected), change the light to green.  
+[UC-3]: Process Approaching Vehicle – When a vehicle is detected, transition the light from the current state to yellow and then to red.  
+[UC-4]: Process Emergency Vehicle Request – When an emergency vehicle is detected, immediately override any current operation. This use case now explicitly includes a check: if a pedestrian request is raised concurrently with an emergency, the pedestrian request is canceled and the light is forced to red in the next state.  
+[UC-5]: Handle System/Sensor Failure – Monitor and manage sensor or system errors by transitioning to a safe state and alerting maintenance.
+
+4. System Boundary:
+IEC 61131-3 Structured Text Program – Traffic Light Controller
+
+5. Relationships Among Actors:
+• Pedestrians trigger UC-2 via the button input.  
+• Vehicles and Emergency Vehicles are detected by sensors that trigger UC-3 and UC-4 respectively.  
+• The Normal Traffic Light Cycle is overridden by any event in UC-2, UC-3, or UC-4.  
+• UC-5 is invoked by any error in sensors or communications across all use cases.
+
+6. Detailed Descriptive Information for Each Use Case:
+
+Use Case: UC-4 Process Emergency Vehicle Request  
+(1) Brief Description:  
+Provide immediate priority to emergency vehicles by preempting all other operations.  
+(2) Preconditions:  
+– An emergency vehicle is detected via reliable sensors.  
+(3) Event Flow:  
+• Basic Flow:  
+   1. The system detects an emergency vehicle.  
+   2. It preempts any active operations, including any pedestrian or vehicle processing.  
+   3. The lights transition to a state optimized for emergency passage; specifically, if a pedestrian button is pressed concurrently, the system forces a red light in the next state.  
+   4. After the emergency vehicle passes and sensor functionality is verified, the system reverts to the normal cycle.  
+• Alternative Flow:  
+   – If the pedestrian button is pressed during an emergency event, UC-4 mandates immediate cancellation of the pedestrian request and sets AX(light = red).  
+   – If sensor/system errors occur during the emergency handling, invoke UC-5.
+(4) Post Conditions:  
+– The system gives exclusive clearance to the emergency vehicle and ensures the light is red if both emergency and pedestrian events occur, before resuming normal operation.
+(5) Special Requirements:  
+– Emergency events always override pedestrian and vehicular requests, with additional explicit enforcement for concurrent emergency and pedestrian requests.
+
+(Other use cases remain as previously defined with the additional note in UC-2 that any emergency detection cancels its execution.)
+
+### Specifications Design
+
+SPEC
+AG((light = green & no_external_requests) -> AF(light = yellow));
+SPEC
+AG((light = yellow & no_external_requests) -> AF(light = red));
+SPEC
+AG((light = red & no_external_requests) -> AF(light = green));
+SPEC
+AG(!( (light = green & light = yellow) | (light = green & light = red) | (light = yellow & light = red) ));
+SPEC
+AG(EF(light = green | light = yellow | light = red));
+
+SPEC
+AG((pedestrian_button_pressed & light = red & no_vehicle_detected & !emergency_vehicle_detected & sensors_ok) -> (light = green));
+SPEC
+AG((pedestrian_button_pressed & light = red & no_vehicle_detected & !emergency_vehicle_detected & sensors_ok & AX(acknowledgement)) -> AX(light = green));
+SPEC
+AG(!(pedestrian_button_pressed & light = red & vehicle_detected & (light = green)));
+
+SPEC
+AG((vehicle_detected & !emergency_vehicle_detected & sensors_ok) -> AF(light = yellow));
+SPEC
+AG((light = yellow & vehicle_detected) -> (light = red));
+SPEC
+AG((vehicle_detected & light = yellow & timer = t_warn) -> (light = red));
+
+SPEC
+AG(emergency_vehicle_detected & sensors_ok -> emergency_state);
+SPEC
+AG(emergency_vehicle_detected & sensors_ok -> emergency_state);
+SPEC
+G((emergency_state) -> O(emergency_vehicle_detected));
+SPEC
+AG((!emergency_vehicle_detected & emergency_state & AF(return_to_normal)) -> AF(normal_cycle));
+
+* New specification to enforce red light when emergency vehicle and pedestrian button are detected concurrently:
+SPEC AG((emergency_vehicle_detected & pedestrian_button_pressed & sensors_ok) -> AX(light = red));
+
+SPEC
+AG(sensor_failure_detected -> safe_state);
+SPEC
+AG(sensor_failure_detected -> alert_maintenance);
+SPEC
+AG((sensor_failure_detected & active_use_case) -> suspend_current_operation);

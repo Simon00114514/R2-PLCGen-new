@@ -1,0 +1,88 @@
+Requirement patterns
+
+1.Implication (ID: pattern-implication)
+• Informal requirement: If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle.
+• Formal requirement: AG(({PLC_END} AND ({1})) --> ({2})) (type: ctl)
+• Parameters:
+    ◦ {1}: Condition
+    ◦ {2}: Implication
+
+
+2.Invariant (ID: pattern-invariant)
+• Informal requirement: {1} is always true at the end of the PLC cycle.
+• Formal requirement: AG({PLC_END} --> ({1})) (type: ctl)
+• Parameters:
+    ◦ {1}: Invariant to be respected at the end of each cycle.
+
+
+    3.Forbidden state (ID: pattern-forbidden)
+• Informal requirement: {1} is impossible at the end of the PLC cycle.
+• Formal requirement: AG({PLC_END} --> NOT ({1})) (type: ctl)
+• Parameters:
+    ◦ {1}: Condition that must be false at the end of each cycle.
+
+
+4.State change during a cycle (ID: pattern-statechange-duringcycle)
+• Informal requirement: If {1} is true at the beginning of the PLC cycle, then {2} is always true at the end of the same cycle.
+• Formal requirement: AG(({PLC_START} AND ({1})) --> A[ NOT {PLC_END} U {PLC_END} AND ({2}) ]) (type: ctl)
+• Parameters:
+    ◦ {1}: Condition at start of cycle
+    ◦ {2}: Expectation at end of cycle
+
+
+5.State change between cycles (ID: pattern-statechange-betweencycles)
+• Informal requirement: If {1} is true at the end of cycle N and {2} is true at the end of cycle N+1, then {3} is always true at the end of cycle N+1.
+• Formal requirement: G(({PLC_END} AND ({1}) AND X( [ NOT {PLC_END} U ({PLC_END} AND ({2})) ] )) --> X( [ NOT {PLC_END} U ({PLC_END} AND ({3})) ] )) (type: ltl)
+• Parameters:
+    ◦ {1}: Condition at the end of cycle N
+    ◦ {2}: Condition at the end of cycle N+1
+    ◦ {3}: Expectation at the end of cycle N+1
+
+
+6.Reachability (ID: pattern-reachability)
+• Informal requirement: It is possible to have {1} at the end of a cycle.
+• Formal requirement: EF({PLC_END} AND ({1})) (type: ctl)
+• Parameters:
+    ◦ {1}: State to reach
+
+
+7.Repeatability (ID: pattern-repeatability)
+• Informal requirement: Any time it is possible to have eventually {1} at the end of a cycle. (AG EF)
+• Formal requirement: AG(EF({PLC_END} AND ({1}))) (type: ctl)
+• Parameters:
+    ◦ {1}: State to reach
+
+
+8.Leads to (ID: pattern-leadsto)
+• Informal requirement: If {1} is true at the end of a cycle, {2} was true at the end of an earlier cycle. (EU)
+• Formal requirement: NOT (E[({PLC_END} --> NOT ({2})) U ({PLC_END} AND {1})]) (type: ctl)
+• Parameters:
+    ◦ {1}: Consequence
+    ◦ {2}: Cause
+
+
+9.Leads to trigger (ID: pattern-leadsto-trigger)
+• Informal requirement: If {1} is true at the end of a cycle, there was a change from {2} to {3} at the end of an earlier cycle.
+• Formal requirement: G(({PLC_END} AND ({1})) --> O([({PLC_END} --> ({2})) U ({PLC_END} --> ({3}))])) (type: ltl)
+• Parameters:
+    ◦ {1}: Response
+    ◦ {2}: Base
+    ◦ {3}: Trigger
+
+
+10.Leads to trigger (ID: pattern-leadsto-earlier)
+• Informal requirement: If {1} is true at the end of a cycle, {2} was true at the beginning of this or an earlier cycle.
+• Formal requirement: G(({PLC_END} AND ({1})) --> O({PLC_START} AND ({2}))) (type: ltl)
+• Parameters:
+    ◦ {1}: Response
+    ◦ {2}: Cause
+
+
+11.Timed trigger response (ID: timed-trigger)
+• Informal requirement: If {1} is true at EoC, and stays true at EoC for {2} ms of time, {3} will be true.
+• Formal requirement: G(({PLC_END} AND {1} AND timer={2}) --> ({3})) (type: ltl)
+• Parameters:
+    ◦ {1}: Trigger
+    ◦ {2}: Time
+    ◦ {3}: Response
+

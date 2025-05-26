@@ -1,0 +1,18 @@
+Based on the task description, here are the use cases for the structured text program controlling the coffee machine:
+
+{ 
+  1: User can initiate the coffee machine by pressing the start button.
+  2: User can select the coffee and milk mode using the designated button.
+  3: User can select the coffee-only mode using the designated button.
+  4: The coffee machine can detect when the mixing tank reaches the maximum liquid level.
+  5: The coffee machine can close both coffee and milk valves when the mixing tank reaches the maximum liquid level in coffee and milk mode.
+  6: The coffee machine can start the mixer when the mixing tank reaches the maximum liquid level in coffee and milk mode.
+  7: The mixer can run for four seconds (LTL) after being activated.
+  8: The coffee machine can automatically open the mixing tank valve after the mixer stops running.
+  9: The coffee machine can close the coffee valve and open the mixing tank valve when the mixing tank reaches the maximum liquid level in coffee-only mode.
+  10: User can activate the emergency stop button to immediately halt the machine operation.
+  11: The coffee machine can close all valves and stop the mixer when the emergency button is pressed.
+  12: The coffee machine can handle unexpected events and stop operation safely when the emergency button is pressed.
+} 
+
+These use cases outline the interactions a user can have with the coffee machine and the machine's automatic responses based on the system's state and user inputs. The structured text program would need to be designed to handle these scenarios to ensure the coffee machine operates correctly and safely.Goodbye! If you have any more questions in the future or need assistance with anything else, feel free to reach out. Have a great day!

@@ -1,0 +1,22 @@
+-job = "verif"
+-id = "1"
+-name = "carwash"
+-description = ""
+-sourcefiles.0 = "D:\plcverif\workspace\R2IL\1.scl"
+-sourcefiles.1 = "D:\plcverif\workspace\R2IL\builtin.scl"
+-lf = "step7"
+-inline = "false"
+-reductions.0 = "basic_reductions"
+-info.backend_name = "unknown"
+-info.backend_algorithm = "N/A"
+-info.plugin_store_keys.0 = "html$$report_filename"
+-info.plugin_store_values.0 = "1.report.html"
+-result = "Error"
+-result.runtime_ms = "413"
+-result.exec_date = "2025-02-27 15:44:16"
+-result.backend_exectime_ms = "0"
+-result.cex_exists = "false"
+-job.req = "pattern"
+-job.req.inputs = {}
+-job.req.params = {}
+

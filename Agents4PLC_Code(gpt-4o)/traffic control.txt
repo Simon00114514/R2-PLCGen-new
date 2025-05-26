@@ -1,0 +1,76 @@
+PROGRAM TrafficLightControl3
+VAR
+    PedestrianButton: BOOL; // Input for pedestrian button
+    EmergencyVehicle: BOOL; // Input for emergency vehicle sensor
+    VehicleDetected: BOOL; // Input for approaching vehicle sensor
+    RedLight: BOOL; // Output for red light
+    YellowLight: BOOL; // Output for yellow light
+    GreenLight: BOOL; // Output for green light
+    currentState: INT; // Current state of the traffic light
+    LightTimer: TON; // Timer for light transitions
+END_VAR
+
+CONST
+    STATE_GREEN := 0;
+    STATE_YELLOW := 1;
+    STATE_RED := 2;
+    TIME_GREEN_MS := T#10s; // Corrected direct assignment
+    TIME_YELLOW_MS := T#2s;
+    TIME_RED_MS := T#5s;
+END_CONST
+
+// Initialize the timer before state checks
+LightTimer(IN := FALSE, PT := T#0s);
+
+IF NOT LightTimer.Q THEN
+    LightTimer(IN := TRUE, PT := T#10ms); // Timer step for running
+END_IF;
+
+IF EmergencyVehicle THEN
+    // Force transition to red for emergency vehicles
+    currentState := STATE_RED;
+
+ELSIF VehicleDetected THEN
+    // Immediate response to vehicle detection
+    IF currentState = STATE_GREEN THEN // Only if in green state
+        currentState := STATE_YELLOW;
+        LightTimer(IN := TRUE, PT := TIME_YELLOW_MS); // Correct timer setting
+    ELSIF currentState = STATE_YELLOW THEN
+        currentState := STATE_RED;
+        LightTimer(IN := TRUE, PT := TIME_RED_MS); // Correct timer setting for red
+    END_IF;
+
+ELSIF PedestrianButton THEN
+    // Allow crossing if Green
+    IF currentState = STATE_GREEN THEN
+        currentState := STATE_RED;
+        LightTimer(IN := TRUE, PT := TIME_RED_MS); // Correct timer setting for red
+    END_IF;
+
+ELSE 
+    // Normal Traffic Light Cycle
+    CASE currentState OF
+        STATE_GREEN:
+            IF LightTimer.ET >= TIME_GREEN_MS THEN
+                currentState := STATE_YELLOW;
+                LightTimer(IN := TRUE, PT := TIME_YELLOW_MS); // Restart and set timer for yellow
+            END_IF;
+        STATE_YELLOW:
+            IF LightTimer.ET >= TIME_YELLOW_MS THEN
+                currentState := STATE_RED;
+                LightTimer(IN := TRUE, PT := TIME_RED_MS); // Restart and set timer for red
+            END_IF;
+        STATE_RED:
+            IF LightTimer.ET >= TIME_RED_MS THEN
+                currentState := STATE_GREEN;
+                LightTimer(IN := TRUE, PT := TIME_GREEN_MS); // Restart and set timer for green
+            END_IF;
+    END_CASE;
+END_IF;
+
+// Output State Logic
+RedLight := (currentState = STATE_RED);
+YellowLight := (currentState = STATE_YELLOW);
+GreenLight := (currentState = STATE_GREEN);
+
+END_PROGRAM

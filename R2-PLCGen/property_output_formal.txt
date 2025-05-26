@@ -1,0 +1,28 @@
+1.
+  (THIS LINE SPECIFIES THE CONDITIONS OF THE CONSTRAINT AND DESCRIPTIONS.LIKE:Automated Car Wash Operation - Start Car Wash: Basic Flow)
+SPEC
+  CTL_expression or LTL_expression,only use one expression!
+
+2.
+  (THIS LINE SPECIFIES THE CONDITIONS OF THE CONSTRAINT AND DESCRIPTIONS.LIKE:Automated Car Wash Operation - Start Car Wash: Postconditions)
+SPEC
+  CTL_expression or LTL_expression,only use one expression!
+
+
+3.
+  (THIS LINE SPECIFIES THE CONDITIONS OF THE CONSTRAINT AND DESCRIPTIONS.LIKE: Automated Car Wash Operation - Start Car Wash: Special Requirements - Personnel Sensor Accuracy)
+
+SPEC
+  CTL_expression or LTL_expression,only use one expression!
+
+4. ("!" REPRESENTS "NOT," "&" REPRESENTS "AND", "|" REPRESENTS "OR," "->" REPRESENTS "IMPLY.")
+
+5. REMEMBER:
+
+THE SYNTAX OF LINEAR TEMPORAL LOGIC (LTL) AND COMPUTATIONAL TREE LOGIC (CTL) SHOULD NOT BE MIXED OR INTERCHANGED!!!!
+
+6. If it is needed, do not forget ">" or "<" the mathematics expression, which means "greater than" or "less than" in the expression, not just only boolean CTL or LTL.
+
+7. "IMPLY" is "->", not "=>", not "->>", not "=>>", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "=>=", not "
+
+8. "NOT" is "!" and "AND" is "&" and "OR" is "|", never use "&&" or "||".

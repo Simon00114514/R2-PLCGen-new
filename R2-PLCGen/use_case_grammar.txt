@@ -1,0 +1,18 @@
+RU1. The use case description must mention at least one actor and one use case.
+RU2. Any interaction mentioned in the use case description (e.g., associations between actors and use cases) must explicitly involve two defined actors or use cases.
+RU3.
+    Actor names must start with a noun (e.g., "Customer").
+    Use case names must start with a verb (e.g., "Place Order").
+RU4. Each actor mentioned must be associated with at least one use case.
+RU5. No redundant interaction descriptions are allowed between two elements (e.g., repeated actor-use case interactions).
+RU6. The use case description must explicitly define abnormal conditions (e.g., system failures) and their handling methods.
+RU7. The use case description must specify:
+    Preconditions (system state before execution).
+    Postconditions (system state after execution).
+RU8. The use case description must explicitly document:
+    Inputs (data/events from actors).
+    Outputs (data/actions to actors).
+    Trigger events (e.g., "user clicks Submit").
+    System boundary (distinguish internal/external elements).
+RU9. The use case priority (e.g., high/medium/low) must be explicitly specified.
+RU10. The use case description must fully cover all constraints from the original requirements.

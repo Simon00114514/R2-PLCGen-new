@@ -1,0 +1,44 @@
+PROGRAM ParkingControl
+VAR
+    X1, X2, M1, M2, M3, M4, M20, M30: BOOL;
+    Y1, Y2: BOOL;
+END_VAR
+
+(* Initialization *)
+Y1 := FALSE; (* Red light OFF *)
+Y2 := TRUE;  (* Green light ON *)
+
+(* Main Logic *)
+IF (M1 OR M4) THEN
+    Y1 := TRUE;  (* Red light ON *)
+    Y2 := FALSE; (* Green light OFF *)
+    M20 := TRUE; (* Car in passage *)
+ELSIF (M2 OR M3) THEN
+    Y1 := TRUE;  (* Red light ON *)
+    Y2 := FALSE; (* Green light OFF *)
+    M30 := TRUE; (* Car in passage *)
+ELSIF (NOT M20 AND NOT M30) THEN
+    Y1 := FALSE; (* Red light OFF *)
+    Y2 := TRUE;  (* Green light ON *)
+END_IF;
+
+(* Photoelectric Switch Logic *)
+IF X1 THEN
+    M1 := TRUE;
+ELSE
+    M1 := FALSE;
+END_IF;
+
+IF X2 THEN
+    M2 := TRUE;
+ELSE
+    M2 := FALSE;
+END_IF;
+
+(* Reset Intermediate Variables *)
+M1 := FALSE;
+M2 := FALSE;
+M3 := FALSE;
+M4 := FALSE;
+
+END_PROGRAM

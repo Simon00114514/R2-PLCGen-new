@@ -1,0 +1,143 @@
+Agent: {
+  "use_cases": [
+    {
+      "use_case": "UC-1 Normal Traffic Light Cycle",
+      "patterns": [
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If the system is in the green state and no external requests are present at the end of the cycle, then the next cycle must show the yellow state.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (light = green AND no_external_requests)) --> (light = yellow))",
+          "parameters": {
+            "{1}": "light = green AND no_external_requests",
+            "{2}": "light = yellow"
+          }
+        },
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If the system is in the yellow state with no external requests at the end of the cycle, then the next cycle must show the red state.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (light = yellow AND no_external_requests)) --> (light = red))",
+          "parameters": {
+            "{1}": "light = yellow AND no_external_requests",
+            "{2}": "light = red"
+          }
+        },
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If the system is in the red state under stable conditions at the end of the cycle, then the next cycle must revert to the green state.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (light = red AND no_external_requests)) --> (light = green))",
+          "parameters": {
+            "{1}": "light = red AND no_external_requests",
+            "{2}": "light = green"
+          }
+        },
+        {
+          "pattern_name": "Forbidden state",
+          "Informal requirement": "At the end of each cycle, it is impossible for any two traffic light signals to be active simultaneously.",
+          "ctl_ltl_formula": "AG({PLC_END} --> NOT ((light = green AND light = yellow) OR (light = green AND light = red) OR (light = yellow AND light = red)))",
+          "parameters": {
+            "{1}": "(light = green AND light = yellow) OR (light = green AND light = red) OR (light = yellow AND light = red)"
+          }
+        },
+        {
+          "pattern_name": "Reachability",
+          "Informal requirement": "It must be possible to eventually reach a state where one of the traffic light signals (green or yellow or red) is active at the end of a cycle.",
+          "ctl_ltl_formula": "EF({PLC_END} AND (light = green OR light = yellow OR light = red))",
+          "parameters": {
+            "{1}": "light = green OR light = yellow OR light = red"
+          }
+        }
+      ]
+    },
+    {
+      "use_case": "UC-2 Process Pedestrian Request",
+      "patterns": [
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If the pedestrian button is pressed and the light is red, with no vehicles or emergency vehicles detected and sensor status ok at the end of the cycle, then the light must transition to green.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (pedestrian_button_pressed AND (light = red) AND no_vehicle_detected AND NOT emergency_vehicle_detected AND sensors_ok)) --> (light = green))",
+          "parameters": {
+            "{1}": "pedestrian_button_pressed AND light = red AND no_vehicle_detected AND NOT emergency_vehicle_detected AND sensors_ok",
+            "{2}": "light = green"
+          }
+        },
+        {
+          "pattern_name": "Forbidden state",
+          "Informal requirement": "It is impossible for the pedestrian request to result in a green light if a vehicle is detected concurrently.",
+          "ctl_ltl_formula": "AG({PLC_END} --> NOT (pedestrian_button_pressed AND (light = red) AND vehicle_detected AND (light = green)))",
+          "parameters": {
+            "{1}": "pedestrian_button_pressed AND light = red AND vehicle_detected AND light = green"
+          }
+        }
+      ]
+    },
+    {
+      "use_case": "UC-3 Process Approaching Vehicle",
+      "patterns": [
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If a vehicle is detected (and no emergency vehicle is active) at the end of the cycle, then the light should transition to yellow.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (vehicle_detected AND NOT emergency_vehicle_detected AND sensors_ok)) --> (light = yellow))",
+          "parameters": {
+            "{1}": "vehicle_detected AND NOT emergency_vehicle_detected AND sensors_ok",
+            "{2}": "light = yellow"
+          }
+        },
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If the system is in the yellow state under a vehicle event, then the light must change to red, ensuring safety.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (light = yellow AND vehicle_detected AND timer = t_warn)) --> (light = red))",
+          "parameters": {
+            "{1}": "light = yellow AND vehicle_detected AND timer = t_warn",
+            "{2}": "light = red"
+          }
+        }
+      ]
+    },
+    {
+      "use_case": "UC-4 Process Emergency Vehicle Request",
+      "patterns": [
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If an emergency vehicle is detected and sensors are functioning at the end of the cycle, then the system must immediately transition to the emergency state.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (emergency_vehicle_detected AND sensors_ok)) --> (emergency_state))",
+          "parameters": {
+            "{1}": "emergency_vehicle_detected AND sensors_ok",
+            "{2}": "emergency_state"
+          }
+        },
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If both an emergency vehicle and a pedestrian request occur concurrently (with sensor status ok) at the end of the cycle, then the light must transition to red.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (emergency_vehicle_detected AND pedestrian_button_pressed AND sensors_ok)) --> (light = red))",
+          "parameters": {
+            "{1}": "emergency_vehicle_detected AND pedestrian_button_pressed AND sensors_ok",
+            "{2}": "light = red"
+          }
+        }
+      ]
+    },
+    {
+      "use_case": "UC-5 Handle System/Sensor Failure",
+      "patterns": [
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If a sensor or system failure is detected at the end of the cycle, then the traffic lights must transition to a safe state and maintenance should be alerted.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND sensor_failure_detected) --> (safe_state AND alert_maintenance))",
+          "parameters": {
+            "{1}": "sensor_failure_detected",
+            "{2}": "safe_state AND alert_maintenance"
+          }
+        },
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If a sensor failure is detected while a use case is active at the end of the cycle, then the current operation must be suspended.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND sensor_failure_detected AND active_use_case) --> suspend_current_operation)",
+          "parameters": {
+            "{1}": "sensor_failure_detected AND active_use_case",
+            "{2}": "suspend_current_operation"
+          }
+        }
+      ]
+    }
+  ]
+}
