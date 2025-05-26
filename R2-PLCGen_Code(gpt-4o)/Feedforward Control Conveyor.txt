@@ -1,0 +1,40 @@
+PROGRAM ConveyorControl
+VAR_INPUT
+    SensorLoad : INT; (* 当前传感器读取的负载值 *)
+    SpeedIncrement : INT :=10;
+END_VAR
+
+VAR_OUTPUT
+    ConveyorSpeed : INT; (* 当前传送带速度 *)
+END_VAR
+
+VAR
+    HighThreshold : INT := 80; (* 负载高阈值 *)
+    LowThreshold : INT := 20; (* 负载低阈值 *)
+    MaintenanceMode : BOOL ; (* 系统维护模式标志 *)
+    InitialSpeed : INT := 50; (* 传送带的初始速度 *)
+   
+END_VAR
+
+
+(* 初始化传送带速度 *)
+ConveyorSpeed := InitialSpeed;
+
+(* 根据负载调整传送带速度 *)
+IF SensorLoad > HighThreshold THEN
+    ConveyorSpeed := ConveyorSpeed - SpeedIncrement; (* 以某个值降低速度 *)
+ELSIF SensorLoad < LowThreshold THEN
+    ConveyorSpeed := ConveyorSpeed + SpeedIncrement; (* 以某个值提高速度 *)
+ELSIF SensorLoad >= LowThreshold AND SensorLoad <= HighThreshold THEN
+    (* 负载在阈值范围内，保持当前速度不变 *)
+     ConveyorSpeed := ConveyorSpeed;
+END_IF;
+
+(* 维护模式下的特殊处理 *)
+IF MaintenanceMode THEN
+    (* 在维护模式下，可能需要执行的特殊逻辑 *)
+    (* 例如，可以设置传送带速度为一个安全值或停止传送带 *)
+    ConveyorSpeed := 0; (* 设置传送带速度为0，停止传送带 *)
+END_IF;
+
+END_PROGRAM

@@ -1,0 +1,43 @@
+PROGRAM BottlePackaging
+VAR_INPUT
+    sensor1_detects_bottle : BOOL; // 传感器1检测到瓶子
+    sensor2_detects_empty : BOOL; // 传感器2检测到空瓶子
+    conveyor_belt_faulty : BOOL; // 传送带故障
+    sensor1_faulty : BOOL; // 传感器1故障
+    sensor2_faulty : BOOL; // 传感器2故障
+    cylinder_faulty : BOOL; // 气缸故障
+END_VAR
+
+VAR_OUTPUT
+    cylinder_activates : BOOL; // 气缸激活移除空瓶子
+    alarm : BOOL; // 故障警报
+    packaging_area_reached : BOOL; // 瓶子到达包装区域
+END_VAR
+
+VAR
+    system_ready : BOOL := TRUE; // 系统准备就绪
+END_VAR
+
+(* 主程序代码 *)
+IF conveyor_belt_faulty OR sensor1_faulty OR sensor2_faulty OR cylinder_faulty THEN
+    alarm := TRUE; // 如果有任何故障，激活警报
+    system_ready := FALSE; // 系统不再准备就绪
+    cylinder_activates := FALSE; // 确保气缸不会激活
+    packaging_area_reached := FALSE; // 确保不会发送到达包装区域的信号
+ELSE
+    alarm := FALSE; // 没有故障，警报关闭
+    IF sensor1_detects_bottle THEN
+        IF sensor2_detects_empty THEN
+            cylinder_activates := TRUE; // 如果检测到空瓶子，激活气缸
+            packaging_area_reached := FALSE; // 空瓶子不会到达包装区域
+        ELSE
+            cylinder_activates := FALSE; // 如果瓶子不为空，不激活气缸
+            packaging_area_reached := TRUE; // 瓶子到达包装区域
+        END_IF;
+    ELSE
+        cylinder_activates := FALSE; // 如果没有检测到瓶子，气缸保持关闭
+        packaging_area_reached := FALSE; // 瓶子不在包装区域
+    END_IF;
+END_IF;
+
+END_PROGRAM

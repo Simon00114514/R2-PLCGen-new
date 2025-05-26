@@ -1,0 +1,71 @@
+PROGRAM TrafficLightControl
+VAR_INPUT
+    PedestrianButtonPressed : BOOL; // TRUE when pedestrian button is pressed
+    VehicleDetected : BOOL; // TRUE when a vehicle is detected
+    EmergencyVehicleDetected : BOOL; // TRUE when an emergency vehicle is detected
+END_VAR
+
+VAR_OUTPUT
+    LightGreen : BOOL; // TRUE when green light is on
+    LightYellow : BOOL; // TRUE when yellow light is on
+    LightRed : BOOL; // TRUE when red light is on
+END_VAR
+
+VAR
+    CurrentLight : INT; // 0 = Green, 1 = Yellow, 2 = Red
+END_VAR
+
+CONST
+    GREEN : INT := 0;
+    YELLOW : INT := 1;
+    RED : INT := 2;
+END_CONST;
+
+(* Initialize lights to ensure only one is on at a time *)
+LightGreen := FALSE;
+LightYellow := FALSE;
+LightRed := FALSE;
+
+(* Control logic based on refined requirements *)
+IF EmergencyVehicleDetected THEN
+    (* Priority is given to emergency vehicles *)
+    CurrentLight := RED;
+ELSIF VehicleDetected THEN
+    (* If a vehicle is detected, switch to yellow then red *)
+    IF CurrentLight = GREEN THEN
+        CurrentLight := YELLOW;
+    ELSEIF CurrentLight = YELLOW THEN
+        CurrentLight := RED;
+    END_IF;
+ELSIF PedestrianButtonPressed AND NOT VehicleDetected AND CurrentLight = RED THEN
+    (* If pedestrian button is pressed, no vehicles, and current light is red, switch to green *)
+    CurrentLight := GREEN;
+ELSE
+    (* Normal traffic light cycle *)
+    CASE CurrentLight OF
+        GREEN:
+            CurrentLight := YELLOW;
+        YELLOW:
+            CurrentLight := RED;
+        RED:
+            CurrentLight := GREEN;
+    END_CASE;
+END_IF;
+
+(* Set the light outputs based on the current state *)
+CASE CurrentLight OF
+    GREEN:
+        LightGreen := TRUE;
+        LightYellow := FALSE;
+        LightRed := FALSE;
+    YELLOW:
+        LightGreen := FALSE;
+        LightYellow := TRUE;
+        LightRed := FALSE;
+    RED:
+        LightGreen := FALSE;
+        LightYellow := FALSE;
+        LightRed := TRUE;
+END_CASE;
+
+END_PROGRAM

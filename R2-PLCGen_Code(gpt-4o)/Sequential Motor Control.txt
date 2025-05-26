@@ -1,0 +1,46 @@
+PROGRAM SequentialMotorControl2
+VAR
+    Motor1_Start : BOOL := FALSE;
+    Motor2_Start : BOOL := FALSE;
+    Motor3_Start : BOOL := FALSE;
+    Motor1_Stop : BOOL := FALSE;
+    Motor2_Stop : BOOL := FALSE;
+    Motor3_Stop : BOOL := FALSE;
+    Operation_Time : TIME := T#0ms;
+    Timer1 : TON;
+    Timer2 : TON;
+    Error_Notification : BOOL := FALSE;
+END_VAR
+
+(* Main control sequence *)
+IF Motor1_Start AND NOT Motor2_Start AND NOT Motor3_Start THEN
+    Timer1(IN:=Motor1_Start, PT:=T#3s); (* Adjust PT for the desired delay *)
+    Motor1_Stop := Timer1.Q;
+    IF Motor1_Stop THEN
+        Motor1_Start := FALSE;
+        Motor2_Start := TRUE;
+    END_IF;
+ELSIF Motor2_Start AND NOT Motor3_Start THEN
+    Timer2(IN:=Motor2_Start, PT:=T#3s); (* Adjust PT for the desired delay *)
+    Motor2_Stop := Timer2.Q;
+    IF Motor2_Stop THEN
+        Motor2_Start := FALSE;
+        Motor3_Start := TRUE;
+    END_IF;
+ELSIF Motor3_Start THEN
+    Operation_Time := Operation_Time + T#100ms; (* Increment operation time *)
+    IF Operation_Time >= T#10s THEN
+        Motor3_Start := FALSE; (* Ensure operation stops after 10 seconds *)
+    END_IF;
+END_IF;
+
+(* Error handling *)
+IF NOT Motor1_Start AND NOT Motor2_Start AND NOT Motor3_Start AND (Operation_Time > T#10s) THEN
+    Error_Notification := TRUE; (* Trigger error notification *)
+    (* Additional actions to handle the error can be implemented here, such as logging the error or alerting an operator. *)
+    Motor1_Start := FALSE;
+    Motor2_Start := FALSE;
+    Motor3_Start := FALSE;
+END_IF;
+
+END_PROGRAM
