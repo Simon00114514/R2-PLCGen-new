@@ -127,7 +127,7 @@ python LLM4PLC.py
 python Agents4PLC.py
 
 ```
-
+```bash
 R2-PLCGen_Root_Directory/
 ├── R2-PLCGen.py                # Main executable script for R2-PLCGen workflow
 ├── LLM4PLC.py                  # Main executable script for LLM4PLC baseline
@@ -147,3 +147,4 @@ R2-PLCGen_Root_Directory/
 ├── LLM4PLC/                    # Resources/modules for the LLM4PLC workflow
 ├── Agents4PLC/                 # Resources/modules for the Agents4PLC workflow
 └── README.md
+```
