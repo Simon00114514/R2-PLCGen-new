@@ -127,6 +127,7 @@ python LLM4PLC.py
 python Agents4PLC.py
 
 ```
+## Project Structure
 ```bash
 R2-PLCGen_Root_Directory/
 ├── R2-PLCGen.py                # Main executable script for R2-PLCGen workflow
