@@ -1,0 +1,37 @@
+PROGRAM ConveyorBeltControl
+VAR_INPUT
+    Start        : BOOL;
+    StopStation1 : BOOL;
+    StopStation2 : BOOL;
+    StopStation3 : BOOL;
+    Sensor1      : BOOL;
+    Sensor2      : BOOL;
+    Sensor3      : BOOL;
+    Sensor4      : BOOL;
+    Sensor5      : BOOL;
+END_VAR
+
+VAR_OUTPUT
+    BeltActive   : BOOL;
+    BeltSpeed    : INT;
+END_VAR
+
+VAR
+    // No internal variables declared
+END_VAR
+
+IF (StopStation1 = TRUE) OR (StopStation2 = TRUE) OR (StopStation3 = TRUE) THEN
+    BeltActive := FALSE;
+ELSIF (Start = TRUE) AND ((Sensor1 = TRUE) OR (Sensor2 = TRUE) OR (Sensor3 = TRUE) OR (Sensor4 = TRUE) OR (Sensor5 = TRUE)) THEN
+    BeltActive := TRUE;
+ELSE
+    BeltActive := FALSE;
+END_IF;
+
+IF BeltActive = TRUE THEN
+    BeltSpeed := 2;
+ELSE
+    BeltSpeed := 0;
+END_IF;
+
+END_PROGRAM

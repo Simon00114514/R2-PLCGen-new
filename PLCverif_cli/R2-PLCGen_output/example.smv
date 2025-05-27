@@ -1,0 +1,99 @@
+-- Model
+MODULE main
+	VAR
+		loc : {init_pv, end, loop_start, prepare_BoC, l_main_call, prepare_EoC, verificationLoop_VerificationLoop_l7};
+		instance_Start : boolean;
+		instance_StopStation1 : boolean; -- frozen
+		instance_StopStation2 : boolean;
+		instance_StopStation3 : boolean;
+		instance_Sensor1 : boolean;
+		instance_Sensor2 : boolean;
+		instance_Sensor3 : boolean;
+		instance_Sensor4 : boolean;
+		instance_Sensor5 : boolean;
+		instance_BeltActive : boolean; -- frozen
+		EoC : boolean; -- frozen
+		BoC : boolean; -- frozen
+	
+	ASSIGN
+		-- CFA structure (loc)
+		init(loc) := init_pv;
+		next(loc) := case
+			loc = init_pv & (TRUE) : loop_start;
+			loc = loop_start & (TRUE) : prepare_BoC;
+			loc = prepare_BoC & (TRUE) : l_main_call;
+			loc = verificationLoop_VerificationLoop_l7 & (TRUE) : prepare_EoC;
+			loc = prepare_EoC & (TRUE) : loop_start;
+			loc = l_main_call & (((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3)) : verificationLoop_VerificationLoop_l7;
+			loc = l_main_call & ((!(((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3))) & ((instance_Start) & (((((instance_Sensor1) | (instance_Sensor2)) | (instance_Sensor3)) | (instance_Sensor4)) | (instance_Sensor5)))) : verificationLoop_VerificationLoop_l7;
+			loc = l_main_call & ((!(((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3))) & (!((!(((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3))) & ((instance_Start) & (((((instance_Sensor1) | (instance_Sensor2)) | (instance_Sensor3)) | (instance_Sensor4)) | (instance_Sensor5)))))) : verificationLoop_VerificationLoop_l7;
+			TRUE: loc;
+		esac;
+		
+		init(instance_Start) := FALSE;
+		next(instance_Start) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_Start;
+		esac;
+		init(instance_StopStation1) := FALSE;
+		next(instance_StopStation1) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_StopStation1;
+		esac;
+		init(instance_StopStation2) := FALSE;
+		next(instance_StopStation2) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_StopStation2;
+		esac;
+		init(instance_StopStation3) := FALSE;
+		next(instance_StopStation3) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_StopStation3;
+		esac;
+		init(instance_Sensor1) := FALSE;
+		next(instance_Sensor1) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_Sensor1;
+		esac;
+		init(instance_Sensor2) := FALSE;
+		next(instance_Sensor2) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_Sensor2;
+		esac;
+		init(instance_Sensor3) := FALSE;
+		next(instance_Sensor3) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_Sensor3;
+		esac;
+		init(instance_Sensor4) := FALSE;
+		next(instance_Sensor4) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_Sensor4;
+		esac;
+		init(instance_Sensor5) := FALSE;
+		next(instance_Sensor5) := case
+			loc = loop_start & (TRUE) : {TRUE, FALSE};
+			TRUE  : instance_Sensor5;
+		esac;
+		init(instance_BeltActive) := FALSE;
+		next(instance_BeltActive) := case
+			loc = l_main_call & (((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3)) : FALSE;
+			loc = l_main_call & ((!(((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3))) & ((instance_Start) & (((((instance_Sensor1) | (instance_Sensor2)) | (instance_Sensor3)) | (instance_Sensor4)) | (instance_Sensor5)))) : TRUE;
+			loc = l_main_call & ((!(((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3))) & (!((!(((instance_StopStation1) | (instance_StopStation2)) | (instance_StopStation3))) & ((instance_Start) & (((((instance_Sensor1) | (instance_Sensor2)) | (instance_Sensor3)) | (instance_Sensor4)) | (instance_Sensor5)))))) : FALSE;
+			TRUE  : instance_BeltActive;
+		esac;
+		init(EoC) := FALSE;
+		next(EoC) := case
+			loc = verificationLoop_VerificationLoop_l7 & (TRUE) : TRUE;
+			loc = prepare_EoC & (TRUE) : FALSE;
+			TRUE  : EoC;
+		esac;
+		init(BoC) := FALSE;
+		next(BoC) := case
+			loc = loop_start & (TRUE) : TRUE;
+			loc = prepare_BoC & (TRUE) : FALSE;
+			TRUE  : BoC;
+		esac;
+
+-- Requirement
+CTLSPEC AG(((EoC) & (instance_StopStation1)) -> (instance_BeltActive));
