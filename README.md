@@ -128,14 +128,11 @@ python Agents4PLC.py
 
 ```
 
-## Project Structure 
-   
-R2-PLCGen/                           # Project Root
+R2-PLCGen_Root_Directory/
 ├── R2-PLCGen.py                # Main executable script for R2-PLCGen workflow
 ├── LLM4PLC.py                  # Main executable script for LLM4PLC baseline
 ├── Agents4PLC.py               # Main executable script for Agents4PLC baseline
 ├── requirements.txt            # Python dependencies
-│
 ├── R2-PLCGen/                  # Core implementation of the R2-PLCGen workflow
 │   ├── Code_Agent.py
 │   ├── Debug_Agent.py
@@ -146,47 +143,7 @@ R2-PLCGen/                           # Project Root
 │   ├── UseCase_Agent.py
 │   ├── config.py               # Configuration for R2-PLCGen
 │   ├── nuXmv.py                # Interface for nuXmv
-│   ├── plcverif.py             # Interface for PLCVerif (from your previous script)
-│   ├── builtin.scl             # Pre-defined SCL FUNCTION_BLOCK file
-│   ├── Modify_Code.scl         # Examples of output SCL file
-│   ├── CTLORTL_design.txt
-│   ├── CTLORTL_initial_design.txt
-│   ├── pattern_id_explain.txt
-│   ├── Patterns_design.txt
-│   ├── R2II_design_req.txt     # Intermediate R2-PLCGen files
-│   ├── R2II_refined_suggestion.txt
-│   ├── property_output_formal.txt
-│   ├── st_rules.txt
-│   ├── use_case_grammar.txt
-│   └── xml_translate.py        # (If used as a utility)
-│
-├── LLM4PLC/                    # Resources/modules for the LLM4PLC workflow (if any)
-├── Agents4PLC/                 # Resources/modules for the Agents4PLC workflow (if any)
-│
-├── PLCverif_cli/               # PLCVerif command-line tool and its resources
-│   ├── eclipsec.exe            # (Assumed executable, based on your script)
-│   ├── cli_set.txt             # Configuration for PLCVerif
-│   ├── NuSMV.exe               # (As referenced in cli_set.txt)
-│   └── output/                 # Default output of PLCVerif if run from here
-│   └── ... (other PLCVerif files)
-│
-├── NL2UC-0/                    # Domain-specific data/module (e.g., Natural Language to Use Case resources)
-├── Pattern_Info/               # Data/resources related to requirement patterns
-├── Property_Info/              # Data/resources related to formal properties
-├── SMV_Info/                   # Data/resources related to SMV models
-├── ST_Grammar/                 # Structured Text grammar definitions or resources
-├── UseCase_Info/               # Data/resources related to use case modeling
-│
-├── Agents4PLC_Code(gpt-4o)/    # Example outputs or experimental results for Agents4PLC (GPT-4o)
-├── Agents4PLC_Code(o3-mini)/   # Example outputs or experimental results for Agents4PLC (O3-mini)
-├── R2-PLCGen_Code(gpt-4o)/     # Example outputs or experimental results for R2-PLCGen (GPT-4o)
-├── R2-PLCGen_Code(o3-mini)/    # Example outputs or experimental results for R2-PLCGen (O3-mini)
-│
-├── examples/                   # Directory for example inputs
-│   └── requirements/
-│       └── sample_task.txt     # Example requirement file
-├── data/                       # Benchmark dataset and formal constraints (if you create this structure)
-│   ├── benchmark_tasks/
-│   └── formal_constraints/
-├── results/                    # General directory for generated outputs from scripts
+│   └── plcverif.py             # Interface for PLCVerif
+├── LLM4PLC/                    # Resources/modules for the LLM4PLC workflow
+├── Agents4PLC/                 # Resources/modules for the Agents4PLC workflow
 └── README.md
