@@ -16,32 +16,28 @@ import sys
 import io
 import re
 
-# 设置标准输出为 UTF编码
 sys.stdout  = io.TextIOWrapper(sys.stdout.buffer,  encoding='utf-8', errors='replace')
 warnings.filterwarnings('ignore')
 try:
     from config import chat_model, openai_api_key, openai_base_url
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
-
+# change the path to your own
 folder_path = 'D:\\project\\R2-PLCGen\\ST_Grammar'
-# 使用glob模式匹配文件夹中的所有md文件
 md_files = glob.glob(os.path.join(folder_path, '*.md'))
-# 使用SimpleDirectoryReader读取所有文件
 documents = SimpleDirectoryReader(input_files=md_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
 
-# 设置全局配置
 Settings.llm = OpenAI(model="o3-mini", temperature=0.1)
-Settings.chunk_size = 512  # 根据需要设置
-Settings.chunk_overlap = 20  # 根据需要设置
+Settings.chunk_size = 512
+Settings.chunk_overlap = 20
 def build_sentence_window_index(
         documents,
         embed_model="local:BAAI/bge-large-en-v1.5",
         sentence_window_size=3,
         save_dir="ST_Grammar_index",
 ):
-    # 创建句子窗口的 node parser
+    # create node parser
     node_parser = SentenceWindowNodeParser(
         window_size=sentence_window_size,
         window_metadata_key="window",
@@ -145,5 +141,5 @@ def PLC_Coder(query_engine, initial_query):
         else:
             conversation_history.append({"role": "user", "content": user_input})
 
-# 启动互动式对话代理
+# interaction with the agent
 PLC_Coder(query_engine, query_str)

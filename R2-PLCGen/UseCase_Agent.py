@@ -22,18 +22,15 @@ try:
     from config import chat_model, openai_api_key, openai_base_url
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
-
+# change the path to your own
 folder_path = 'D:\\project\\R2-PLCGen\\UseCase_Info'
-# 使用glob模式匹配文件夹中的所有PDF文件
 pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
-# 使用SimpleDirectoryReader读取所有PDF文件,加载文档
 documents = SimpleDirectoryReader(input_files=pdf_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
-
-# 设置全局配置
+# set up the OpenAI LLM
 Settings.llm = OpenAI(model="o3-mini", temperature=0.1)
-Settings.chunk_size = 512  # 根据需要设置
-Settings.chunk_overlap = 20  # 根据需要设置
+Settings.chunk_size = 512
+Settings.chunk_overlap = 20
 
 def build_sentence_window_index(
         documents,
@@ -85,7 +82,7 @@ query_engine = get_sentence_window_query_engine(index, similarity_top_k=6)
 
 
 
-#读取文件
+# read files
 def get_prompt_from_file(file_path):
     with open(file_path, 'rb') as file:
         raw_data = file.read()

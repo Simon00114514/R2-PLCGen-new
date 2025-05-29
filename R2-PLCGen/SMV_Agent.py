@@ -21,17 +21,17 @@ try:
     from config import chat_model, openai_api_key, openai_base_url
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
-
+# change the path to your own
 folder_path = 'D:\\project\\R2-PLCGen\\SMV_Info'
-# 使用glob模式匹配文件夹中的所有PDF文件
+# access all pdf files in the folder
 pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
-# 使用SimpleDirectoryReader读取所有PDF文件
+# use SimpleDirectoryReader to read all PDF files
 documents = SimpleDirectoryReader(input_files=pdf_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
-# 设置全局配置
+# LLM sets
 Settings.llm = OpenAI(model="o3-mini", temperature=0.1)
-Settings.chunk_size = 512  # 根据需要设置
-Settings.chunk_overlap = 20  # 根据需要设置
+Settings.chunk_size = 512  # setting chunk size
+Settings.chunk_overlap = 20  # setting chunk overlap
 
 def build_sentence_window_index(
         documents,
@@ -39,7 +39,7 @@ def build_sentence_window_index(
         sentence_window_size=3,
         save_dir="smv_index",
 ):
-    # 创建句子窗口的 node parser
+    # create sentence window node parser
     node_parser = SentenceWindowNodeParser(
         window_size=sentence_window_size,
         window_metadata_key="window",
@@ -102,7 +102,7 @@ spec_prompt2 = get_prompt_from_file('CTLORLTL_initial_design.txt')
 smv_example2 = get_prompt_from_file('SMV_grammar_example.txt')
 
 
-# 定义任务选择机制
+# select different task
 def select_task():
     print("Choose the task you want to perform:")
     print("1. check the semantic consistency of the specification")
@@ -110,7 +110,7 @@ def select_task():
     task = input("Input 1 or 2:")
     return task
 
-# 根据任务选择加载不同的query_str
+#  task 1 or task 2
 task = select_task()
 if task == "1":
     query_str = ("""
@@ -163,7 +163,7 @@ def smv_agent(query_engine, initial_query):
                                                           " Your task is to construct an SMV model that verifies the syntactic correctness of the refined requirements based on the initial requirements. "
                                                           "You should follow the guidelines provided to ensure the model is accurate and complete."}]
     conversation_history.append({"role": "user", "content": initial_query})
-    latest_smv_model = None  # 用于存储最新的 SMV 模型
+    latest_smv_model = None
 
     print("Type 'save' to save the latest SMV model to test.smv, or 'exit' to quit.")
 
@@ -178,7 +178,7 @@ def smv_agent(query_engine, initial_query):
         if match:
             latest_smv_model = match.group(1).strip()  # 更新最新模型
 
-        # 将完整响应（包含 "Agent: "）保存到日志文件
+        # save the complete response (including "Agent: ") to the log file
         with open("smv_check_design.txt", 'w', encoding='gbk', errors="replace") as f:
             f.write(f"Agent: {response}\n")
 
@@ -187,7 +187,6 @@ def smv_agent(query_engine, initial_query):
             break
         elif user_input.lower() == "save":
             if latest_smv_model:
-                # 只保存 SMV 模型内容到 test.smv，不添加 "Agent: "
                 with open("test.smv", 'w', encoding='gbk', errors="replace") as f:
                     f.write(latest_smv_model)
                 print("SMV model saved to test.smv")

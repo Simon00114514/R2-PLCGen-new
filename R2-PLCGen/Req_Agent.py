@@ -15,24 +15,20 @@ from llama_index.core import Settings
 import sys
 import io
 import re
-# 设置标准输出为 utf-8 编码
 sys.stdout  = io.TextIOWrapper(sys.stdout.buffer,  encoding='utf-8', errors='replace')
 warnings.filterwarnings('ignore')
 try:
     from config import chat_model, openai_api_key, openai_base_url
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
-
+# change the path to your own
 folder_path = 'D:\\project\\R2-PLCGen\\ST_Grammar'
-# 使用glob模式匹配文件夹中的所有md文件
 pdf_files = glob.glob(os.path.join(folder_path, '*.md'))
-# 使用SimpleDirectoryReader读取所有文c件
 documents = SimpleDirectoryReader(input_files=pdf_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
-# 设置全局配置
 Settings.llm = OpenAI(model="o3-mini", temperature=0.1)
-Settings.chunk_size = 512  # 根据需要设置
-Settings.chunk_overlap = 20  # 根据需要设置
+Settings.chunk_size = 512
+Settings.chunk_overlap = 20
 
 def build_sentence_window_index(
         documents,
@@ -40,7 +36,6 @@ def build_sentence_window_index(
         sentence_window_size=3,
         save_dir="usecase_index",
 ):
-    # 创建句子窗口的 node parser
     node_parser = SentenceWindowNodeParser(
         window_size=sentence_window_size,
         window_metadata_key="window",
@@ -98,7 +93,7 @@ spec_prompt = get_prompt_from_file("CTLORLTL_design.txt")
 use_case_design = get_prompt_from_file("R2IL_design_req.txt")
 
 
-# 改进后的提示词设计
+# prompt for guiding req_Agent
 query_str = ("""
     You are an expert-level programmer in the field of computer formal verification and modeling, with years of programming experience and rich expertise in model design and verification techniques.
     You are proficient in various CTL/LTL and SMV tools and are capable of designing CTL formulas or SMV models based on actual requirements.
@@ -147,5 +142,5 @@ def Req_Agent(query_engine, initial_query):
         else:
             conversation_history.append({"role": "user", "content": user_input})
 
-# 启动互动式对话代理
+# interaction with the agent
 Req_Agent(query_engine, query_str)
