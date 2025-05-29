@@ -7,7 +7,7 @@ REQUIREMENT_SCRIPTS = [
     'R2-PLCGen/Pattern_Agent.py',
     'R2-PLCGen/Property_Agent.py',
     'R2-PLCGen/SMV_Agent.py',
-    'R2-PLCGen/Req_Agent.py',
+    'R2-PLCGen/ReqDebug_Agent.py',
 ]
 
 # Code Generaion Phase Scripts

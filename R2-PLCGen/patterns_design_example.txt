@@ -5,7 +5,7 @@ Output structure:
     {
       "pattern_name": "<Pattern Name>",
       "Informal requirement": If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle.
-      "ctl_ltl_formula": "<Generated Formula>",
+      "Formal requirement": "<Generated Formula>",
       "parameters": {
         "{1}": "<Extracted condition or state>",
         "{2}": "<Extracted condition or state>",
@@ -23,7 +23,7 @@ Example based on provided patterns:
         {
           "pattern_name": "Implication",
           "Informal requirement": "If an emergency vehicle is detected and sensors are functioning at the end of the cycle, then the system must immediately transition to the emergency state.",
-          "ctl_ltl_formula": "AG(({PLC_END} AND (emergency_vehicle_detected AND sensors_ok)) --> (emergency_state))",
+          "Formal requirement": "AG(({PLC_END} AND (emergency_vehicle_detected AND sensors_ok)) --> (emergency_state))",
           "parameters": {
             "{1}": "emergency_vehicle_detected AND sensors_ok",
             "{2}": "emergency_state"
@@ -41,74 +41,122 @@ Example based on provided patterns:
       ]
     }
 
-Pattern grammar:
-⟨pattern_document⟩ ::= LBRACE EOL?
-                      STRING ':' STRING ',' EOL?
-                      STRING ':' LBRACK EOL?
-                      ⟨pattern_object⟩ ( ',' EOL? ⟨pattern_object⟩ )* EOL?
-                      RBRACK EOL?
-                      RBRACE EOF
+— Pattern Grammar Parser Rules —
 
-⟨pattern_object⟩ ::= LBRACE EOL?
-                     ( ⟨pattern_name_pair⟩ ',' EOL?
-                       ⟨informal_req_pair⟩ ',' EOL?
-                       ⟨ctl_ltl_formula_pair⟩ ',' EOL?
-                       ⟨parameters_pair⟩
-                     | ⟨informal_req_pair⟩ ',' EOL?
-                       ⟨ctl_ltl_formula_pair⟩ ',' EOL?
-                       ⟨parameters_pair⟩ ',' EOL?
-                       ⟨pattern_name_pair⟩
-                     ) EOL?
-                     RBRACE
+<pattern_document>
+    ::= <LBRACE> (<EOL>)?
+        <use_case_pair> <COMMA> (<EOL>)?          // Changed from generic STRING:STRING
+        <PATTERNS_KEY> <COLON> <LBRACK> (<EOL>)? // Changed from generic STRING:LBRACK
+        <pattern_object> (<COMMA> (<EOL>)? <pattern_object>)* (<EOL>)?
+        <RBRACK> (<EOL>)?
+        <RBRACE> <EOF>                          // Assuming EOF is a conceptual end-of-file marker
 
-⟨pattern_name_pair⟩      ::= P_NAME_KEY ':' ⟨pattern_name_value⟩
-⟨informal_req_pair⟩     ::= INF_REQ_KEY ':' STRING
-⟨ctl_ltl_formula_pair⟩ ::= CTL_LTL_KEY ':' STRING
+// New rule for the use_case key-value pair
+<use_case_pair>
+    ::= <USE_CASE_KEY> <COLON> <STRING>
 
-⟨parameters_pair⟩ ::= PARAMS_KEY ':' LBRACE EOL?
-                        ⟨parameter⟩ ( ',' EOL? ⟨parameter⟩ )* EOL?
-                      RBRACE
+<pattern_object>
+    ::= <LBRACE> (<EOL>)?
+       (
+         <pattern_name_pair> <COMMA> (<EOL>)?
+         <informal_req_pair> <COMMA> (<EOL>)?
+         <ctl_ltl_formula_pair> <COMMA> (<EOL>)?
+         <parameters_pair>
+       | <informal_req_pair> <COMMA> (<EOL>)?
+         <ctl_ltl_formula_pair> <COMMA> (<EOL>)?
+         <parameters_pair> <COMMA> (<EOL>)?
+         <pattern_name_pair>
+       ) (<EOL>)?
+       <RBRACE>
 
-⟨parameter⟩ ::= STRING ':' STRING
+<pattern_name_pair>
+    ::= <P_NAME_KEY> <COLON> <pattern_name_value>
 
-⟨pattern_name_value⟩ ::= P_IMPLICATION
-                        | P_INVARIANT
-                        | P_FORBIDDEN
-                        | P_STATECHANGE_DURING
-                        | P_STATECHANGE_BETWEEN
-                        | P_REACHABILITY
-                        | P_REPEATABILITY
-                        | P_LEADSTO
-                        | P_LEADSTO_TRIGGER
-                        | P_LEADSTO_EARLIER
-                        | P_TIMED_TRIGGER
-                        | STRING
+<informal_req_pair>
+    ::= <INF_REQ_KEY> <COLON> <STRING>
 
-–– Lexer tokens (terminals) ––
-LBRACE            ::= '{'
-RBRACE            ::= '}'
-LBRACK            ::= '['
-RBRACK            ::= ']'
-P_NAME_KEY        ::= '"pattern_name"'
-INF_REQ_KEY       ::= '"Informal requirement"'
-CTL_LTL_KEY       ::= '"ctl_ltl_formula"'
-PARAMS_KEY        ::= '"parameters"'
+<ctl_ltl_formula_pair>
+    ::= <CTL_LTL_KEY> <COLON> <STRING>
 
-P_IMPLICATION         ::= '"Implication"'
-P_INVARIANT           ::= '"Invariant"'
-P_FORBIDDEN           ::= '"Forbidden state"'
-P_STATECHANGE_DURING  ::= '"State change during a cycle"'
-P_STATECHANGE_BETWEEN ::= '"State change between cycles"'
-P_REACHABILITY        ::= '"Reachability"'
-P_REPEATABILITY       ::= '"Repeatability"'
-P_LEADSTO             ::= '"Leads to"'
-P_LEADSTO_TRIGGER     ::= '"Leads to trigger"'
-P_LEADSTO_EARLIER     ::= '"Leads to earlier"'
-P_TIMED_TRIGGER       ::= '"Timed trigger response"'
+<parameters_pair>
+    ::= <PARAMS_KEY> <COLON> <LBRACE> (<EOL>)?
+        <parameter> (<COMMA> (<EOL>)? <parameter>)* (<EOL>)?
+        <RBRACE>
 
-STRING ::= '"' ( ~["\\] | '\\' . )* '"'
-         | '\'' ( ~['\\] | '\\' . )* '\''
+<parameter>
+    ::= <STRING> <COLON> <STRING>
 
-EOL ::= [\r\n]+
-WS  ::= [ \t]+   (skipped)
+<pattern_name_value>
+    ::= <P_IMPLICATION>
+     | <P_INVARIANT>
+     | <P_FORBIDDEN>
+     | <P_STATECHANGE_DURING>
+     | <P_STATECHANGE_BETWEEN>
+     | <P_REACHABILITY>
+     | <P_REPEATABILITY>
+     | <P_LEADSTO>
+     | <P_LEADSTO_TRIGGER>
+     | <P_LEADSTO_EARLIER>
+     | <P_TIMED_TRIGGER>
+     | <STRING>
 
+
+— Terminal Symbols (Lexer Rules) —
+
+<LBRACE>              ::= '{'
+<RBRACE>              ::= '}'
+<LBRACK>              ::= '['
+<RBRACK>              ::= ']'
+<COLON>               ::= ':'
+<COMMA>               ::= ','
+
+// Specific Keys (Terminals)
+<USE_CASE_KEY>        ::= '"use_case"'          // New Terminal
+<PATTERNS_KEY>        ::= '"patterns"'          // New Terminal
+<P_NAME_KEY>          ::= '"pattern_name"'
+<INF_REQ_KEY>         ::= '"Informal requirement"'
+<CTL_LTL_KEY>         ::= '"ctl_ltl_formula"'
+<PARAMS_KEY>          ::= '"parameters"'
+
+// Pattern Name Values (Terminals)
+<P_IMPLICATION>       ::= '"Implication"'
+<P_INVARIANT>         ::= '"Invariant"'
+<P_FORBIDDEN>         ::= '"Forbidden state"'
+<P_STATECHANGE_DURING>::= '"State change during a cycle"'
+<P_STATECHANGE_BETWEEN>::= '"State change between cycles"'
+<P_REACHABILITY>      ::= '"Reachability"'
+<P_REPEATABILITY>     ::= '"Repeatability"'
+<P_LEADSTO>           ::= '"Leads to"'
+<P_LEADSTO_TRIGGER>   ::= '"Leads to trigger"'
+<P_LEADSTO_EARLIER>   ::= '"Leads to earlier"'
+<P_TIMED_TRIGGER>     ::= '"Timed trigger response"'
+
+<STRING>
+    ::= '"' ( <any_char_except_double_quote_or_backslash> | <BACKSLASH> <any_char> )* '"'
+     | '\'' ( <any_char_except_single_quote_or_backslash> | <BACKSLASH> <any_char> )* '\''
+    // Note: The ( ~["\\] | '\\' . )* is ANTLR-specific regex.
+    // For a more traditional BNF, you might define <char_sequence> more abstractly
+    // or define helper terminals like <any_char_except_...>, <BACKSLASH>.
+    // I've tried to make it a bit more generic here.
+
+<EOL>                 ::= ( '\t' | '\r' | '\n' )+   // Represents one or more EOL characters
+                                                 // The "-> skip" is an ANTLR lexer action,
+                                                 // not part of pure BNF structure.
+                                                 // In BNF, if EOLs are structurally significant,
+                                                 // they appear in rules. If just whitespace,
+                                                 // they are often omitted from parser rules
+                                                 // with a general note.
+                                                 // Given your use of (<EOL>)?, it's treated as an optional token.
+
+<WS>                  ::= ( ' ' | '\t' )+         // Represents one or more whitespace characters
+                                                 // (excluding newlines if EOL is separate)
+                                                 // Similar comment to <EOL> regarding "-> skip".
+
+// Helper terminal definitions (if you want to be very explicit for <STRING>)
+<BACKSLASH>                           ::= '\'
+<any_char>                            ::= /* any character */
+<any_char_except_double_quote_or_backslash> ::= /* any character except " or \ */
+<any_char_except_single_quote_or_backslash> ::= /* any character except ' or \ */
+
+// Conceptual end-of-file marker
+<EOF>                 ::= ‘end-of-file’

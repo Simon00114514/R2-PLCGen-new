@@ -139,7 +139,7 @@ R2-PLCGen_Root_Directory/
 │   ├── Debug_Agent.py
 │   ├── Pattern_Agent.py
 │   ├── Property_Agent.py
-│   ├── Req_Agent.py
+│   ├── ReqDebug_Agent.py
 │   ├── SMV_Agent.py
 │   ├── UseCase_Agent.py
 │   ├── config.py               # Configuration for R2-PLCGen
