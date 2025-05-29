@@ -53,7 +53,7 @@ def build_sentence_window_index(
         documents,
         embed_model="local:BAAI/bge-large-en-v1.5",
         sentence_window_size=3,
-        save_dir="ctl_index",
+        save_dir="property_index",
 ):
     # 创建句子窗口的 node parser
     node_parser = SentenceWindowNodeParser(
@@ -93,7 +93,7 @@ def get_sentence_window_query_engine(
 
 index = build_sentence_window_index(
     [document],
-    save_dir="ctl_index",
+    save_dir="property_index",
 )
 query_engine = get_sentence_window_query_engine(index, similarity_top_k=6)
 
