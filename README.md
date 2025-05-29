@@ -144,6 +144,9 @@ R2-PLCGen_Root_Directory/
 │   ├── UseCase_Agent.py
 │   ├── config.py               # Configuration for R2-PLCGen
 │   ├── nuXmv.py                # Interface for nuXmv
+│   ├── Pattern_id_explain.txt  # Explanation of 'Patterns'
+│   ├── Patterns_design_example.txt  # Prompts for 'how to design pattern' and 'Patterns' Grammar designs(BNF formal)
+│   ├── use_case_examples.txt                # Prompts for 'how to design UC' and 'UC-diagram' Grammar designs(BNF formal)
 │   └── plcverif.py             # Interface for PLCVerif
 ├── LLM4PLC/                    # Resources/modules for the LLM4PLC workflow
 ├── Agents4PLC/                 # Resources/modules for the Agents4PLC workflow
