@@ -1,0 +1,114 @@
+Output structure:
+{
+  "use_case": "<Brief description or identifier of the use case>",
+  "patterns-i(i=1,2,3...)": [
+    {
+      "pattern_name": "<Pattern Name>",
+      "Informal requirement": If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle.
+      "ctl_ltl_formula": "<Generated Formula>",
+      "parameters": {
+        "{1}": "<Extracted condition or state>",
+        "{2}": "<Extracted condition or state>",
+        // Include all parameters relevant to the pattern
+      }
+    },
+    // Additional patterns if applicable
+  ]
+}
+
+Example based on provided patterns:
+{
+      "use_case": "UC-4 Process Emergency Vehicle Request",
+      "patterns": [
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If an emergency vehicle is detected and sensors are functioning at the end of the cycle, then the system must immediately transition to the emergency state.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (emergency_vehicle_detected AND sensors_ok)) --> (emergency_state))",
+          "parameters": {
+            "{1}": "emergency_vehicle_detected AND sensors_ok",
+            "{2}": "emergency_state"
+          }
+        },
+        {
+          "pattern_name": "Implication",
+          "Informal requirement": "If both an emergency vehicle and a pedestrian request occur concurrently (with sensor status ok) at the end of the cycle, then the light must transition to red.",
+          "ctl_ltl_formula": "AG(({PLC_END} AND (emergency_vehicle_detected AND pedestrian_button_pressed AND sensors_ok)) --> (light = red))",
+          "parameters": {
+            "{1}": "emergency_vehicle_detected AND pedestrian_button_pressed AND sensors_ok",
+            "{2}": "light = red"
+          }
+        }
+      ]
+    }
+
+Pattern grammar:
+⟨pattern_document⟩ ::= LBRACE EOL?
+                      STRING ':' STRING ',' EOL?
+                      STRING ':' LBRACK EOL?
+                      ⟨pattern_object⟩ ( ',' EOL? ⟨pattern_object⟩ )* EOL?
+                      RBRACK EOL?
+                      RBRACE EOF
+
+⟨pattern_object⟩ ::= LBRACE EOL?
+                     ( ⟨pattern_name_pair⟩ ',' EOL?
+                       ⟨informal_req_pair⟩ ',' EOL?
+                       ⟨ctl_ltl_formula_pair⟩ ',' EOL?
+                       ⟨parameters_pair⟩
+                     | ⟨informal_req_pair⟩ ',' EOL?
+                       ⟨ctl_ltl_formula_pair⟩ ',' EOL?
+                       ⟨parameters_pair⟩ ',' EOL?
+                       ⟨pattern_name_pair⟩
+                     ) EOL?
+                     RBRACE
+
+⟨pattern_name_pair⟩      ::= P_NAME_KEY ':' ⟨pattern_name_value⟩
+⟨informal_req_pair⟩     ::= INF_REQ_KEY ':' STRING
+⟨ctl_ltl_formula_pair⟩ ::= CTL_LTL_KEY ':' STRING
+
+⟨parameters_pair⟩ ::= PARAMS_KEY ':' LBRACE EOL?
+                        ⟨parameter⟩ ( ',' EOL? ⟨parameter⟩ )* EOL?
+                      RBRACE
+
+⟨parameter⟩ ::= STRING ':' STRING
+
+⟨pattern_name_value⟩ ::= P_IMPLICATION
+                        | P_INVARIANT
+                        | P_FORBIDDEN
+                        | P_STATECHANGE_DURING
+                        | P_STATECHANGE_BETWEEN
+                        | P_REACHABILITY
+                        | P_REPEATABILITY
+                        | P_LEADSTO
+                        | P_LEADSTO_TRIGGER
+                        | P_LEADSTO_EARLIER
+                        | P_TIMED_TRIGGER
+                        | STRING
+
+–– Lexer tokens (terminals) ––
+LBRACE            ::= '{'
+RBRACE            ::= '}'
+LBRACK            ::= '['
+RBRACK            ::= ']'
+P_NAME_KEY        ::= '"pattern_name"'
+INF_REQ_KEY       ::= '"Informal requirement"'
+CTL_LTL_KEY       ::= '"ctl_ltl_formula"'
+PARAMS_KEY        ::= '"parameters"'
+
+P_IMPLICATION         ::= '"Implication"'
+P_INVARIANT           ::= '"Invariant"'
+P_FORBIDDEN           ::= '"Forbidden state"'
+P_STATECHANGE_DURING  ::= '"State change during a cycle"'
+P_STATECHANGE_BETWEEN ::= '"State change between cycles"'
+P_REACHABILITY        ::= '"Reachability"'
+P_REPEATABILITY       ::= '"Repeatability"'
+P_LEADSTO             ::= '"Leads to"'
+P_LEADSTO_TRIGGER     ::= '"Leads to trigger"'
+P_LEADSTO_EARLIER     ::= '"Leads to earlier"'
+P_TIMED_TRIGGER       ::= '"Timed trigger response"'
+
+STRING ::= '"' ( ~["\\] | '\\' . )* '"'
+         | '\'' ( ~['\\] | '\\' . )* '\''
+
+EOL ::= [\r\n]+
+WS  ::= [ \t]+   (skipped)
+
