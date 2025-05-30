@@ -108,7 +108,7 @@ def get_prompt_from_file(file_path):
         return file.read()
 
 
-# input files:
+# get relevant files for the query
 usecase_file = get_prompt_from_file("R2IL_design_req.txt")
 patterns_explain = get_prompt_from_file("pattern_id_explain.txt")
 patterns_example = get_prompt_from_file("patterns_design_example.txt")

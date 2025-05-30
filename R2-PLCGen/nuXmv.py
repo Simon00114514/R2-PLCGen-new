@@ -1,4 +1,4 @@
-# -*- coding: GBK -*-
+# -*- coding: utf-8 -*-
 import subprocess
 import glob
 import time
@@ -6,59 +6,57 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import sys
 import io
-sys.stdout  = io.TextIOWrapper(sys.stdout.buffer,  encoding='gbk', errors='replace')
+sys.stdout  = io.TextIOWrapper(sys.stdout.buffer,  encoding='utf-8', errors='replace')
 
 def run_nuxmv(file_path):
     """
-    ÔËĞĞ nuXmv ¼ì²éÖ¸¶¨µÄ SMV ÎÄ¼ş¡£
+    running nuXmv checking
 
-    ²ÎÊı:
-        file_path (str): Òª¼ì²éµÄ SMV ÎÄ¼şÂ·¾¶¡£
+    å‚æ•°:
+        file_path (str): è¦æ£€æŸ¥çš„ SMV æ–‡ä»¶è·¯å¾„ã€‚
     """
-    print(f"ÕıÔÚÔËĞĞ nuXmv ¼ì²é {file_path}...")
+    print(f"running nuXmv checking {file_path}...")
     subprocess.run(['nuXmv', file_path])
 
 
 class SMVHandler(PatternMatchingEventHandler):
     """
-    ÎÄ¼şÊÂ¼ş´¦ÀíÆ÷£¬×¨ÃÅ´¦Àí .smv ÎÄ¼şµÄÊÂ¼ş¡£
+    event handler for smv files
     """
     patterns = ["*.smv"]
 
     def on_modified(self, event):
         """
-        µ± .smv ÎÄ¼ş±»ĞŞ¸ÄÊ±µ÷ÓÃ£¬ÔËĞĞ nuXmv ¼ì²é¡£
+        when smv file is modified, run nuXmv check
 
-        ²ÎÊı:
-            event: ÎÄ¼şĞŞ¸ÄÊÂ¼ş¶ÔÏó¡£
+       reference:
+            event:
         """
         run_nuxmv(event.src_path)
 
     def on_created(self, event):
         """
-        µ± .smv ÎÄ¼ş±»´´½¨Ê±µ÷ÓÃ£¬ÔËĞĞ nuXmv ¼ì²é¡£
+        when smv file is created, run nuXmv check
 
-        ²ÎÊı:
-            event: ÎÄ¼ş´´½¨ÊÂ¼ş¶ÔÏó¡£
         """
         run_nuxmv(event.src_path)
 
 
 if __name__ == "__main__":
-    # ³õÊ¼¼ì²é£º¶Ôµ±Ç°Ä¿Â¼ÏÂËùÓĞ .smv ÎÄ¼şÔËĞĞ nuXmv
+    #  initial checking
     smv_files = glob.glob('*.smv')
     for file in smv_files:
         run_nuxmv(file)
 
-    # ÉèÖÃÎÄ¼ş¼à²âÆ÷£¬¼à²âµ±Ç°Ä¿Â¼ÏÂµÄ .smv ÎÄ¼ş±ä»¯
-    path = '.'  # µ±Ç°Ä¿Â¼
+    # è®¾ç½®æ–‡ä»¶ç›‘æµ‹å™¨ï¼Œç›‘æµ‹å½“å‰ç›®å½•ä¸‹çš„ .smv æ–‡ä»¶å˜åŒ–
+    path = '.'  # å½“å‰ç›®å½•
     event_handler = SMVHandler()
     observer = Observer()
     observer.schedule(event_handler, path, recursive=False)
     observer.start()
-    print("ÕıÔÚ¼à²â .smv ÎÄ¼şµÄ±ä»¯£¬°´ Ctrl+C Í£Ö¹¡£")
+    print("Detecting .smv file changes, press Ctrl+C to stop.")
 
-    # ³ÖĞøÔËĞĞ£¬Ö±µ½ÓÃ»§ÊÖ¶¯Í£Ö¹
+    # æŒç»­è¿è¡Œï¼Œç›´åˆ°ç”¨æˆ·æ‰‹åŠ¨åœæ­¢
     try:
         while True:
             time.sleep(1)

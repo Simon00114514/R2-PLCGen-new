@@ -98,7 +98,7 @@ index = build_sentence_window_index(
 query_engine = get_sentence_window_query_engine(index, similarity_top_k=6)
 
 
-# 定义查询
+# get relevant files for the query
 spec_format = get_prompt_from_file('property_output_formal.txt')
 pattern_explain = get_prompt_from_file("pattern_id_explain.txt")
 refined_requirement = get_prompt_from_file("R2IL_design_req.txt")
