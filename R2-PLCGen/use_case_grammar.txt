@@ -14,7 +14,7 @@ RU8. The use case description must explicitly document:
     Outputs (data/actions to actors).
     Trigger events (e.g., "user clicks Submit").
     System boundary (distinguish internal/external elements).
-RU9. The use case priority (e.g., high/medium/low) must be explicitly specified.
+RU9. Each use case priority (e.g., high/medium/low) must be explicitly specified.
 RU10. The use case description must fully cover all constraints from the original requirements.
 
 Use Case Diagrams Grammar(BNF formalism):
