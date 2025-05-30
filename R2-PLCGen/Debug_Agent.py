@@ -15,7 +15,6 @@ from llama_index.core import Settings
 import sys
 import io
 import re
-# 设置标准输出为 utf-8 编码
 sys.stdout  = io.TextIOWrapper(sys.stdout.buffer,  encoding='utf-8', errors='replace')
 warnings.filterwarnings('ignore')
 try:

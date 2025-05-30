@@ -18,22 +18,20 @@ import sys
 sys.stdout  = io.TextIOWrapper(sys.stdout.buffer,  encoding='utf-8', errors='replace')
 
 warnings.filterwarnings('ignore')
-# 导入openai模型设置
+# import LLM setting
 try:
     from config import chat_model, openai_api_key, openai_base_url
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
-
+# change the path of your own
 folder_path = '.D:\\project\\R2-PLCGen\\Property_Info'
-# 使用glob模式匹配文件夹中的所有PDF文件
 pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
-# 使用SimpleDirectoryReader读取所有PDF文件,加载文档
 documents = SimpleDirectoryReader(input_files=pdf_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
-# 设置全局配置
+
 Settings.llm = OpenAI(model="o3-mini", temperature=0.1)
-Settings.chunk_size = 512  # 根据需要设置
-Settings.chunk_overlap = 20  # 根据需要设置
+Settings.chunk_size = 512  # Set as needed
+Settings.chunk_overlap = 20
 
 def get_prompt_from_file(file_path):
     with open(file_path, 'rb') as file:
@@ -55,7 +53,7 @@ def build_sentence_window_index(
         sentence_window_size=3,
         save_dir="property_index",
 ):
-    # 创建句子窗口的 node parser
+    # create node parser
     node_parser = SentenceWindowNodeParser(
         window_size=sentence_window_size,
         window_metadata_key="window",
@@ -148,14 +146,13 @@ ctl_str2 = (("""
                 "Here are the relevant files: "
                 "please refer to the template or requirements to generate the related files and save them.\n
             """) + "refined requirements:" + refined_requirement)
-
-# 用户选择机制
+# select one of the two options
 print("select a desgin for model checking:")
 print("1. Patterns+CTL")
 print("2. Only CTL")
 choice = input("input option(1 or 2):")
 
-# 根据用户选择动态调整内容
+
 if choice == "1":
     selected_choice = ctl_str1
     print("selected Patterns+CTL")
@@ -169,7 +166,7 @@ def CTLANDLTL_agent(query_engine, initial_query):
     conversation_history.append({"role": "user", "content": initial_query})
 
     while True:
-        # 使用完整的对话历史进行查询
+        # use the query engine to get the response
         full_query = "\n".join([f"{msg['role']}: {msg['content']}" for msg in conversation_history])
         response = query_engine.query(full_query)
 
@@ -177,7 +174,7 @@ def CTLANDLTL_agent(query_engine, initial_query):
         conversation_history.append({"role": "assistant", "content": str(response)})
         print(f"Agent: {response}")
 
-        # 保存用例设计
+        # save the last output to a file
         with open("CTLORLTL_design.txt", 'w', encoding='gbk',errors="replace") as f:
             f.write(f"Agent: {response}\n")
 
@@ -187,5 +184,5 @@ def CTLANDLTL_agent(query_engine, initial_query):
         conversation_history.append({"role": "user", "content": user_input})
 
 
-# 启动互动式对话代理
+# initiate the agent
 CTLANDLTL_agent(query_engine, selected_choice)

@@ -38,7 +38,7 @@ def build_sentence_window_index(
         sentence_window_size=3,
         save_dir="usecase_index",
 ):
-    # 创建句子窗口的 node parser
+    # create a sentence window node parser
     node_parser = SentenceWindowNodeParser(
         window_size=sentence_window_size,
         window_metadata_key="window",
@@ -148,7 +148,7 @@ elif Refine_task == "2":
 else:
     print("Invalid input, please input 1 or 2.")
     sys.exit(1)
-# 创建互动式对话代理
+# create agent
 def Requirement_agent(query_engine, initial_query):
     conversation_history = [{"role": "system", "content": "You are an expert in requirement engineering and model building."}]
     conversation_history.append({"role": "user", "content": initial_query})
@@ -185,5 +185,5 @@ def Requirement_agent(query_engine, initial_query):
             conversation_history.append({"role": "user", "content": user_input})
 
 
-# 启动互动式对话代理
+# initiate agent
 Requirement_agent(query_engine, query_str)

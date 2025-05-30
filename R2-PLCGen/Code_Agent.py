@@ -79,7 +79,7 @@ index = build_sentence_window_index(
 )
 query_engine = get_sentence_window_query_engine(index, similarity_top_k=6)
 
-# 定义查询
+# define files access
 def get_prompt_from_file(file_path):
     with open(file_path, 'rb') as file:
         raw_data = file.read()
@@ -110,7 +110,7 @@ query_str = ("""
 def PLC_Coder(query_engine, initial_query):
     conversation_history = [{"role": "system", "content": "You are an expert in PLC coding and requirement analysis."}]
     conversation_history.append({"role": "user", "content": initial_query})
-    latest_st_code = None  # 用于存储最新的 ST 代码
+    latest_st_code = None  # save the latest ST code
 
     print("Type 'save' to save the latest ST code to Modify_Code.txt and Modify_Code.scl, or 'exit' to quit.")
 
@@ -120,7 +120,7 @@ def PLC_Coder(query_engine, initial_query):
         conversation_history.append({"role": "assistant", "content": str(response)})
         print(f"Agent: {response}")
         print("Type 'save' to save the latest use case and specification designs to R2IL_refined_suggestion.txt, or 'exit' to quit.")
-        # 提取响应中的 ST 代码
+        # extract the ST code from the response
         match = re.search(r'<st_code>(.*?)</st_code>', str(response), re.DOTALL)
         if match:
             latest_st_code = match.group(1).strip()  # 更新最新代码
