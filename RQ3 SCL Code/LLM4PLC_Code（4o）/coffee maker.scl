@@ -1,0 +1,97 @@
+// Define states
+VAR CONSTANT
+    STATE_INITIALIZE : INT := 0;
+    STATE_WAIT_FOR_SELECTION : INT := 1;
+    STATE_FILLING_COFFEE_MILK : INT := 2;
+    STATE_FILLING_COFFEE_ONLY : INT := 3;
+    STATE_MIXING : INT := 4;
+    STATE_DISPENSING : INT := 5;
+    STATE_EMERGENCY_STOP : INT := 6;
+END_VAR
+
+// Declare variables
+VAR
+    state : INT := STATE_INITIALIZE; // Current state of the machine
+    prevState : INT; // Previous state of the machine
+    TankLevel : INT := 0; // Current level of the tank in milliliters
+    MixerTimer : TIME := T#0S; // Timer for mixing duration
+    StartButtonPressed : BOOL := FALSE; // Status of start button
+    Button3Pressed : BOOL := FALSE; // Status of coffee and milk mode button
+    Button4Pressed : BOOL := FALSE; // Status of coffee only mode button
+    EmergencyStopButtonPressed : BOOL := FALSE; // Status of emergency stop button
+    TankLevelReachedMaximum : BOOL := FALSE; // Indicates if tank level reached maximum
+    MixerTimerExpired : BOOL := FALSE; // Indicates if mixer timer expired
+    OutputDispensed : BOOL := FALSE; // Indicates if output has been dispensed
+    ResetConditionsMet : BOOL := FALSE; // Conditions met for reset from emergency state
+END_VAR
+
+// Main logic
+IF EmergencyStopButtonPressed THEN
+    state := STATE_EMERGENCY_STOP;
+ELSE
+    CASE state OF
+        STATE_INITIALIZE:
+            // Initialize outputs
+            CoffeeValve := FALSE;
+            MilkValve := FALSE;
+            OutputValve := FALSE;
+            Mixer := FALSE;
+            IF StartButtonPressed THEN
+                state := STATE_WAIT_FOR_SELECTION;
+            END_IF;
+
+        STATE_WAIT_FOR_SELECTION:
+            IF Button3Pressed THEN
+                state := STATE_FILLING_COFFEE_MILK;
+            ELSIF Button4Pressed THEN
+                state := STATE_FILLING_COFFEE_ONLY;
+            END_IF;
+        
+        STATE_FILLING_COFFEE_MILK:
+            CoffeeValve := TRUE;
+            MilkValve := TRUE;
+            IF TankLevelReachedMaximum THEN
+                CoffeeValve := FALSE;
+                MilkValve := FALSE;
+                state := STATE_MIXING;
+            END_IF;
+
+        STATE_FILLING_COFFEE_ONLY:
+            CoffeeValve := TRUE;
+            IF TankLevelReachedMaximum THEN
+                CoffeeValve := FALSE;
+                state := STATE_DISPENSING;
+            END_IF;
+        
+        STATE_MIXING:
+            Mixer := TRUE;
+            IF NOT MIXER_TIMER_START THEN // Start mixer timer if not started
+                MixerTimer := T#4S; // Initial mixer time is set to 4 seconds
+                MIXER_TIMER_START := TRUE;
+            END_IF;
+            MixerTimer := MixerTimer - T#1MS; // Decrease the timer
+            IF MixerTimer <= T#0S THEN
+                Mixer := FALSE;
+                MixerTimerExpired := TRUE;
+            END_IF;
+            IF MixerTimerExpired THEN
+                state := STATE_DISPENSING;
+            END_IF;
+
+        STATE_DISPENSING:
+            OutputValve := TRUE;
+            IF OutputDispensed THEN
+                OutputValve := FALSE;
+                state := STATE_WAIT_FOR_SELECTION;
+            END_IF;
+
+        STATE_EMERGENCY_STOP:
+            CoffeeValve := FALSE;
+            MilkValve := FALSE;
+            OutputValve := FALSE;
+            Mixer := FALSE;
+            IF ResetConditionsMet THEN
+                state := STATE_INITIALIZE;
+            END_IF;
+    END_CASE;
+END_IF;

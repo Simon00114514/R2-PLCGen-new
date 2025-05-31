@@ -1,0 +1,68 @@
+### Revised Use Case Design
+
+#### 1. Use Case Name:
+Sequential Motor Control
+
+#### 2. Actor:
+Motor Control System: The system responsible for controlling the sequence of motor operations.
+
+#### 3. Use Case:
+Sequential Motor Operation: The process of starting three motors in a specific sequence with a delay between each start.
+
+#### 4. System Boundary:
+IEC 61131-3 Structured Text Program
+
+#### 5. Relationships Among Actors:
+The Motor Control System is responsible for executing the Sequential Motor Operation.
+
+#### 6. Detailed Descriptive Information for Each Use Case:
+- **Use Case: Sequential Motor Operation**
+  - **(1) Brief Description**:
+    - The use case involves the operation of three motors in a specific sequence. Motor 1 starts first, followed by Motor 2 after a delay, and finally Motor 3 starts after another delay. The entire operation must be completed within 10 seconds. At any given time, only one motor can be in the start state.
+
+  - **(2) Preconditions**:
+    - All three motors are in a state ready for operation.
+
+  - **(3) Event Flow**:
+    - **Basic Flow**:
+      1. The Motor Control System initiates the operation.
+      2. Motor 1 starts.
+      3. After a delay, Motor 2 starts only if Motor 1 has stopped.
+      4. After another delay, Motor 3 starts only if Motor 2 has stopped.
+      5. The operation is completed within 10 seconds.
+
+    - **Alternative Flow**:
+      - If any motor fails to start, the Motor Control System halts the operation and triggers an error notification.
+
+  - **(4) Postconditions**:
+    - All three motors have started in sequence and the operation is completed within 10 seconds.
+
+  - **(5) Use Case Scenario**:
+    - In a manufacturing plant, the Motor Control System is used to operate three motors that drive different parts of a production line. The motors must start in a specific sequence to ensure the smooth operation of the production line.
+
+  - **(6) Special Requirements**:
+    - The operation must adhere to the constraint that two motors cannot start simultaneously, and the total start time must be within 10 seconds. Additionally, each motor must stop before the next motor starts.
+
+#### 7. Priority of Use Cases:
+Sequential Motor Operation: High
+
+#### 8. Data Requirements:
+Motor Status Data: Information about the status of each motor (e.g., ready, operating, error).
+
+#### 9. Business Rules:
+1. Two motors cannot start simultaneously.
+2. The motors must start in sequence.
+3. The total start time must be within 10 seconds.
+
+### CTL/LTL Expressions
+
+1. **Sequential Start Constraint**:
+   - CTL: `AG((Motor1_Start -> AX(!Motor1_Start & EF(Motor2_Start))) & (Motor2_Start -> AX(!Motor2_Start & EF(Motor3_Start))))`
+
+2. **Time Limit Constraint**:
+   - LTL: `G((Motor1_Start -> F(Motor2_Start & (Operation_Time <= 10))) & (Motor2_Start -> F(Motor3_Start & (Operation_Time <= 10))))`
+
+3. **Total Operation Time Constraint**:
+   - LTL: `G(Operation_Time <= 10)`
+
+These modifications should ensure that the requirements are clearly defined and the constraints are properly enforced in the formal verification process. Adjustments may be necessary based on specific system implementations and verification tools.

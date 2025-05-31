@@ -1,0 +1,56 @@
+### Use Case Design
+
+Use Case Diagram: Packaging Bottle Program
+
+Subject: IEC 61131-3 Structured Text Program for Packaging Bottles
+
+Actors:
+ • Proximity Sensor (initiates bottle detection)
+ • Empty Bottle Sensor (verifies bottle emptiness)
+
+Use Cases:
+ [UC1] Transport Bottle to Packaging Area
+  • Trigger: Proximity Sensor detects a filled bottle.
+  • Flow:
+   1. The program receives the filled bottle detection.
+   2. It initiates the conveyor belt.
+   3. The bottle is transported to the packaging area.
+  • Alternative: In case of sensor signal instability, the program waits for a stable signal and issues an error alert if needed.
+  • Preconditions: The bottle is filled; sensors and system are fully operational.
+  • Postconditions: The bottle has reached the packaging area; the system resets for the next detection cycle.
+  • Priority: High
+
+ [UC2] Remove Empty Bottle
+  • Trigger: Both the Proximity Sensor and the Empty Bottle Sensor detect a bottle.
+  • Flow:
+   1. The simultaneous detection prompts the program.
+   2. The pneumatic cylinder is activated to remove the empty bottle.
+   3. The system logs the removal operation.
+  • Alternatives:
+   A1. If only one sensor is activated, the removal process is not triggered and the bottle continues toward packaging.
+   A2. In the event of a pneumatic cylinder malfunction, the conveyor stops immediately and an alert is issued.
+  • Preconditions: A bottle is present; both sensors are functional; the pneumatic cylinder is operational.
+  • Postconditions: The empty bottle is successfully removed; the system returns to normal detection operation.
+  • Priority: High
+
+Relationships:
+ • [UC2] extends [UC1] by adding the additional condition provided by the Empty Bottle Sensor.
+ • All interactions involve explicitly defined actors and clearly mapped use cases without redundant descriptions.
+
+### Specifications Design
+
+Revised CTL Specifications for the Packaging Bottle Program
+
+For [UC1] Transport Bottle to Packaging Area:
+ 1. Implication: It is required that when a filled bottle is detected, eventually the conveyor is in motion and the bottle reaches the packaging area.
+  AG(FilledBottleDetected -> AF(ConveyorMoving & BottleAtPackagingArea))
+ 2. Invariant: The filled bottle sensor must always maintain a stable signal.
+  AG(StableFilledBottleSignal)
+ 3. Forbidden State: The system must never operate the conveyor belt while an unstable sensor signal is present.
+  AG(!UnstableSensorSignal)
+
+For [UC2] Remove Empty Bottle:
+ 1. Implication: When both the proximity and empty bottle sensors detect a bottle, it is required that the pneumatic cylinder is activated.
+  AG((ProximityDetected & EmptyBottleDetected) -> CylinderActivated)
+ 2. Forbidden State: The conveyor belt must not run if a pneumatic cylinder malfunction occurs.
+  AG(!(CylinderMalfunction & ConveyorMoving))

@@ -1,0 +1,13 @@
+Below are the use cases for the described task, formatted in JSON:
+
+```json
+{
+  "1": "User can view the status of the conveyor belt system through a GUI.",
+  "2": "User can manually stop the conveyor belt at any of the three stations using a stop button.",
+  "3": "System automatically starts the conveyor belt when sensors detect an object and the user has not pressed the stop button.",
+  "4": "System automatically stops the conveyor belt when no objects are detected by the sensors or the user has pressed the stop button.",
+  "5": "System maintains the conveyor belt speed at 2 meters per second when the conveyor belt is active."
+}
+```
+
+These use cases reflect the requirements of the task, ensuring that the user has control over the conveyor belt system while also automating the process based on sensor input. The system is designed to be responsive to both manual user inputs and automatic sensor detections, with a clear constraint on the operating speed of the conveyor belt.

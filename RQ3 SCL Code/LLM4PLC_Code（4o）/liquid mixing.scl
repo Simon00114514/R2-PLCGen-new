@@ -1,0 +1,79 @@
+PROGRAM LiquidMixingApplication
+VAR
+    state: INT := 0; // The current state of the system
+    liquidLevel: INT := 0; // The current level of liquid in the tank
+    maxLiquidLevel: INT := 100; // The maximum level that the liquid can reach
+    buttonS1: BOOL := FALSE; // Input for button S1
+    buttonS2: BOOL := FALSE; // Input for button S2
+    buttonS3: BOOL := FALSE; // Input for button S3
+    M: BOOL := FALSE; // Stirring motor output
+    V1: BOOL := FALSE; // Valve 1 for discharge
+    S1: BOOL := FALSE; // Output for liquid 1 pour
+    S2: BOOL := FALSE; // Output for liquid 2 pour
+    mixingComplete: BOOL := FALSE; // Indicator when mixing is complete
+    dischargeComplete: BOOL := FALSE; // Indicator when discharge is complete
+END_VAR
+
+// Main program block
+BEGIN
+    CASE state OF
+        // State 0: Idle
+        0:
+            S1 := FALSE;
+            S2 := FALSE;
+            M := FALSE;
+            V1 := FALSE;
+            
+            IF buttonS1 AND liquidLevel < maxLiquidLevel THEN
+                state := 1; // Transition to state 1: Filling liquid 1
+            ELSIF buttonS2 AND liquidLevel < maxLiquidLevel THEN
+                state := 2; // Transition to state 2: Filling liquid 2
+            END_IF;
+
+        // State 1: Filling liquid 1
+        1:
+            S1 := TRUE;
+            S2 := FALSE;
+            M := TRUE;
+            V1 := FALSE;
+
+            IF buttonS3 THEN
+                state := 3; // Transition to state 3: Mixing
+            END_IF;
+
+        // State 2: Filling liquid 2
+        2:
+            S1 := FALSE;
+            S2 := TRUE;
+            M := TRUE;
+            V1 := FALSE;
+            
+            IF buttonS3 THEN
+                state := 3; // Transition to state 3: Mixing
+            END_IF;
+
+        // State 3: Mixing
+        3:
+            S1 := FALSE;
+            S2 := FALSE;
+            M := TRUE;
+            V1 := FALSE;
+            
+            // Assuming some condition or timer indicates mixing is complete
+            IF mixingComplete THEN
+                state := 4; // Transition to state 4: Discharging
+            END_IF;
+
+        // State 4: Discharging
+        4:
+            S1 := FALSE;
+            S2 := FALSE;
+            M := FALSE;
+            V1 := TRUE;
+            
+            // Assuming some condition or timer indicates discharge is complete
+            IF dischargeComplete THEN
+                state := 0; // Transition back to state 0: Idle
+            END_IF;
+    END_CASE;
+END_PROGRAM

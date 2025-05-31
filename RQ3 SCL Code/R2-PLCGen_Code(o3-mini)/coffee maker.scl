@@ -1,0 +1,107 @@
+PROGRAM CoffeeMachineControl
+VAR_INPUT
+    E_Stop           : BOOL;       // Emergency stop button
+    Start_CoffeeMilk : BOOL;       // Button for coffee and milk mode
+    Start_CoffeeOnly : BOOL;       // Button for coffee only mode
+    MixerLevel       : INT;        // Current liquid level in mixer tank (ml)
+END_VAR
+
+VAR_OUTPUT
+    CoffeeValve    : BOOL;        // TRUE: Coffee valve open
+    MilkValve      : BOOL;        // TRUE: Milk valve open
+    Mixer          : BOOL;        // TRUE: Mixer running
+    OutputValve    : BOOL;        // TRUE: Output valve open
+    Alarm          : BOOL;        // TRUE: Alarm active
+END_VAR
+
+VAR
+    state    : INT := 0;          // State machine variable; initial state: 0 (Idle)
+    mixTimer : TON;               // Timer for mixer running 4 seconds
+    initDone : BOOL := FALSE;     // Initialization flag (FALSE on startup)
+END_VAR
+
+CONST
+    MAX_LEVEL : INT := 130;        // Maximum mixer tank level (ml)
+END_CONST
+
+(* Initialization on first scan *)
+IF NOT initDone THEN
+    CoffeeValve := FALSE;
+    MilkValve   := FALSE;
+    Mixer       := FALSE;
+    OutputValve := FALSE;
+    Alarm       := FALSE;
+    state       := 0;
+    initDone    := TRUE;
+END_IF;
+
+(* Emergency Stop: Override any operation *)
+IF E_Stop = TRUE THEN
+    state := 99;
+END_IF;
+
+(* State Machine Execution *)
+CASE state OF
+    0:  // Idle State
+        CoffeeValve := FALSE;
+        MilkValve   := FALSE;
+        Mixer       := FALSE;
+        OutputValve := FALSE;
+        Alarm       := FALSE;
+        IF Start_CoffeeMilk = TRUE THEN
+            state := 1;    // Transition: Start Coffee & Milk mode fill
+        ELSIF Start_CoffeeOnly = TRUE THEN
+            state := 11;   // Transition: Start Coffee Only mode fill
+        END_IF;
+        
+    1:  // Coffee and Milk Mode – Filling Stage
+        CoffeeValve := TRUE;
+        MilkValve   := TRUE;
+        Mixer       := FALSE;
+        OutputValve := FALSE;
+        IF MixerLevel >= MAX_LEVEL THEN
+            CoffeeValve := FALSE;  // Close valves immediately
+            MilkValve   := FALSE;
+            state       := 2;      // Move to mixer activation
+        END_IF;
+        
+    2:  // Coffee and Milk Mode – Mixer Activation and Run 4 sec
+        Mixer := TRUE;
+        mixTimer(IN := TRUE, PT := T#4S);
+        mixTimer();  // Execute timer
+        IF mixTimer.Q = TRUE THEN
+            Mixer := FALSE;        // Stop mixer after exactly 4 seconds
+            mixTimer(IN := FALSE, PT := T#4S);
+            state := 3;            // Proceed to dispensation
+        END_IF;
+        
+    3:  // Coffee and Milk Mode – Dispensing Stage
+        OutputValve := TRUE;
+        state := 0;                // Return to idle
+        
+    11: // Coffee Only Mode – Filling Stage
+        CoffeeValve := TRUE;
+        MilkValve   := FALSE;
+        Mixer       := FALSE;
+        OutputValve := FALSE;
+        IF MixerLevel >= MAX_LEVEL THEN
+            CoffeeValve := FALSE;  // Close coffee valve immediately
+            state       := 12;     // Transition to dispensing
+        END_IF;
+        
+    12: // Coffee Only Mode – Dispensing Stage
+        OutputValve := TRUE;
+        state := 0;                // Return to idle
+        
+    99: // Emergency Stop State
+        CoffeeValve := FALSE;
+        MilkValve   := FALSE;
+        Mixer       := FALSE;
+        OutputValve := FALSE;
+        Alarm       := TRUE;
+        state := 0;                // Reset to idle after emergency
+        
+    ELSE
+        state := 0;                // Fallback to idle if undefined state
+END_CASE;
+END_PROGRAM

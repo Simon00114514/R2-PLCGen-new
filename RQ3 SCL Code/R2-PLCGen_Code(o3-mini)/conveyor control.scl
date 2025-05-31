@@ -1,0 +1,60 @@
+
+PROGRAM ConveyorBeltControl
+// This standalone IEC 61131-3 Structured Text program controls a conveyor belt system.
+// The system consists of three user stations and five sensors. 
+// The start command, stop command, and sensor inputs are represented as INT values (1 = true, 0 = false).
+// When the start command is issued and at least one sensor detects an object (value 1) while no stop command is active,
+// the conveyor belt runs with a constant speed of 2 m/s. Otherwise, the belt remains stopped.
+
+VAR
+    // User commands (inputs from three stations)
+    StartCmd     : INT;    // Command to start the conveyor (1 = active, 0 = inactive)
+    StopCmd      : INT;    // Command to stop the conveyor (1 = active, 0 = inactive)
+    
+    // Sensor inputs (5 sensors detecting objects on the conveyor)
+    Sensor1      : INT;    // 1 = object detected, 0 = no detection
+    Sensor2      : INT;
+    Sensor3      : INT;
+    Sensor4      : INT;
+    Sensor5      : INT;
+    
+    // Internal signal indicating if any sensor is active (1 = active, 0 = inactive)
+    SensorActive : INT;
+    
+    // Conveyor outputs
+    ConveyorRun  : INT;    // 1 = running, 0 = stopped
+    ConveyorSpeed: INT;    // Speed in m/s (2 when running, 0 when stopped)
+END_VAR
+
+// Check sensor status: if any sensor is active, set SensorActive to 1.
+SensorActive := 0;
+IF (Sensor1 = 1) OR (Sensor2 = 1) OR (Sensor3 = 1) OR (Sensor4 = 1) OR (Sensor5 = 1) THEN
+    SensorActive := 1;
+END_IF;
+
+// Control logic:
+// 1. If the stop command is active, the conveyor stops.
+// 2. If the start command is active and a sensor is active, the conveyor starts.
+// 3. Otherwise, the conveyor remains stopped.
+IF StopCmd = 1 THEN
+    ConveyorRun := 0;
+ELSE
+    IF StartCmd = 1 THEN
+        IF SensorActive = 1 THEN
+            ConveyorRun := 1;
+        ELSE
+            ConveyorRun := 0;
+        END_IF;
+    ELSE
+        ConveyorRun := 0;
+    END_IF;
+END_IF;
+
+// Set the conveyor speed based on the running state.
+IF ConveyorRun = 1 THEN
+    ConveyorSpeed := 2;  // Maintain a speed of 2 m/s
+ELSE
+    ConveyorSpeed := 0;
+END_IF;
+
+END_PROGRAM

@@ -1,0 +1,35 @@
+Agent: To begin with, let's define the initial requirement: 
+
+The requirement is to develop an independent 61131-3 structured text program, not a function block, to control the temperature of a heating system. The system should automatically turn on and off based on three temperature sensors and maintain a constant temperature range of 20 to 25 degrees Celsius. The temperature is represented in integer form.
+
+Now, let's refine the requirements and design the use cases:
+
+Use Case 1: Monitor Temperature
+Event Flow:
+1. The system reads the temperature from the three sensors.
+2. The system calculates the average temperature.
+3. The system compares the average temperature with the desired range (20-25 degrees Celsius).
+
+Alternative Flow:
+If any sensor fails to provide a reading, the system will calculate the average temperature based on the readings from the other sensors.
+
+Use Case 2: Control Heating System
+Event Flow:
+1. If the average temperature is below 20 degrees Celsius, the system turns on the heating system.
+2. If the average temperature is above 25 degrees Celsius, the system turns off the heating system.
+
+Alternative Flow:
+If the heating system fails to respond to the system's command, an error message is generated.
+
+Priority: Use Case 1 is the highest priority as it provides the necessary data for Use Case 2. Use Case 2 is the second priority as it directly controls the heating system based on the data from Use Case 1.
+
+Errors: There could be errors in sensor readings or in the heating system's response to commands. These are addressed in the alternative flows.
+
+The properties mentioned in the initial requirement (three temperature sensors, temperature range of 20-25 degrees Celsius, and temperature represented in integer form) are reflected in the use cases.
+
+The use case design is in the requested format.
+CTL/LTL Expressions (with Detailed Source Mapping to Use Case Design)
+1.AG((AverageTemperature < 20 & !HeatingSystemFailed) -> AX HeatingSystemIsOn)
+2.AG((AverageTemperature > 25 & !HeatingSystemFailed) -> AX HeatingSystemIsOff)
+3.AG(HeatingSystemCommandSent & HeatingSystemNoResponse -> AF ErrorMessageGenerated)
+4.AG(SystemOperational -> AF TemperatureSensorsAreRead)

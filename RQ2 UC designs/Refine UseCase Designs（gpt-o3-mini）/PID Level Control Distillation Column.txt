@@ -1,0 +1,105 @@
+### Revised Use Case Design
+
+#### 1. Use Case Name
+Control Distillation Tower Level
+
+#### 2. Actors
+- **IEC 61131-3 Structured Text Program**: The program implementing PID feedback control for the distillation tower level.
+- **Inlet Valve**: The valve controlling the flow of liquid into the distillation tower.
+
+#### 3. Use Case
+Control the distillation tower level by monitoring the liquid level and adjusting the inlet valve accordingly.
+
+#### 4. System Boundary
+IEC 61131-3 Structured Text Program - The program that implements the control logic.
+
+#### 5. Relationships Among Actors
+The IEC 61131-3 Structured Text Program interacts with the Inlet Valve to control the liquid level in the distillation tower.
+
+#### 6. Detailed Descriptive Information for Each Use Case
+
+- **Brief Description**:
+  The program monitors the liquid level in the distillation tower and controls the inlet valve based on the level.
+
+- **Preconditions**:
+  - The distillation tower is operational.
+  - The inlet valve is functioning properly.
+
+- **Event Flow**:
+
+  **Basic Flow**:
+  1. The program monitors the liquid level in the distillation tower.
+  2. If the liquid level is below a defined low threshold, the program opens the inlet valve.
+  3. If the liquid level reaches or exceeds the threshold, the program closes the inlet valve.
+
+  **Exception Flow**:
+  1. If the liquid level sensor fails, the program issues an alert and enters a safe mode.
+  2. If the inlet valve fails, the program issues an alert and attempts to regain control.
+
+- **Postconditions**:
+  The liquid level is maintained at or near the threshold.
+
+- **Use Case Scenario**:
+  The distillation tower is in operation. The program continuously monitors the liquid level. When the level drops below the low threshold, the program opens the inlet valve to allow more liquid into the tower. Once the level reaches or exceeds the threshold, the program closes the valve.
+
+- **Special Requirements**:
+  The program must accurately monitor the liquid level and control the inlet valve. The system must be reliable and capable of continuous operation.
+
+#### 7. Priority of Use Cases
+High
+
+#### 8. Data Requirements
+- **[D-1]**: Liquid level data - The current liquid level in the distillation tower.
+
+#### 9. Business Rules (Optional)
+- **[B-1]**: The inlet valve must not be opened if the liquid level is at or above the threshold.
+- **[B-2]**: The inlet valve must be opened if the liquid level is below the low threshold.
+
+### Revised CTL/LTL Expressions
+
+1. **Open Valve Condition**:
+   ```ctl
+   AG((liquid_level < low_threshold) -> AX(valve_open))
+   ```
+
+2. **System Reliability**:
+   ```ctl
+   AG((accurate_monitoring_of_liquid_level) & (control_of_inlet_valve))
+   ```
+
+3. **Forbidden Condition**:
+   ```ctl
+   AG(!(liquid_level >= threshold & valve_open))
+   ```
+
+4. **State Change During Cycle**:
+   ```ctl
+   AG((liquid_level < low_threshold) -> A[ !U (valve_open) ])
+   ```
+
+5. **State Change Between Cycles**:
+   ```ctl
+   G((open_inlet_valve) & X( [ !U (liquid_level = threshold) ] ) -> X( [ !U (!valve_open) ] ))
+   ```
+
+6. **Reachability**:
+   ```ctl
+   EF(liquid_level = threshold)
+   ```
+
+7. **Repeatability**:
+   ```ctl
+   AG(EF(liquid_level = threshold))
+   ```
+
+8. **Leads To**:
+   ```ctl
+   !(E[(! (liquid_level = threshold)) U (close_inlet_valve)])
+   ```
+
+9. **Exception Handling**:
+   ```ctl
+   AG((sensor_fault -> alert) & (valve_fault -> alert))
+   ```
+
+These revisions ensure that the use case design and CTL/LTL expressions are aligned and consistent, addressing the issues identified during the formal verification process.

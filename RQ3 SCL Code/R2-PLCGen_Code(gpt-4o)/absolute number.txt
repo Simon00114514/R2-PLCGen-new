@@ -1,0 +1,27 @@
+PROGRAM AbsoluteValueCalculator
+VAR_INPUT
+    InputValue : INT; // 用户输入的整数值
+END_VAR
+
+VAR_OUTPUT
+    AbsValue : DINT; // 计算后的绝对值
+    ErrorCode : INT; // 错误代码，0表示无错误，非0表示有错误
+END_VAR
+
+
+(* 程序主体代码 *)
+ErrorCode := 0; // 初始化错误代码为0，表示无错误
+
+IF InputValue < -32767   THEN
+    // 如果输入值是INT类型能表示的最小负数，则设置错误代码
+    ErrorCode := -1; // 可以定义一个错误代码表，-1表示输入值非法
+    AbsValue := 0; // 设置一个默认的绝对值
+ELSIF InputValue < 0 THEN
+    AbsValue := -InputValue; // 如果输入是其他负数，则取其相反数作为绝对值
+ELSE
+    AbsValue := InputValue; // 如果输入是正数或零，则直接赋值
+END_IF;
+
+// 可以在此处添加其他程序逻辑，例如处理用户界面或与其他系统交互
+
+END_PROGRAM

@@ -1,0 +1,52 @@
+Agent: Use case name: Sequential Motor Control
+
+1. Actor:
+- Operator: The user who initiates the sequential motor control process.
+
+2. Use case:
+- Start Motor Sequence: The process of starting the motors in a specific order with time delays.
+
+3. System boundary:
+- Motor Control System: The software responsible for controlling the sequence in which the motors start.
+
+4. Relationships among actors:
+- The Operator triggers the Start Motor Sequence use case.
+- There are no other actors, hence no inclusion, extension, or generalization relationships are present in this scenario.
+
+Brief Description:
+This use case describes the process by which an operator initiates the sequential starting of three motors, ensuring that each motor starts one after the other with a time delay, completing the sequence within ten seconds.
+
+Event Flow:
+Basic Flow:
+- Preconditions: The system is powered on, and all motors are in the off state.
+- Postconditions: All three motors have started in the correct sequence within ten seconds.
+
+Alternative Flow:
+- Preconditions: The system is powered on, and one or more motors are not in the off state.
+- Postconditions: The system returns to a safe state, ensuring no motors are running, and prompts the operator to reset the motors to the off state before retrying.
+
+Use Case Scenario:
+- The operator commands the system to start the motor sequence.
+- The system starts Motor 1, waits for the predefined delay, starts Motor 2, waits again, and then starts Motor 3.
+
+Special Requirements:
+- The system must ensure that no two motors start simultaneously.
+- The system must complete the motor start sequence within ten seconds.
+- The system must be reliable and perform the sequence accurately every time.
+- The system must be scalable to accommodate changes in the number of motors or sequence timing.
+
+Preconditions:
+- The operator has access to the motor control system.
+- All motors are in the off state.
+
+Postconditions:
+- Motor 1, Motor 2, and Motor 3 have started in sequence.
+- The system is ready for the next operation or shutdown.
+
+Priority of Use Cases:
+- The primary use case is the Start Motor Sequence, which has the highest priority as it encompasses the main functionality of the system.
+
+Errors in Requirements:
+- The requirement does not specify what should happen if a motor fails to start or if there is a system error during the sequence. This should be addressed in the alternative flows to ensure the system can handle exceptions safely.
+
+In the use case design, the properties mentioned in the initial requirement, such as the constraint that two motors cannot start simultaneously and that the total start time must be within ten seconds, are reflected in the special requirements and postconditions of the use case.

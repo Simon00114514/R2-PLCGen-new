@@ -1,0 +1,69 @@
+PROGRAM PLC_Bottle_Packaging
+VAR
+    // State definitions
+    state : INT := 0;           // Current state variable
+    // Sensor Inputs
+    proxSensor : BOOL;          // Proximity sensor: detects any bottle
+    emptySensor : BOOL;         // Empty bottle sensor: detects empty bottles only
+    // Actuator Outputs
+    conveyorBelt : BOOL;        // Output controlling the conveyor belt motor
+    pneumaticCylinder : BOOL;   // Output controlling the pneumatic cylinder
+END_VAR
+
+// Main execution cycle
+// A state machine is implemented based on the plan.
+CASE state OF
+
+    // STATE 0: INITIALIZE
+    0: 
+        // Set outputs for initialization
+        conveyorBelt := FALSE;
+        pneumaticCylinder := FALSE;
+        // Transition: After initialization, move to WAIT_FOR_BOTTLE state.
+        state := 1;
+        
+    // STATE 1: WAIT_FOR_BOTTLE
+    1:
+        // Outputs are off in waiting state.
+        conveyorBelt := FALSE;
+        pneumaticCylinder := FALSE;
+        // Transition conditions based on sensor inputs.
+        IF proxSensor THEN
+            // Check if an empty bottle is detected.
+            IF emptySensor THEN
+                // Transition to REMOVE_EMPTY_BOTTLE state.
+                state := 3;
+            ELSE
+                // Transition to PACKAGE_BOTTLE state.
+                state := 2;
+            END_IF;
+        END_IF;
+        
+    // STATE 2: PACKAGE_BOTTLE
+    2:
+        // Set outputs: Conveyor belt ON, Pneumatic cylinder OFF.
+        conveyorBelt := TRUE;
+        pneumaticCylinder := FALSE;
+        // Transition: Once the bottle has passed (proximity sensor turns FALSE),
+        // return to WAIT_FOR_BOTTLE state.
+        IF NOT proxSensor THEN
+            state := 1;
+        END_IF;
+        
+    // STATE 3: REMOVE_EMPTY_BOTTLE
+    3:
+        // Set outputs: Conveyor belt OFF, Pneumatic cylinder ON.
+        conveyorBelt := FALSE;
+        pneumaticCylinder := TRUE;
+        // Transition: Once the empty bottle is removed (proximity sensor turns FALSE),
+        // return to WAIT_FOR_BOTTLE state.
+        IF NOT proxSensor THEN
+            state := 1;
+        END_IF;
+        
+    // Default case (should never occur)
+    ELSE
+        state := 0;
+END_CASE;
+
+END_PROGRAM

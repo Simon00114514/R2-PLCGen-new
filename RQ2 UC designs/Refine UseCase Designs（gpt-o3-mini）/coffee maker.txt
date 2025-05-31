@@ -1,0 +1,174 @@
+###Use Case Name:
+Beverage Coffee Machine Control System
+Actors:
+Operator
+Use Cases:
+[UC-1]: Perform Emergency Stop – Immediately halts all operations, closes all valves, and stops the mixer upon operator command or system-detected critical fault.
+[UC-2]: Start Machine – Initiates the system, performs self-checks, and transitions the machine to an idle state.
+[UC-3]: Prepare Coffee and Milk Beverage – Fills with coffee and milk to 130ml, closes input valves, mixes for 4 seconds, then dispenses.
+[UC-4]: Prepare Coffee Only Beverage – Fills with coffee to 130ml, closes coffee valve, then dispenses (no mixing).
+System Boundary:
+IEC 61131-3 Structured Text Program controlling the coffee machine hardware (buttons, valves, mixer, level sensor).
+Relationships Among Actors:
+The Operator interacts with the system by pressing the Emergency Stop Button ([UC-1]), Start Button ([UC-2]), Coffee and Milk Mode Button ([UC-3]), and Coffee Only Mode Button ([UC-4]).
+Detailed Descriptive Information for Each Use Case:
+Use Case: [UC-1] Perform Emergency Stop
+(1) Brief Description:
+Immediately halts any running functions, closes all valves (coffee, milk, output), and stops the mixer when the emergency stop button is pressed or a critical abnormality is detected.
+(2) Preconditions:
+– The machine is powered on.
+(3) Event Flow:
+Basic Flow (Operator Initiated):
+1. The Operator presses the Emergency Stop Button.
+2. The system immediately commands the coffee valve to close.
+3. The system immediately commands the milk valve to close.
+4. The system immediately commands the output valve to close.
+5. The system immediately commands the mixer to stop.
+6. The action is logged or displayed.
+Alternative Flow(s):
+– AF-1: System Initiated Emergency Stop
+1. System detects a critical fault condition (e.g., valve stuck, level sensor error during operation, mixer malfunction).
+2. Proceed with steps 2-6 of the Basic Flow.
+– AF-2: Actuator Non-Response
+1. If any actuator (mixer or valves) does not confirm closure/stop after command:
+2. System logs a fault.
+3. System reissues stop/close commands until confirmed off, or enters a deeper fault state.
+(4) Post Conditions:
+Success:
+– The machine is in a safe, halted state with all specified actuators deactivated.
+(5) Special Requirements:
+– Response to emergency stop must be immediate.
+Use Case: [UC-2] Start Machine
+(1) Brief Description:
+Initiates the system from standby, performs necessary self-checks, and transitions the machine to an idle state, ready for beverage selection.
+(2) Preconditions:
+– The system is in standby mode.
+– No un-cleared critical fault conditions exist.
+– Operator presses the Start Button.
+(3) Event Flow:
+Basic Flow:
+1. System detects the Start Button press.
+2. The system performs a self-test (e.g., checks sensors, valve positions, mixer status).
+3. Upon a successful self-test:
+4. The machine transitions to an idle state.
+Alternative Flow(s):
+– AF-1: Self-Test Failure
+1. If any component fails during the self-test:
+2. An error message is generated/logged.
+3. Machine does not transition to idle state.
+(4) Post Conditions:
+Success:
+– The machine is in idle state, ready to accept beverage mode commands.
+Failure (if AF-1 occurs):
+– An error is indicated, and the machine is not ready for operation.
+(5) Special Requirements:
+– Self-test must cover critical components.
+Use Case: [UC-3] Prepare Coffee and Milk Beverage
+(1) Brief Description:
+Prepares a beverage combining coffee and milk. Fills mixer tank to 130ml, closes input valves, mixes for 4 seconds, then opens output valve to dispense.
+(2) Preconditions:
+– Machine is in idle state.
+– Operator selects Coffee and Milk mode.
+– All associated hardware is functional.
+(3) Event Flow:
+Basic Flow:
+1. System detects Coffee and Milk mode selection.
+2. System commands coffee valve to open.
+3. System commands milk valve to open.
+4. Mixer tank begins filling; sensors monitor liquid level.
+5. When liquid level reaches 130 ml:
+a. System commands coffee valve to close.
+b. System commands milk valve to close.
+c. System commands mixer to start.
+d. A 4-second mixing timer is started.
+6. Mixer runs.
+7. When mixing timer reaches 4 seconds:
+a. System commands mixer to stop.
+8. After mixer stops, system commands output valve to open to dispense beverage.
+9. After dispensing is complete (e.g., based on timer or sensor), output valve closes, and the system returns to idle state.
+Alternative Flow(s):
+– AF-1: Fill Level Not Reached
+1. If the 130 ml level is not detected within an expected fill period:
+2. An alarm is triggered, and the operation is halted.
+3. Operator intervention is requested.
+– AF-2: Mixer Malfunction
+1. If the mixer stops prematurely or fails to start/run correctly:
+2. An error is logged, and a safe recovery routine (possibly [UC-1]) is initiated.
+(4) Post Conditions:
+Success:
+– Beverage is dispensed.
+– System returns to idle state.
+(5) Special Requirements:
+– Mixing duration must be exactly 4 seconds.
+– Liquid level for filling must be 130 ml.
+Use Case: [UC-4] Prepare Coffee Only Beverage
+(1) Brief Description:
+Prepares a coffee-only beverage. Fills mixer tank with coffee to 130ml, closes coffee valve, then opens output valve to dispense (no mixing).
+(2) Preconditions:
+– Machine is in idle state.
+– Operator selects Coffee Only mode.
+– Coffee valve and associated sensors are functional.
+(3) Event Flow:
+Basic Flow:
+1. System detects Coffee Only mode selection.
+2. System commands coffee valve to open.
+3. Mixer tank begins filling; sensors monitor liquid level.
+4. When liquid level reaches 130 ml:
+a. System commands coffee valve to close.
+b. System commands output valve to open to dispense beverage.
+5. After dispensing is complete, output valve closes, and the system returns to idle state.
+Alternative Flow(s):
+– AF-1: Fill Level Not Reached (Coffee Only)
+1. If the 130 ml level is not detected within an expected fill period:
+2. System performs brief additional rechecks.
+3. If still unsuccessful, an alarm is raised, and operator intervention is requested.
+– AF-2: Coffee Valve Malfunction
+1. If the coffee valve fails to close properly:
+2. An error is logged, and an emergency routine (possibly [UC-1]) may be triggered.
+(4) Post Conditions:
+Success:
+– Beverage is dispensed.
+– System returns to idle state.
+(5) Special Requirements:
+– Liquid level for filling must be 130 ml.
+– No mixing cycle is performed in this mode.
+Priority of Use Cases:
+[UC-1] Perform Emergency Stop: High (Critical for safety)
+[UC-2] Start Machine: High
+[UC-3] Prepare Coffee and Milk Beverage: High
+[UC-4] Prepare Coffee Only Beverage: Medium
+Data Requirements:
+[D-1]: Emergency Button Pressed Status (Event or persistent state until reset)
+[D-2]: Start Machine Button Pressed Status (Event)
+[D-3]: Coffee and Milk Mode Selected Status (Event or state indicating current mode)
+[D-4]: Coffee Only Mode Selected Status (Event or state indicating current mode)
+[D-5]: Max Level Reached Sensor Status (Boolean state, true when liquid at 130ml)
+[D-6]: Coffee Valve State (Open/Closed)
+[D-7]: Milk Valve State (Open/Closed)
+[D-8]: Output Valve State (Open/Closed - also referred to as mixer_valve in original constraints)
+[D-9]: Mixer State (On/Off)
+[D-10]: Mix Timer Value (Counts from 0 to 4 seconds during mixing)
+[D-11]: Self-Test Passed Status (Boolean result of self-test)
+[D-12]: System Operational State (Enum: Standby, Idle, Filling, Mixing, Dispensing, Fault, EmergencyStop)
+[D-13]: Fault/Error Log Data
+Business Rules:
+[B-1]: Upon selection of Coffee and Milk mode and after the mixer tank's liquid level reaches the maximum level, both the milk valve and the coffee valve must be commanded to close in the next operational state.
+[B-2]: Upon selection of Coffee and Milk mode and after the mixer tank's liquid level reaches the maximum level, the mixer must be commanded to start in the next operational state.
+[B-3]: Once the mixer is on and has been running for 4 seconds (as indicated by the mix timer), it must be commanded to stop in the next operational state.
+[B-4]: After the mixer has been on and the mix timer indicates 4 seconds of operation (implying mixing is complete and mixer is about to stop or has just stopped), the output valve (mixer_valve) must eventually be commanded to open.
+[B-5]: Upon selection of Coffee Only mode and after the mixer tank's liquid level reaches the maximum level, the coffee valve must be commanded to close, and the output valve (mixer_valve) must be commanded to open in the next operational state.
+[B-6]: If the emergency stop button is pressed, then in the next operational state, the coffee valve, milk valve, and output valve must all be commanded to close, and the mixer must be commanded to stop.
+[B-7]: (Implied by UC-3 Postcondition/Basic Flow step 7) After the 4-second mixing cycle completes and the mixer is stopped, the mixer must remain off until a system reset condition for starting a new beverage cycle is met.
+
+CTL/LTL Expressions
+Core System Logic & Safety (Derived from Business Rules / Original Constraints):
+AG((coffee_and_milk_mode_is_selected & max_level_is_reached) -> AX(!milk_valve_is_open & !coffee_valve_is_open))
+AG((coffee_and_milk_mode_is_selected & max_level_is_reached) -> AX mixer_is_on)
+G(mixer_is_on & mix_timer_value = 4 -> X !mixer_is_on) (LTL)
+G(mixer_is_on & mix_timer_value = 4 -> F output_valve_is_open) (LTL)
+AG((coffee_only_mode_is_selected & max_level_is_reached) -> AX(!coffee_valve_is_open & output_valve_is_open))
+AG(emergency_button_is_pressed_event -> AX(!coffee_valve_is_open & !milk_valve_is_open & !output_valve_is_open & !mixer_is_on))
+Additional CTL/LTL from Use Case Flows (Examples):
+7. LTL: G((start_machine_button_is_pressed_event & AX self_test_has_passed) -> AX system_is_in_idle_state)
+8. LTL: G((coffee_and_milk_mode_is_selected & system_is_in_idle_state) -> F(coffee_valve_is_open & milk_valve_is_open & F max_level_is_reached))
+9. LTL: G((mix_timer_value = 4 & !mixer_is_on) -> X((!mixer_is_on U system_has_reset_for_next_cycle) | G(!mixer_is_on)))

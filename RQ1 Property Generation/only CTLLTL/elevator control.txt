@@ -1,0 +1,27 @@
+Agent: To generate temporal logic expressions for the Elevator Control System, consider the following CTL expressions based on the refined requirements:
+
+1. **Process Floor Call Request ([UC-1])**:
+   - **Precondition**: The control program is active and monitoring button signals.
+   - **CTL Expression**: 
+     - `AG (control_program_active -> AF (button_press_detected -> AX (request_queued)))`
+   - This expression ensures that if the control program is active, eventually, any detected button press will lead to the request being queued.
+
+2. **Manage Elevator Movement ([UC-2])**:
+   - **Precondition**: The call queue contains valid floor requests.
+   - **CTL Expression**: 
+     - `AG (valid_floor_requests -> AF (elevator_moving -> AX (floor_limit_switch_activated -> AX (elevator_stopped))))`
+   - This expression ensures that if there are valid floor requests, the elevator will eventually move and stop at the correct floor when the limit switch is activated.
+
+3. **Control Elevator Door Operation ([UC-3])**:
+   - **Precondition**: Elevator has arrived at a designated floor.
+   - **CTL Expression**: 
+     - `AG (elevator_arrived -> AF (door_open -> AX (timer_7_seconds -> AX (door_closed))))`
+   - This expression ensures that once the elevator arrives, the door will open and close after 7 seconds unless interrupted by a safety condition.
+
+4. **Reopen Elevator Door on Inactivity ([UC-4])**:
+   - **Precondition**: The door has closed as per the normal cycle.
+   - **CTL Expression**: 
+     - `AG (door_closed -> AF (no_button_press_within_10_seconds -> AX (door_reopened)))`
+   - This expression ensures that if the door closes and no button is pressed within 10 seconds, the door will reopen.
+
+These CTL expressions are designed to capture the essential behaviors and constraints of the elevator system as described in the use cases, ensuring that the system operates according to the specified requirements.

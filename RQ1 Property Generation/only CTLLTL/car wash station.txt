@@ -1,0 +1,75 @@
+Agent: Final CTL/LTL Specification:
+
+1. Automated Car Wash Operation - Start Car Wash: Basic Flow (CTL)
+   SPEC
+   AG((car_detected & !person_detected & current_stage_is_Idle_op) -> car_wash_starts);
+
+2. Automated Car Wash Operation - Start Car Wash: Postconditions (CTL)
+   SPEC
+   AG(car_is_ready_to_leave -> AF(car_has_left_station_event));
+
+3. Automated Car Wash Operation - Start Car Wash: Special Requirements - Personnel Sensor Accuracy (CTL)
+   SPEC
+   AG(wash_cycle_active -> AG(!person_detected | AF(person_detected -> operations_halted & alarm_triggered)));
+
+4. Automated Car Wash Operation - Emergency Stop: Basic Flow (CTL)
+   SPEC
+   AG(person_detected & wash_cycle_active -> AF(operations_halted & alarm_triggered));
+
+5. Automated Car Wash Operation - Emergency Stop: Postconditions (CTL)
+   SPEC
+   AG(operations_halted -> AF(emergency_stop_state));
+
+6. Automated Car Wash Operation - Emergency Stop: Special Requirements - Immediate Stoppage (CTL)
+   SPEC
+   AG(person_detected -> AX(operations_halted));
+
+7. Automated Car Wash Operation - Monitor for Person Presence: Basic Flow (CTL)
+   SPEC
+   AG(wash_cycle_active -> AG(!person_detected | AF(person_detected -> operations_halted)));
+
+8. Automated Car Wash Operation - Monitor for Person Presence: Postconditions (CTL)
+   SPEC
+   AG(!person_detected -> AF(wash_cycle_active));
+
+9. Automated Car Wash Operation - Monitor for Person Presence: Special Requirements - High Frequency Detection (CTL)
+   SPEC
+   AG(wash_cycle_active -> person_sensor_check_event);
+
+10. Automated Car Wash Operation - Start Car Wash: Basic Flow (LTL)
+    SPEC
+    G((car_detected & !person_detected & current_stage_is_start_op) -> F(current_stage_is_spray));
+
+11. Automated Car Wash Operation - Start Car Wash: Postconditions (LTL)
+    SPEC
+    G(car_is_ready_to_leave -> F(car_has_left_station_event));
+
+12. Automated Car Wash Operation - Start Car Wash: Special Requirements - Personnel Sensor Accuracy (LTL)
+    SPEC
+    G(wash_cycle_active -> G(!person_detected | F(person_detected -> operations_halted & alarm_triggered)));
+
+13. Automated Car Wash Operation - Emergency Stop: Basic Flow (LTL)
+    SPEC
+    G(person_detected & wash_cycle_active -> F(operations_halted & alarm_triggered));
+
+14. Automated Car Wash Operation - Emergency Stop: Postconditions (LTL)
+    SPEC
+    G(operations_halted -> F(emergency_stop_state));
+
+15. Automated Car Wash Operation - Emergency Stop: Special Requirements - Immediate Stoppage (LTL)
+    SPEC
+    G(person_detected -> X(operations_halted));
+
+16. Automated Car Wash Operation - Monitor for Person Presence: Basic Flow (LTL)
+    SPEC
+    G(wash_cycle_active -> G(!person_detected | F(person_detected -> operations_halted)));
+
+17. Automated Car Wash Operation - Monitor for Person Presence: Postconditions (LTL)
+    SPEC
+    G(!person_detected -> F(wash_cycle_active));
+
+18. Automated Car Wash Operation - Monitor for Person Presence: Special Requirements - High Frequency Detection (LTL)
+    SPEC
+    G(wash_cycle_active -> G(person_sensor_check_event));
+
+These specifications comprehensively cover the car wash system's operations, emergency handling, and monitoring requirements using both CTL and LTL paradigms.

@@ -1,0 +1,24 @@
+Agent: Here is a comprehensive set of CTL specifications for the Water Pump Control System, covering various scenarios and requirements:
+
+1. **Precondition for Starting the Pump:**
+   - **SPEC**: AG((!Tank_Full & Pump_Unlocked) -> AX(Start_Button_Press -> AF(Pump_Running)));
+
+2. **Basic Flow - High Water Level Detection Leads to Pump Stop:**
+   - **SPEC**: AG((Pump_Running & High_Water_Level_Detected) -> AF(!Pump_Running & Pump_Unlocked));
+
+3. **Alternative Flow - Stop Button Press to Unlock Pump:**
+   - **SPEC**: AG((!Pump_Unlocked & Stop_Button_Press) -> AF(Pump_Unlocked));
+
+4. **Exception Flow - Sensor Failure:**
+   - **SPEC**: AG(Sensor_Failure -> AF(Alarm_Triggered & !Pump_Running & Pump_Unlocked));
+
+5. **Exception Flow - Button Malfunction:**
+   - **SPEC**: AG(Button_Malfunction -> AF(Manual_Power_Disconnect_Action));
+
+6. **Empty Tank Use Case - Basic Flow:**
+   - **SPEC**: AG(Tank_Full & Discharge_Valve_Open -> AF(Tank_Empty));
+
+7. **Empty Tank Use Case - Exception Flow (Valve Malfunction):**
+   - **SPEC**: AG(Valve_Malfunction -> AF(Manual_Empty_Tank_Action));
+
+These CTL specifications ensure that all critical aspects of the system's behavior are captured, including preconditions, normal operations, and exception handling.

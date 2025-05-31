@@ -1,0 +1,77 @@
+### Revised Use Case Design
+
+#### Use Case Design Format
+
+1. **Use Case Name**: PID Feedback pH Control
+
+2. **Actors**:
+   - **Actor 1**: pH Control System
+   - **Actor 2**: Alkaline Solution Injector
+   - **Actor 3**: Acidic Solution Injector
+   - **Actor 4**: Liquid Level Sensor
+
+3. **Use Cases**:
+   - **Use Case 1**: Maintain pH Level
+   - **Use Case 2**: Inject Alkaline Solution
+   - **Use Case 3**: Inject Acidic Solution
+   - **Use Case 4**: Monitor Liquid Level
+
+4. **System Boundary**: IEC 61131-3 Structured Text Program
+
+5. **Relationships Among Actors**: The pH Control System interacts with the Alkaline Solution Injector, Acidic Solution Injector, and Liquid Level Sensor to maintain the pH level within the specified range.
+
+#### Detailed Descriptive Information for Each Use Case
+
+**Use Case: Maintain pH Level**
+- **Brief Description**: The system maintains the pH level within the specified range (5-8) by controlling the rate of injection of alkaline and acidic solutions, continuously injecting until the liquid level reaches the upper limit.
+- **Preconditions**: The pH level is outside the specified range.
+- **Event Flow**:
+  - **Basic Flow**: If the pH level is less than 5, the system increases the rate of alkaline solution injection. If the pH level is greater than 8, the system increases the rate of acidic solution injection. The system continues to inject solutions until the liquid level reaches the upper limit.
+  - **Alternative Flow**: If the liquid level sensor triggers an alarm, the system stops the injection of both solutions immediately.
+- **Postconditions**: The pH level is within the specified range.
+- **Use Case Scenario**: The pH level drops below 5. The system increases the rate of alkaline solution injection until the pH level is within the specified range or the liquid level sensor triggers an alarm.
+- **Special Requirements**: The system must be able to adjust the rate of solution injection and respond to liquid level sensor alarms.
+
+**Use Case: Monitor Liquid Level**
+- **Brief Description**: The system continuously monitors the liquid level and stops solution injection when the upper limit is reached.
+- **Preconditions**: The system is operational.
+- **Event Flow**:
+  - **Basic Flow**: The system continuously receives signals from the liquid level sensor. If the signal indicates the liquid level has reached the upper limit, an alarm is triggered, and solution injection stops.
+- **Postconditions**: Solution injection is stopped when the liquid level reaches the upper limit.
+- **Special Requirements**: The system must respond immediately to the liquid level sensor alarm.
+
+**Priority of Use Cases**:
+- Maintain pH Level: High
+- Inject Alkaline Solution: Medium
+- Inject Acidic Solution: Medium
+- Monitor Liquid Level: High
+
+### Revised CTL/LTL Specifications
+
+1. **Use Case: Maintain pH Level**
+   - **Pattern: Implication**
+     - CTL: `AG((pH < 5) -> increase_alkaline_rate)`
+     - CTL: `AG((pH > 8) -> increase_acidic_rate)`
+   - **Pattern: Forbidden**
+     - CTL: `AG(!(pH < 5 | pH > 8))`
+
+2. **Use Case: Inject Alkaline Solution**
+   - **Pattern: State Change During Cycle**
+     - CTL: `AG((pH < 5) -> AX(increase_alkaline_rate))`
+
+3. **Use Case: Inject Acidic Solution**
+   - **Pattern: State Change During Cycle**
+     - CTL: `AG((pH > 8) -> AX(increase_acidic_rate))`
+
+4. **Use Case: Monitor Liquid Level**
+   - **Pattern: Invariant**
+     - CTL: `AG((liquid_level < upper_limit) -> injecting_solutions)`
+   - **Pattern: Leads To**
+     - CTL: `AG((alarm_triggered -> !injecting_solutions))`
+
+### Notes for nuXmv Tool
+
+- Ensure that all variables such as `pH`, `increase_alkaline_rate`, `increase_acidic_rate`, `liquid_level`, `upper_limit`, `injecting_solutions`, and `alarm_triggered` are properly defined in your model.
+- Replace placeholders with actual system variables or conditions.
+
+This revised use case design and CTL/LTL specifications should better reflect the original requirements and be compatible with the nuXmv tool for formal verification. If there are further adjustments needed or additional verification results, feel free to share them for further refinement.

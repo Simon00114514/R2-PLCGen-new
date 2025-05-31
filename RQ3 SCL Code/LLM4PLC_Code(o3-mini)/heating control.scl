@@ -1,0 +1,52 @@
+PROGRAM HeatingControl
+
+  VAR
+    state         : INT;    (* 0 = INITIALIZE, 1 = HEATING, 2 = MAINTAIN/OFF *)
+    sensor1       : INT;    (* Temperature reading from sensor 1 *)
+    sensor2       : INT;    (* Temperature reading from sensor 2 *)
+    sensor3       : INT;    (* Temperature reading from sensor 3 *)
+    computedTemp  : INT;    (* Computed average temperature from sensors *)
+    heater        : BOOL;   (* Output to control the heating device: TRUE for ON, FALSE for OFF *)
+  END_VAR
+
+  (* Compute the average of three sensors.
+     If another method is needed to combine the sensor readings, modify this computation. *)
+  computedTemp := (sensor1 + sensor2 + sensor3) / 3;
+
+  (* State Machine Implementation *)
+  CASE state OF
+
+    0:  (* INITIALIZE *)
+          IF computedTemp < 20 THEN
+             state := 1;       (* Transition to HEATING *)
+             heater := TRUE;   (* Heater activated *)
+          ELSE
+             state := 2;       (* Transition to MAINTAIN/OFF *)
+             heater := FALSE;  (* Heater remains off *)
+          END_IF;
+
+    1:  (* HEATING *)
+          IF computedTemp >= 25 THEN
+             state := 2;       (* Transition to MAINTAIN/OFF *)
+             heater := FALSE;  (* Heater deactivated *)
+          ELSE
+             state := 1;       (* Remain in HEATING *)
+             heater := TRUE;   (* Heater stays on *)
+          END_IF;
+
+    2:  (* MAINTAIN/OFF *)
+          IF computedTemp < 20 THEN
+             state := 1;       (* Transition to HEATING *)
+             heater := TRUE;   (* Heater activated *)
+          ELSE
+             state := 2;       (* Remain in MAINTAIN/OFF *)
+             heater := FALSE;  (* Heater remains off *)
+          END_IF;
+
+  ELSE
+         (* In case the state variable holds an unexpected value, reinitialize. *)
+         state := 0;
+         heater := FALSE;
+  END_CASE;
+
+END_PROGRAM

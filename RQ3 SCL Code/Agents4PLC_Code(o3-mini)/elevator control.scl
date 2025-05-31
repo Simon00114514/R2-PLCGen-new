@@ -1,0 +1,200 @@
+PROGRAM ElevatorControl_Repaired
+
+
+(* Define state and direction constants *)
+CONST
+  STATE_IDLE      : INT := 0;
+  STATE_MOVING    : INT := 1;
+  STATE_DOOR_OPEN : INT := 2;
+  STATE_WAIT      : INT := 3;
+  
+  DIR_IDLE  : INT := 0;
+  DIR_UP    : INT := 1;
+  DIR_DOWN  : INT := -1;
+  
+  T_DOOR_OPEN   : TIME := T#7000ms;    // 7 seconds expressed in milliseconds
+  T_DOOR_REOPEN : TIME := T#10000ms;   // 10 seconds expressed in milliseconds
+END_CONST;
+
+(* Define inputs and outputs *)
+VAR_INPUT
+  UpButton    : ARRAY[1..5] OF BOOL;     // Up call buttons for floors 1 to 5
+  DownButton  : ARRAY[1..5] OF BOOL;     // Down call buttons for floors 1 to 5
+  FloorSensor : ARRAY[1..5] OF BOOL;     // Limit switches positioned at floors 1-5
+END_VAR
+
+VAR_OUTPUT
+  MoveUp      : BOOL;    // Command to move the elevator upward
+  MoveDown    : BOOL;    // Command to move the elevator downward
+  DoorOpen    : BOOL;    // Signal to open the door
+  DoorClose   : BOOL;    // Signal to close the door
+  CurrentFloor: INT;     // Holds the floor number currently reached
+END_VAR
+
+VAR
+  State       : INT := STATE_IDLE;  // Current state of the elevator
+  Direction   : INT := DIR_IDLE;    // Current movement direction
+  TargetFloor : INT := 0;           // Floor selected as destination
+  i           : INT;                // Loop counter for scanning buttons
+  
+  // Timer function blocks
+  tDoorOpen   : TON;
+  tDoorReopen : TON;
+END_VAR
+
+//-------------------------------
+// Determine the current floor from floor sensors.
+// In practice, only one sensor should be active at a time.
+IF FloorSensor[1] THEN
+  CurrentFloor := 1;
+ELSIF FloorSensor[2] THEN
+  CurrentFloor := 2;
+ELSIF FloorSensor[3] THEN
+  CurrentFloor := 3;
+ELSIF FloorSensor[4] THEN
+  CurrentFloor := 4;
+ELSIF FloorSensor[5] THEN
+  CurrentFloor := 5;
+END_IF;
+
+// Reset default outputs each cycle.
+MoveUp := FALSE;
+MoveDown := FALSE;
+
+//------------------------------------------------------------
+// State Machine
+//------------------------------------------------------------
+CASE State OF
+
+  STATE_IDLE:
+    // (Entry) Reset timers on entering IDLE state.
+    tDoorOpen(IN := FALSE);
+    tDoorReopen(IN := FALSE);
+    DoorOpen := FALSE;
+    DoorClose := TRUE;
+    TargetFloor := 0;
+    
+    // Search for any call above current floor first.
+    FOR i := CurrentFloor + 1 TO 5 DO
+      IF UpButton[i] OR DownButton[i] THEN
+        TargetFloor := i;
+        Direction := DIR_UP;
+        EXIT;
+      END_IF;
+    END_FOR;
+    
+    // If no upward call is found, check for calls below.
+    IF TargetFloor = 0 THEN
+      FOR i := CurrentFloor - 1 DOWNTO 1 DO
+        IF UpButton[i] OR DownButton[i] THEN
+          TargetFloor := i;
+          Direction := DIR_DOWN;
+          EXIT;
+        END_IF;
+      END_FOR;
+    END_IF;
+    
+    // If a valid target floor is chosen and it is different than the current floor, begin motion.
+    IF (TargetFloor <> 0) AND (TargetFloor <> CurrentFloor) THEN
+      State := STATE_MOVING;
+    END_IF;
+    
+  STATE_MOVING:
+    // Activate motor signals based on the direction.
+    IF Direction = DIR_UP THEN
+      MoveUp := TRUE;
+    ELSIF Direction = DIR_DOWN THEN
+      MoveDown := TRUE;
+    END_IF;
+    
+    // When the elevator arrives at the target floor, transition to door operation.
+    IF ((TargetFloor = 1) AND FloorSensor[1]) OR
+       ((TargetFloor = 2) AND FloorSensor[2]) OR
+       ((TargetFloor = 3) AND FloorSensor[3]) OR
+       ((TargetFloor = 4) AND FloorSensor[4]) OR
+       ((TargetFloor = 5) AND FloorSensor[5]) THEN
+         
+         // Stop movement and start door opening.
+         MoveUp := FALSE;
+         MoveDown := FALSE;
+         DoorOpen := TRUE;
+         DoorClose := FALSE;
+         
+         // (Reset and start) Door open timer for 7 seconds.
+         tDoorOpen(IN := FALSE);   // Ensure previous instance is cleared
+         tDoorOpen(IN := TRUE, PT := T_DOOR_OPEN);
+         
+         State := STATE_DOOR_OPEN;
+    END_IF;
+    
+  STATE_DOOR_OPEN:
+    // Continue running the door open timer.
+    tDoorOpen(IN := TRUE, PT := T_DOOR_OPEN);
+    
+    // When the 7-second duration has elapsed, close the door and prepare the waiting phase.
+    IF tDoorOpen.Q THEN
+      DoorOpen := FALSE;
+      DoorClose := TRUE;
+      
+      // Reset door open timer to prepare for next cycle.
+      tDoorOpen(IN := FALSE);
+      
+      // Reset and start the door reopen timer for a 10-second delay.
+      tDoorReopen(IN := FALSE);
+      tDoorReopen(IN := TRUE, PT := T_DOOR_REOPEN);
+      
+      State := STATE_WAIT;
+    END_IF;
+    
+  STATE_WAIT:
+    // Continue running the door reopen timer.
+    tDoorReopen(IN := TRUE, PT := T_DOOR_REOPEN);
+    
+    // Scan all call buttons for any new request during wait time.
+    FOR i := 1 TO 5 DO
+      IF UpButton[i] OR DownButton[i] THEN
+        TargetFloor := i;
+        // Determine proper movement direction.
+        IF TargetFloor > CurrentFloor THEN
+          Direction := DIR_UP;
+        ELSIF TargetFloor < CurrentFloor THEN
+          Direction := DIR_DOWN;
+        ELSE
+          // Request on this floor: reopen door immediately.
+          DoorOpen := TRUE;
+          DoorClose := FALSE;
+          
+          // Reset timers.
+          tDoorOpen(IN := FALSE);
+          tDoorOpen(IN := TRUE, PT := T_DOOR_OPEN);
+          tDoorReopen(IN := FALSE);
+          State := STATE_DOOR_OPEN;
+          EXIT;  // Exit scanning loop.
+        END_IF;
+        // Indicate door closing and initiate movement.
+        DoorClose := TRUE;
+        // Reset the reopen timer.
+        tDoorReopen(IN := FALSE);
+        State := STATE_MOVING;
+        EXIT;  // Exit scanning loop.
+      END_IF;
+    END_FOR;
+    
+    // If no call button is pressed and the timer has elapsed, automatically reopen the door.
+    IF tDoorReopen.Q THEN
+      tDoorReopen(IN := FALSE);
+      DoorOpen := TRUE;      // Reopen the door.
+      DoorClose := FALSE;
+      // Reset and start the door open timer again.
+      tDoorOpen(IN := FALSE);
+      tDoorOpen(IN := TRUE, PT := T_DOOR_OPEN);
+      State := STATE_DOOR_OPEN;
+    END_IF;
+    
+  ELSE
+    // Fallback: reset the state to IDLE in case of an undefined value.
+    State := STATE_IDLE;
+    
+END_CASE;
+
+// End of program cycle

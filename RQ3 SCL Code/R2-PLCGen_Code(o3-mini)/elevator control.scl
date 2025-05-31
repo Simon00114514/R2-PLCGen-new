@@ -1,0 +1,191 @@
+PROGRAM ElevatorControl
+VAR_INPUT
+    CallUp1       : BOOL;  
+    CallUp2       : BOOL;  
+    CallUp3       : BOOL;  
+    CallUp4       : BOOL;  
+    CallUp5       : BOOL;  
+    CallDown1     : BOOL;  
+    CallDown2     : BOOL;  
+    CallDown3     : BOOL;  
+    CallDown4     : BOOL;  
+    CallDown5     : BOOL;  
+    InsideCall1   : BOOL;  
+    InsideCall2   : BOOL;  
+    InsideCall3   : BOOL;  
+    InsideCall4   : BOOL;  
+    InsideCall5   : BOOL;  
+    PosSensor     : INT;    (* 当前楼层传感器正常范围15 *)
+    Emergency     : BOOL;  
+END_VAR
+
+VAR_OUTPUT
+    DriveUp         : BOOL;  
+    DriveDown       : BOOL;  
+    Brake           : BOOL;  
+    DoorOpenSignal  : BOOL;  
+END_VAR
+
+VAR
+    state          : INT;   
+    targetFloor    : INT;   
+    direction      : INT;   
+    doorTimer      : TIME;  
+    reopenTimer    : TIME;  
+    cycleTime      : TIME;  
+    init           : BOOL;  
+END_VAR
+
+(* 初始化 *)
+IF init = FALSE THEN
+    state := 0;
+    targetFloor := PosSensor;
+    direction := 0;
+    doorTimer := T#0s;
+    reopenTimer := T#0s;
+    cycleTime := T#100ms;
+    DriveUp := FALSE;
+    DriveDown := FALSE;
+    Brake := TRUE;
+    DoorOpenSignal := FALSE;
+    init := TRUE;
+END_IF;
+
+(* 首先对楼层传感器数据进行有效性检查 *)
+IF (PosSensor < 1) OR (PosSensor > 5) THEN
+    state := 9;  (* 无效数据时进入紧急状态 *)
+END_IF;
+
+(* 紧急情况处理 *)
+IF Emergency = TRUE THEN
+    state := 9;
+END_IF;
+
+(* 状态机 *)
+CASE state OF
+    0:  (* 空闲状态检测呼叫 *)
+        DriveUp := FALSE;
+        DriveDown := FALSE;
+        Brake := TRUE;
+        DoorOpenSignal := FALSE;
+        IF (InsideCall1 OR InsideCall2 OR InsideCall3 OR InsideCall4 OR InsideCall5 OR 
+            CallUp1 OR CallUp2 OR CallUp3 OR CallUp4 OR CallUp5 OR 
+            CallDown1 OR CallDown2 OR CallDown3 OR CallDown4 OR CallDown5) = TRUE THEN
+            IF (InsideCall1 = TRUE) AND (PosSensor <> 1) THEN
+                targetFloor := 1;
+            ELSIF (InsideCall2 = TRUE) AND (PosSensor <> 2) THEN
+                targetFloor := 2;
+            ELSIF (InsideCall3 = TRUE) AND (PosSensor <> 3) THEN
+                targetFloor := 3;
+            ELSIF (InsideCall4 = TRUE) AND (PosSensor <> 4) THEN
+                targetFloor := 4;
+            ELSIF (InsideCall5 = TRUE) AND (PosSensor <> 5) THEN
+                targetFloor := 5;
+            ELSIF (CallUp1 = TRUE) AND (PosSensor <> 1) THEN
+                targetFloor := 1;
+            ELSIF (CallUp2 = TRUE) AND (PosSensor <> 2) THEN
+                targetFloor := 2;
+            ELSIF (CallUp3 = TRUE) AND (PosSensor <> 3) THEN
+                targetFloor := 3;
+            ELSIF (CallUp4 = TRUE) AND (PosSensor <> 4) THEN
+                targetFloor := 4;
+            ELSIF (CallUp5 = TRUE) AND (PosSensor <> 5) THEN
+                targetFloor := 5;
+            ELSIF (CallDown1 = TRUE) AND (PosSensor <> 1) THEN
+                targetFloor := 1;
+            ELSIF (CallDown2 = TRUE) AND (PosSensor <> 2) THEN
+                targetFloor := 2;
+            ELSIF (CallDown3 = TRUE) AND (PosSensor <> 3) THEN
+                targetFloor := 3;
+            ELSIF (CallDown4 = TRUE) AND (PosSensor <> 4) THEN
+                targetFloor := 4;
+            ELSIF (CallDown5 = TRUE) AND (PosSensor <> 5) THEN
+                targetFloor := 5;
+            ELSE
+                targetFloor := PosSensor;
+            END_IF;
+            IF targetFloor > PosSensor THEN
+                direction := 1;
+            ELSIF targetFloor < PosSensor THEN
+                direction := -1;
+            ELSE
+                direction := 0;
+            END_IF;
+            IF direction <> 0 THEN
+                state := 1;
+            END_IF;
+        END_IF;
+        
+    1:  (* 运行状态朝目标楼层移动 *)
+        Brake := FALSE;
+        DoorOpenSignal := FALSE;
+        IF direction = 1 THEN
+            DriveUp := TRUE;
+            DriveDown := FALSE;
+        ELSIF direction = -1 THEN
+            DriveDown := TRUE;
+            DriveUp := FALSE;
+        END_IF;
+        IF PosSensor = targetFloor THEN
+            state := 2;
+            doorTimer := T#0s;
+        ELSE
+            IF direction = 1 THEN
+                IF (CallUp2 = TRUE) AND (PosSensor < 2) AND (2 < targetFloor) THEN
+                    targetFloor := 2;
+                ELSIF (CallUp3 = TRUE) AND (PosSensor < 3) AND (3 < targetFloor) THEN
+                    targetFloor := 3;
+                ELSIF (CallUp4 = TRUE) AND (PosSensor < 4) AND (4 < targetFloor) THEN
+                    targetFloor := 4;
+                ELSIF (CallUp5 = TRUE) AND (PosSensor < 5) AND (5 < targetFloor) THEN
+                    targetFloor := 5;
+                END_IF;
+            ELSIF direction = -1 THEN
+                IF (CallDown4 = TRUE) AND (PosSensor > 4) AND (4 > targetFloor) THEN
+                    targetFloor := 4;
+                ELSIF (CallDown3 = TRUE) AND (PosSensor > 3) AND (3 > targetFloor) THEN
+                    targetFloor := 3;
+                ELSIF (CallDown2 = TRUE) AND (PosSensor > 2) AND (2 > targetFloor) THEN
+                    targetFloor := 2;
+                ELSIF (CallDown1 = TRUE) AND (PosSensor > 1) AND (1 > targetFloor) THEN
+                    targetFloor := 1;
+                END_IF;
+            END_IF;
+        END_IF;
+        
+    2:  (* 到达楼层后开启门7秒 *)
+        DriveUp := FALSE;
+        DriveDown := FALSE;
+        Brake := TRUE;
+        DoorOpenSignal := TRUE;
+        doorTimer := doorTimer + cycleTime;
+        IF doorTimer >= T#7s THEN
+            DoorOpenSignal := FALSE;
+            state := 3;
+            reopenTimer := T#0s;
+        END_IF;
+        
+    3:  (* 门关闭后等待10秒内无按钮按下则重新开启 *)
+        Brake := TRUE;
+        DoorOpenSignal := FALSE;
+        IF (InsideCall1 OR InsideCall2 OR InsideCall3 OR InsideCall4 OR InsideCall5) = TRUE THEN
+            state := 0;
+        ELSE
+            reopenTimer := reopenTimer + cycleTime;
+            IF reopenTimer >= T#10s THEN
+                state := 2;
+                doorTimer := T#0s;
+            END_IF;
+        END_IF;
+        
+    9:  (* 紧急状态 *)
+        DriveUp := FALSE;
+        DriveDown := FALSE;
+        Brake := TRUE;
+        DoorOpenSignal := FALSE;
+        
+    ELSE
+        state := 0;
+END_CASE;
+
+END_PROGRAM

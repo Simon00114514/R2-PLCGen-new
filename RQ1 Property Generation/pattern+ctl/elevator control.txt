@@ -1,0 +1,46 @@
+Agent: Here are the translated CTL and LTL specifications with the requested modifications:
+
+1. **UC-1 Process Floor Call Request:**
+
+   - **Pattern Type:** Implication
+     - **CTL Specification:**
+     AG((Elevator is moving up & Up call button is pressed at a floor & !Limited_switch) -> (Elevator stops at that floor));
+   - **Pattern Type:** Implication
+     - **CTL Specification:**
+     AG((Elevator is moving down & Down call button is pressed at a floor & !Llimited_switch) -> (Elevator stops at that floor))；
+   - **Pattern Type:** Forbidden State
+     - **CTL Specification:** AG(!conflicting_signals_active);
+
+   - **Pattern Type:** Reachability
+     - **CTL Specification:** EF(call_registered);
+
+2. **UC-2 Manage Elevator Movement:**
+
+   - **Pattern Type:** Invariant
+     - **CTL Specification:** AG(floor_limit_switch_operational);
+
+   - **Pattern Type:** Leads To
+     - **CTL Specification:** !E[(!floor_request_received) U (elevator_stopped)];
+
+3. **UC-3 Control Elevator Door Operation:**
+
+   - **Pattern Type:** Timed Trigger Response
+     - **LTL Specification:** G((door_open & timer=7000) -> door_close_command_issued);
+
+   - **Pattern Type:** Forbidden State
+     - **CTL Specification:** AG(!(door_open & safety_override_triggered));
+
+   - **Pattern Type:** Repeatability
+     - **CTL Specification:** AG(EF(door_closed_after_open));
+
+4. **UC-4 Reopen Elevator Door on Inactivity:**
+
+   - **Pattern Type:** Implication
+     - **CTL Specification:** AG((no_internal_button_press & timer_expired) -> door_reopened);
+
+   - **Pattern Type:** Reachability
+     - **CTL Specification:** EF(door_reopened_due_to_inactivity);
+
+
+
+These specifications now use the specified syntax changes, ensuring clarity and adherence to the required format.

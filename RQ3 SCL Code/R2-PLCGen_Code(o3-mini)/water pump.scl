@@ -1,0 +1,91 @@
+PROGRAM WaterPumpControl
+VAR_INPUT
+    StartPB         : BOOL;    // Start pushbutton signal
+    StopPB          : BOOL;    // Stop pushbutton signal
+    SetPB           : BOOL;    // Set (latch) pushbutton signal
+    ResetPB         : BOOL;    // Reset (unlatch) pushbutton signal
+    HighLevelSensor : BOOL;    // TRUE when tank is full
+    DrainValveCmd   : BOOL;    // Command to activate drain valve
+END_VAR
+
+VAR_OUTPUT
+    PumpMotor       : BOOL;    // Output to pump motor; TRUE = running
+    LatchLamp       : BOOL;    // Indicates latch status; TRUE = latched
+    DrainValve      : BOOL;    // Output to drain valve; TRUE = open
+END_VAR
+
+VAR
+    PumpLatched     : BOOL;    // Internal latch state
+    InternalPump    : BOOL;    // Internal pump running state
+END_VAR
+
+(*----------------------------------------------------------------------
+  Automatic Pump Shutdown:
+  If the high-level sensor indicates the tank is full, force the pump
+  to stop and clear the latch.
+----------------------------------------------------------------------*)
+IF HighLevelSensor = TRUE THEN
+    InternalPump := FALSE;
+    PumpLatched  := FALSE;
+    
+ELSE
+    (*------------------------------------------------------------------
+      Process Start Operation:
+      When the Start PB is pressed and the tank is not full, start the pump.
+      Also, if not already latched, the system latches the pump.
+    ------------------------------------------------------------------*)
+    IF StartPB = TRUE THEN
+        IF PumpLatched = FALSE THEN
+            PumpLatched := TRUE;
+        END_IF;
+        InternalPump := TRUE;
+    END_IF;
+    
+    (*------------------------------------------------------------------
+      Process Stop Operation:
+      When the Stop PB is pressed, stop the pump.
+      The latch is maintained if already set; if not, it remains unlatched.
+    ------------------------------------------------------------------*)
+    IF StopPB = TRUE THEN
+        InternalPump := FALSE;
+    END_IF;
+    
+    (*------------------------------------------------------------------
+      Process Set Latch:
+      Allow the operator to manually latch the pump using the Set PB.
+    ------------------------------------------------------------------*)
+    IF SetPB = TRUE THEN
+        IF PumpLatched = FALSE THEN
+            PumpLatched := TRUE;
+        END_IF;
+    END_IF;
+    
+    (*------------------------------------------------------------------
+      Process Reset Latch:
+      When the Reset PB is pressed and the pump is not running, unlatch the pump.
+    ------------------------------------------------------------------*)
+    IF ResetPB = TRUE THEN
+        IF (PumpLatched = TRUE) AND (InternalPump = FALSE) THEN
+            PumpLatched := FALSE;
+        END_IF;
+    END_IF;
+END_IF;
+
+(*----------------------------------------------------------------------
+  Drain Tank Operation:
+  The drain valve can only be activated when the pump is not running.
+----------------------------------------------------------------------*)
+IF (DrainValveCmd = TRUE) AND (InternalPump = FALSE) THEN
+    DrainValve := TRUE;
+ELSE
+    DrainValve := FALSE;
+END_IF;
+
+(*----------------------------------------------------------------------
+  Update Outputs:
+  Assign the internal pump state and latch flag to the physical outputs.
+----------------------------------------------------------------------*)
+PumpMotor := InternalPump;
+LatchLamp := PumpLatched;
+
+END_PROGRAM

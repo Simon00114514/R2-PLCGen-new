@@ -1,0 +1,46 @@
+FUNCTION_BLOCK FB_Abs
+VAR_INPUT
+    inputValue : INT;              // Input value to compute the absolute value for.
+END_VAR
+VAR_OUTPUT
+    absValue   : INT;              // Output holding the computed absolute value.
+END_VAR
+VAR
+    state      : INT := 0;         // FSM current state. 0: INITIALIZE, 1: CHECK_INPUT, etc.
+    prevState  : INT;             // Optional variable for state transition debugging.
+END_VAR
+
+BEGIN
+    // Finite State Machine (FSM) implementation for absolute value computation.
+    CASE state OF
+        0:  // INITIALIZE 鈥� Prepare the function block; no computation is done yet.
+            prevState := state;
+            state := 1;  // Transition to CHECK_INPUT
+            
+        1:  // CHECK_INPUT 鈥� Determine if inputValue is negative or non-negative.
+            prevState := state;
+            IF inputValue < 0 THEN
+                state := 2;  // Transition to PROCESS_NEGATIVE
+            ELSE
+                state := 3;  // Transition to PROCESS_NON_NEGATIVE
+            END_IF;
+            
+        2:  // PROCESS_NEGATIVE 鈥� Compute absolute value by multiplying the input by -1.
+            prevState := state;
+            absValue := -inputValue;
+            state := 4;     // Transition to FINISHED
+            
+        3:  // PROCESS_NON_NEGATIVE 鈥� Pass the input as is.
+            prevState := state;
+            absValue := inputValue;
+            state := 4;     // Transition to FINISHED
+            
+        4:  // FINISHED 鈥� Finalize computation. Output absValue is available.
+            prevState := state;
+            state := 0;     // Reset state to INITIALIZE for the next cycle.
+            
+        ELSE
+            // In case of an undefined state, reset to INITIALIZE.
+            state := 0;
+    END_CASE;
+END_FUNCTION_BLOCK

@@ -1,0 +1,86 @@
+### Revised Use Case Design
+
+1. **Use Case Name**: Control Mixing Ratio
+
+2. **Actor**:
+   - **Actor 1**: Control System (61131-3 Structured Text Program)
+
+3. **Use Case**: Control the mixing ratio of two reactants to maintain a 100:1 ratio.
+
+4. **System Boundary**: The boundary is the control system which is responsible for maintaining the mixing ratio of the reactants.
+
+5. **Relationships Among Actors**: The Control System interacts with the reactants and the mixing process.
+
+6. **Detailed Descriptive Information for Each Use Case**:
+
+   **Use Case**: Control Mixing Ratio
+
+   (1) **Brief Description**: The control system maintains the mixing ratio of two reactants at 100:1. It continuously adjusts the input rate of the reactants based on the current ratio.
+
+   (2) **Preconditions**: The reactants are available for mixing.
+
+   (3) **Event Flow**:
+
+   **Basic Flow**:
+   - The control system continuously monitors the current ratio of the reactants.
+   - **Trigger Event**: If the ratio is detected to be outside the acceptable range (98 to 102), or approaching these boundaries, the system triggers an immediate adjustment of the input rate.
+
+   **Alternative Flow**:
+   - If the ratio is greater than 102, the system reduces the input rate and continues to monitor until the ratio is back within range.
+   - If the ratio is less than 98, the system increases the input rate and continues to monitor until the ratio is back within range.
+
+   (4) **Postconditions**: The mixing ratio of the reactants is maintained at 100:1.
+
+   (5) **Use Case Scenario**: The control system is maintaining a 100:1 mixing ratio of two reactants. The current ratio is detected to be 103:1. The system reduces the input rate to bring the ratio back to the desired range.
+
+   (6) **Special Requirements**: The control system must be able to accurately measure the ratio of the reactants and adjust the input rate as needed, even in extreme cases.
+
+7. **Priority of Use Cases**: High (as it's critical for the mixing process)
+
+8. **Data Requirements**: The system requires real-time data on the current ratio of the reactants.
+
+9. **Business Rules**: The system must maintain the mixing ratio within the range of 98:1 to 102:1. If the ratio goes beyond this range, or approaches these boundaries, the system must adjust the input rate to correct the ratio.
+
+### Revised CTL Specifications
+
+1. **Implication**: 
+   - `AG((ratio > 102 OR ratio < 98) -> AX(adjust_input_rate))`
+   - This ensures that whenever the ratio is outside the acceptable range, the system immediately triggers an adjustment.
+
+2. **Invariant**:
+   - `AG(98 <= ratio <= 102)`
+   - This ensures that the system maintains the ratio within the acceptable range as an invariant condition.
+
+3. **Forbidden**:
+   - `AG(NOT (ratio > 102 OR ratio < 98))`
+   - This specifies that the system should not allow the ratio to remain outside the acceptable range without adjustment.
+
+4. **State Change During Cycle**:
+   - `AG((NOT (98 <= ratio <= 102)) -> AF (adjust_input_rate))`
+   - Ensures that if the ratio is outside the range, the system will eventually adjust the input rate.
+
+5. **State Change During Cycle**:
+   - `AG((ratio > 102) -> AF (reduce_input_rate))`
+   - Ensures that if the ratio is too high, the system will eventually reduce the input rate.
+
+6. **State Change During Cycle**:
+   - `AG((ratio < 98) -> AF (increase_input_rate))`
+   - Ensures that if the ratio is too low, the system will eventually increase the input rate.
+
+7. **State Change Between Cycles**:
+   - `AG((NOT (98 <= ratio <= 102)) AND X(AF(adjust_input_rate)) --> X(AF(98 <= ratio <= 102)))`
+   - Ensures that if the ratio is outside the range, the system will adjust the input rate in the next cycle to bring it back within range.
+
+8. **Reachability**:
+   - `EF(98 <= ratio <= 102)`
+   - Ensures that it is always possible to reach a state where the ratio is within the acceptable range.
+
+9. **Repeatability**:
+   - `AG(EF(98 <= ratio <= 102))`
+   - Ensures that the system can repeatedly bring the ratio back to the acceptable range.
+
+10. **Leads To**:
+    - `AG((adjust_input_rate) -> EF(!(98 <= ratio <= 102)))`
+    - Ensures that adjusting the input rate will eventually lead to the ratio being brought back within the acceptable range.
+
+These modifications aim to ensure that the system's behavior is consistent with the requirements and that the CTL specifications accurately reflect the desired system properties. Please proceed with these adjustments and verify them using your formal verification tools.

@@ -1,0 +1,17 @@
+Final CTL Specification:
+
+{1}: 
+SPEC  
+  AG((Emergency_Stop_Pressed | Critical_Fault) -> AX((Coffee_Valve = closed) & (Milk_Valve = closed) & (Output_Valve = closed) & (Mixer = off)));
+
+{2}: 
+SPEC  
+  AG(((System_Operational_State = Standby) & Start_Button_Pressed & Self_Test_Passed) -> AF(System_Operational_State = Idle));
+
+{3}: 
+SPEC  
+  AG((Coffee_Milk_Mode_Selected & Max_Level_Reached) -> AX((Coffee_Valve = closed) & (Milk_Valve = closed) & (Mixer = on))) ;
+  
+SPEC  
+  AG((Mixer = on & Mix_Timer = 4) -> AX((Mixer = off) & AF(Output_Valve = open)) & 
+     ((Coffee_Only_Mode_Selected & Max_Level_Reached) -> AX((Coffee_Valve = closed) & AF(Output_Valve = open))));

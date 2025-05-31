@@ -1,0 +1,219 @@
+PROGRAM ElevatorControl
+VAR
+    // State variables
+    state        : INT := 0;        // FSM state: 0 to 5.
+    currentFloor : INT := 1;        // Current floor (1 - 5).
+    targetFloor  : INT := 1;        // Target floor selected from calls.
+    direction    : INT := 0;        //  1 = up, -1 = down, 0 = idle.
+    
+    // Output flags
+    motorUp      : BOOL := FALSE;   // Elevator motor up command.
+    motorDown    : BOOL := FALSE;   // Elevator motor down command.
+    doorOpen     : BOOL := FALSE;   // Door status: TRUE = OPEN, FALSE = CLOSED.
+    
+    // Call arrays: external and internal calls for each floor.
+    callUp       : ARRAY [1..5] OF BOOL := [FALSE, FALSE, FALSE, FALSE, FALSE];
+    callDown     : ARRAY [1..5] OF BOOL := [FALSE, FALSE, FALSE, FALSE, FALSE];
+    internalCall : ARRAY [1..5] OF BOOL := [FALSE, FALSE, FALSE, FALSE, FALSE];
+    
+    // Timer function blocks declarations.
+    // DoorOpenTimer: 7-second door open timer.
+    // DoorReopenTimer: 10-second door closed wait timer.
+    DoorOpenTimer   : TON;  // Timer On delay for door open period.
+    DoorReopenTimer : TON;  // Timer On delay for door reopen waiting period.
+    
+    // Timer trigger booleans.
+    timerDoorOpenTrigger : BOOL := FALSE;
+    timerReopenTrigger   : BOOL := FALSE;
+    
+    // Local loop variable.
+    i : INT;
+END_VAR
+
+// ------------------------------------------------------------------------
+// Update the timers on every scan cycle.
+// For the door open timer, when its trigger is TRUE, the timer counts up to 7 seconds.
+// For the door reopen timer, when its trigger is TRUE, the timer counts up to 10 seconds.
+DoorOpenTimer(IN := timerDoorOpenTrigger, PT := T#7s);
+DoorReopenTimer(IN := timerReopenTrigger, PT := T#10s);
+
+// FSM implementation using CASE statement over the variable "state".
+CASE state OF
+    // STATE 0: INITIALIZE
+    0:
+        // Set initial values.
+        motorUp      := FALSE;
+        motorDown    := FALSE;
+        doorOpen     := FALSE;
+        direction    := 0;
+        currentFloor := 1;
+        targetFloor  := 1;
+        
+        // Clear call arrays.
+        FOR i := 1 TO 5 DO
+            callUp[i]       := FALSE;
+            callDown[i]     := FALSE;
+            internalCall[i] := FALSE;
+        END_FOR;
+        
+        // Transition to IDLE when initialization is complete.
+        state := 1;
+    
+    // STATE 1: IDLE
+    1:
+        motorUp   := FALSE;
+        motorDown := FALSE;
+        doorOpen  := FALSE;
+        timerDoorOpenTrigger := FALSE;
+        timerReopenTrigger   := FALSE;
+        
+        // Check if the current floor is requested (internal call) 鈥�
+        // immediate door open if the elevator is already at the requested floor.
+        IF internalCall[currentFloor] THEN
+            state := 4;  // Transition to DOOR_OPEN state.
+        ELSE
+            // Check for any call above the current floor.
+            FOR i := currentFloor + 1 TO 5 DO
+                IF internalCall[i] OR callUp[i] THEN
+                    targetFloor := i;
+                    direction   := 1;
+                    state       := 2;  // Transition to MOVING_UP.
+                    EXIT;  // Exit the FOR loop after selecting target.
+                END_IF;
+            END_FOR;
+            
+            // If no upward call is found, then check for any call below.
+            IF state = 1 THEN
+                // Use a loop in reverse: note the correct syntax for downward looping.
+                FOR i := currentFloor - 1 TO 1 BY -1 DO
+                    IF internalCall[i] OR callDown[i] THEN
+                        targetFloor := i;
+                        direction   := -1;
+                        state       := 3;  // Transition to MOVING_DOWN.
+                        EXIT;
+                    END_IF;
+                END_FOR;
+            END_IF;
+        END_IF;
+    
+    // STATE 2: MOVING_UP
+    2:
+        motorUp   := TRUE;
+        motorDown := FALSE;
+        doorOpen  := FALSE;
+        
+        // Simulate upward movement: increment the current floor if not yet at target.
+        IF currentFloor < targetFloor THEN
+            currentFloor := currentFloor + 1;
+        END_IF;
+        
+        // When the elevator reaches the target floor OR if an intermediate floor is requested,
+        // transition to DOOR_OPEN.
+        IF (currentFloor = targetFloor) OR (internalCall[currentFloor] OR callUp[currentFloor]) THEN
+            state := 4;
+        END_IF;
+    
+    // STATE 3: MOVING_DOWN
+    3:
+        motorUp   := FALSE;
+        motorDown := TRUE;
+        doorOpen  := FALSE;
+        
+        // Simulate downward movement: decrement the current floor if not yet at target.
+        IF currentFloor > targetFloor THEN
+            currentFloor := currentFloor - 1;
+        END_IF;
+        
+        // When the elevator reaches the target floor OR if an intermediate floor is requested,
+        // transition to DOOR_OPEN.
+        IF (currentFloor = targetFloor) OR (internalCall[currentFloor] OR callDown[currentFloor]) THEN
+            state := 4;
+        END_IF;
+    
+    // STATE 4: DOOR_OPEN
+    4:
+        // Arrived at a floor. Stop the motor and open the door.
+        motorUp   := FALSE;
+        motorDown := FALSE;
+        doorOpen  := TRUE;
+        
+        // Start the 7-second door open timer.
+        timerDoorOpenTrigger := TRUE;
+        
+        // When the door open timer expires, close the door and clear the call for this floor.
+        IF DoorOpenTimer.Q THEN
+            // Reset door open timer for next use.
+            timerDoorOpenTrigger := FALSE;
+            DoorOpenTimer(IN := FALSE);
+            
+            // Clear calls for the current floor.
+            internalCall[currentFloor] := FALSE;
+            callUp[currentFloor]       := FALSE;
+            callDown[currentFloor]     := FALSE;
+            
+            // Transition to DOOR_CLOSED_WAIT state.
+            state := 5;
+        END_IF;
+    
+    // STATE 5: DOOR_CLOSED_WAIT
+    5:
+        // With door closed, wait 10 seconds for any new call.
+        motorUp   := FALSE;
+        motorDown := FALSE;
+        doorOpen  := FALSE;
+        
+        // Start the 10鈥憇econd door reopen timer.
+        timerReopenTrigger := TRUE;
+        
+        // Check if a new internal call on the current floor is registered.
+        IF internalCall[currentFloor] THEN
+            // Button pressed: Reopen door immediately.
+            timerReopenTrigger := FALSE;
+            DoorReopenTimer(IN := FALSE);
+            state := 4;
+        ELSE
+            // Check if a new call has been requested (based on the previous direction).
+            IF direction = 1 THEN
+                FOR i := currentFloor + 1 TO 5 DO
+                    IF internalCall[i] OR callUp[i] THEN
+                        targetFloor := i;
+                        state       := 2;  // Transition to MOVING_UP.
+                        timerReopenTrigger := FALSE;
+                        DoorReopenTimer(IN := FALSE);
+                        EXIT;
+                    END_IF;
+                END_FOR;
+            ELSIF direction = -1 THEN
+                FOR i := currentFloor - 1 TO 1 BY -1 DO
+                    IF internalCall[i] OR callDown[i] THEN
+                        targetFloor := i;
+                        state       := 3;  // Transition to MOVING_DOWN.
+                        timerReopenTrigger := FALSE;
+                        DoorReopenTimer(IN := FALSE);
+                        EXIT;
+                    END_IF;
+                END_FOR;
+            END_IF;
+            
+            // If no new call appears and the 10鈥憇econd timer expires, reopen the door.
+            IF DoorReopenTimer.Q THEN
+                timerReopenTrigger := FALSE;
+                DoorReopenTimer(IN := FALSE);
+                state := 4;
+            END_IF;
+        END_IF;
+    
+    // Default fallback: if an unknown state is encountered, reinitialize.
+    ELSE
+        state := 0;
+END_CASE;
+
+// Safety: Reset timers if not in their associated state.
+IF state <> 4 THEN
+    timerDoorOpenTrigger := FALSE;
+END_IF;
+IF state <> 5 THEN
+    timerReopenTrigger := FALSE;
+END_IF;
+
+END_PROGRAM

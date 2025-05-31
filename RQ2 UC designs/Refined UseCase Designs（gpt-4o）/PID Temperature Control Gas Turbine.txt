@@ -1,0 +1,86 @@
+### 修改后的精化需求
+
+**1. Use Case Name:**
+   - Temperature Control
+
+**2. Actor:**
+   - Gas Turbine: The component that requires temperature control.
+   - PID Controller: The component that controls the temperature of the gas turbine.
+
+**3. Use Case:**
+   - Temperature Control: The PID controller adjusts the opening of the inlet valve to control the internal temperature of the gas turbine.
+
+**4. System Boundary:**
+   - IEC 61131-3 Structured Text Program
+   - System Boundary Clarification: The system includes the PID controller and the gas turbine's inlet valve control mechanism. External elements include temperature sensors and the gas turbine itself.
+
+**5. Relationships Among Actors:**
+   - The PID Controller interacts with the Gas Turbine to control its temperature.
+
+**6. Detailed Descriptive Information for Each Use Case:**
+
+   **Use Case: Temperature Control**
+
+   (1) **Brief Description:**
+       - The PID controller adjusts the opening of the inlet valve to control the internal temperature of the gas turbine.
+
+   (2) **Preconditions:**
+       - The gas turbine is operational.
+       - The PID controller is active.
+       - Temperature sensors are functioning correctly.
+
+   (3) **Event Flow:**
+
+   **Basic Flow:**
+   1. The PID controller reads the current temperature of the gas turbine from the sensors.
+   2. If the temperature is below the threshold, the PID controller increases the opening of the inlet valve.
+   3. If the temperature is above the threshold, the PID controller decreases the opening of the inlet valve.
+
+   **Alternative Flow:**
+   1. If the temperature is within the acceptable range, the PID controller maintains the current opening of the inlet valve.
+
+   **Exception Flow:**
+   1. If the temperature sensor fails, the system triggers an alert and switches to a safe mode, maintaining the current valve position until manual intervention.
+   2. If the PID controller fails, the system triggers an alert and the inlet valve is set to a predefined safe position.
+
+   (4) **Postconditions:**
+       - The temperature of the gas turbine is controlled within the acceptable range.
+
+   (5) **Use Case Scenario:**
+       - In a scenario where the gas turbine's temperature is above the threshold, the PID controller will decrease the opening of the inlet valve to lower the temperature.
+
+   (6) **Special Requirements:**
+       - The system must be able to accurately read the temperature of the gas turbine and adjust the opening of the inlet valve accordingly.
+       - The system should handle sensor and controller failures gracefully.
+
+**7. Priority of Use Cases:**
+   - Temperature Control: High
+
+**8. Data Requirements:**
+   - D-1: Current temperature of the gas turbine (sourced from temperature sensors)
+   - D-2: Threshold temperature for the gas turbine
+   - D-3: Current opening of the inlet valve
+
+**9. Business Rules (Optional):**
+   - B-1: The PID controller must not allow the temperature of the gas turbine to exceed the threshold.
+   - B-2: The PID controller must adjust the opening of the inlet valve based on the current temperature of the gas turbine.
+1. Implication (ID: pattern-implication)
+   - Formal requirement: AG((Temperature_Above_Threshold) -> (Decrease_Inlet_Valve_Opening)) (type: ctl)
+
+2. Invariant (ID: pattern-invariant)
+   - Formal requirement: AG(Temperature_Within_Range) (type: ctl)
+
+3. Forbidden State (ID: pattern-forbidden)
+   - Formal requirement: AG(!Temperature_Exceeds_Threshold) (type: ctl)
+
+4. State Change During a Cycle (ID: pattern-statechange-duringcycle)
+   - Formal requirement: AG((Temperature_Above_Threshold) -> A[ !Temperature_Within_Range U Temperature_Within_Range ]) (type: ctl)
+
+5. State Change During a Cycle (ID: pattern-statechange-duringcycle)
+   - Formal requirement: AG((Temperature_Below_Threshold) -> A[ !Increase_Inlet_Valve_Opening U Increase_Inlet_Valve_Opening ]) (type: ctl)
+
+6. State Change Between Cycles (ID: pattern-statechange-betweencycles)
+   - Formal requirement: G((Temperature_Within_Range & X( [ !Maintain_Inlet_Valve_Opening U (Maintain_Inlet_Valve_Opening) ] )) -> X( [ !Maintain_Inlet_Valve_Opening U (Maintain_Inlet_Valve_Opening) ] )) (type: ltl)
+
+7. Reachability (ID: pattern-reachability)
+   - Formal requirement: EF(Temperature_Within_Range) (type: ctl)

@@ -1,0 +1,21 @@
+SPEC G((light_green) -> X(light_yellow));
+
+SPEC G((light_yellow) -> X(light_red));
+
+SPEC G((light_red) -> X(light_green));
+
+SPEC G((Pedestrian_Button & light_red & !Vehicle_Detected & !emergency_vehicle_detected) -> X(light_green));
+
+SPEC G((Vehicle_Detected & !emergency_vehicle_detected) -> X(light_red));
+
+SPEC AG((emergency_vehicle_detected) -> emergency_state);
+
+SPEC AG((emergency_vehicle_detected & Pedestrian_Button) -> light_red);
+
+SPEC AG((sensor_failure_detected) -> (safe_state & maintenance_alert));
+
+SPEC AG((light_green -> !(light_yellow | light_red)) & 
+       (light_yellow -> !(light_green | light_red)) & 
+       (light_red -> !(light_green | light_yellow)));
+
+SPEC AG(system_active);

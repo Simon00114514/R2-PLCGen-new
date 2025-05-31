@@ -1,0 +1,60 @@
+PROGRAM PackageBottles
+// Declare variables
+VAR
+    state: INT; // The state variable
+    proximitySensor: BOOL; // TRUE when a bottle is detected
+    emptyBottleSensor: BOOL; // TRUE when an empty bottle is detected
+    conveyor: BOOL; // TRUE when the conveyor is operating
+    cylinder: BOOL; // TRUE when the cylinder is extended
+END_VAR
+
+// Set initial state
+state := 0; // IDLE
+
+// Main program loop
+REPEAT
+
+    // Handle state actions and transitions
+    CASE state OF
+
+        // State 0: IDLE
+        0:
+            // Actions for IDLE state
+            conveyor := FALSE; // Conveyor is OFF
+            cylinder := FALSE; // Cylinder is RETRACTED
+
+            // Transitions from IDLE state
+            IF proximitySensor AND NOT emptyBottleSensor THEN
+                state := 1; // Move to MOVE_BOTTLE_TO_PACKAGING state
+            ELSIF proximitySensor AND emptyBottleSensor THEN
+                state := 2; // Move to REMOVE_EMPTY_BOTTLE state
+            END_IF;
+
+        // State 1: MOVE_BOTTLE_TO_PACKAGING
+        1:
+            // Actions for MOVE_BOTTLE_TO_PACKAGING state
+            conveyor := TRUE; // Conveyor is ON
+            cylinder := FALSE; // Cylinder is RETRACTED
+
+            // Transitions from MOVE_BOTTLE_TO_PACKAGING state
+            IF NOT proximitySensor AND NOT emptyBottleSensor THEN
+                state := 0; // Return to IDLE state
+            END_IF;
+
+        // State 2: REMOVE_EMPTY_BOTTLE
+        2:
+            // Actions for REMOVE_EMPTY_BOTTLE state
+            conveyor := FALSE; // Conveyor is OFF
+            cylinder := TRUE; // Cylinder is EXTENDED
+
+            // Transitions from REMOVE_EMPTY_BOTTLE state
+            IF NOT proximitySensor AND NOT emptyBottleSensor THEN
+                state := 0; // Return to IDLE state after removal of empty bottle
+            END_IF;
+
+    END_CASE;
+
+UNTIL FALSE
+END_REPEAT;
+
+END_PROGRAM

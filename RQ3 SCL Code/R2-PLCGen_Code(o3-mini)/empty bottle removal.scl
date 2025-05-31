@@ -1,0 +1,49 @@
+PROGRAM BottlePackagingSystem
+VAR_INPUT
+    ProxSensor      : BOOL;  // Proximity sensor detects any bottle
+    EmptySensor     : BOOL;  // Empty bottle sensor detects an empty bottle
+    ProxSensorOp    : BOOL;  // Proximity sensor operational status
+    EmptySensorOp   : BOOL;  // Empty bottle sensor operational status
+    BeltOp          : BOOL;  // Conveyor belt operational status
+    CylinderOp      : BOOL;  // Cylinder operational status
+END_VAR
+
+VAR_OUTPUT
+    ConveyorBelt    : BOOL;  // TRUE: belt moves bottle to packaging area
+    Cylinder        : BOOL;  // TRUE: cylinder activated to remove empty bottle
+    Alert           : BOOL;  // TRUE: system alert (sensor or component failure)
+END_VAR
+
+VAR
+    // Internal flag variable if needed in the future
+END_VAR
+
+(* Main logic for Bottle Packaging System *)
+IF (ProxSensorOp = FALSE) OR (EmptySensorOp = FALSE) THEN
+    Alert := TRUE;
+    ConveyorBelt := FALSE;
+    Cylinder := FALSE;
+ELSIF BeltOp = FALSE THEN
+    Alert := TRUE;
+    ConveyorBelt := FALSE;
+    Cylinder := FALSE;
+ELSIF CylinderOp = FALSE THEN
+    Alert := TRUE;
+    ConveyorBelt := FALSE;
+    Cylinder := FALSE;
+ELSE
+    Alert := FALSE;
+    IF ProxSensor = TRUE THEN
+        ConveyorBelt := TRUE;
+        IF EmptySensor = TRUE THEN
+            Cylinder := TRUE;
+        ELSE
+            Cylinder := FALSE;
+        END_IF;
+    ELSE
+        ConveyorBelt := FALSE;
+        Cylinder := FALSE;
+    END_IF;
+END_IF;
+    
+END_PROGRAM

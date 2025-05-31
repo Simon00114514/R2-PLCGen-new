@@ -1,0 +1,144 @@
+Use Case Name:
+Automatic Car Wash System
+Actors:
+Car 
+Person 
+Sensor System
+Alarm System 
+Car Wash Control System 
+Use Cases:
+[UC-1]: Initiate and Execute Normal Wash Cycle – Manages the standard car wash process (start, spray, scrub, dry) from vehicle entry to exit when no safety issues are present.
+[UC-2]: Monitor for Person Presence – Continuously checks for people in the wash area during active wash operations.
+[UC-3]: Handle Emergency Stop (Person Detected) – Stops all wash operations and activates an alarm if a person is detected in the wash area during a cycle.
+System Boundary:
+Car Wash Station, specifically the IEC 61131-3 Structured Text Program and its interface to sensors and actuators.
+Relationships Among Actors:
+The Sensor System provides input (Car presence, Person presence) to the Car Wash Control System.
+The Car Wash Control System executes [UC-1] based on initial sensor inputs.
+The Car Wash Control System executes [UC-2] concurrently with [UC-1]'s active wash phases (spray, scrub, dry).
+If [UC-2] detects a person, it triggers [UC-3].
+[UC-3] commands the Car Wash Control System to stop operations and activate the Alarm System.
+The Car is the subject of [UC-1]. The Person is the subject of detection for [UC-2] and [UC-3].
+Detailed Descriptive Information for Each Use Case:
+Use Case: [UC-1] Initiate and Execute Normal Wash Cycle
+(1) Brief Description:
+This use case describes the standard, uninterrupted car wash process. It starts when a car is detected and no person is present, proceeds through the wash stages (start, spray, scrub, dry), and concludes with the car leaving and the system resetting.
+(2) Preconditions:
+– A car is detected by the Sensor System (car_detected is true).
+– No people are detected in the wash area by the Sensor System (!person_detected is true).
+– The Car Wash Control System is in an idle_state.
+(3) Event Flow:
+Basic Flow:
+1. Car Wash Control System verifies preconditions (car detected, no person, system idle).
+2. Car Wash Control System initiates the "Start" operation/phase (current_stage_is_start_op). This may involve initial positioning or checks.
+3. After the "Start" operation completes (e.g., start_op_complete event), system commands the "Spray" operation (current_stage_is_spray).
+4. After spray duration is met (e.g., spray_time_met event), system commands the "Scrub" operation (current_stage_is_scrub).
+5. After scrub duration is met (e.g., scrub_time_met event), system commands the "Dry" operation (current_stage_is_dry).
+6. After dry duration is met (e.g., dry_time_met event), the dry operation completes.
+7. Car Wash Control System signals car is ready to leave (car_is_ready_to_leave state/event).
+8. Sensor System or Car Wash Control System detects car leaves station (car_has_left_station_event).
+9. Car Wash Control System resets to an idle_state.
+Alternative Flow(s):
+– AF-1: Person Detected During Cycle (Handled by UC-3)
+1. If [UC-2] Monitor for Person Presence signals a person detection during any active wash stage (start, spray, scrub, dry - steps 2-6):
+2. This use case ([UC-1]) is immediately interrupted.
+3. Control is effectively transferred to [UC-3] Handle Emergency Stop.
+(4) Post Conditions:
+Success:
+– The car is washed according to the defined cycle (start, spray, scrub, dry).
+– The car has left the station.
+– The Car Wash Control System is in idle_state.
+– No alarm was triggered during this use case.
+Interrupted (by AF-1):
+– The wash cycle is stopped prematurely.
+– Further state is determined by [UC-3].
+(5) Special Requirements:
+– Each wash stage (start, spray, scrub, dry) must complete its defined duration/conditions unless interrupted.
+– The sequence of stages must be strictly followed: Start -> Spray -> Scrub -> Dry.
+Use Case: [UC-2] Monitor for Person Presence
+(1) Brief Description:
+This use case describes the continuous monitoring for any person within the car wash area specifically when a car wash cycle ([UC-1]) is actively performing its wash stages (start, spray, scrub, dry).
+(2) Preconditions:
+– [UC-1] Initiate and Execute Normal Wash Cycle is in an active wash stage (i.e., wash_cycle_active is true, meaning current stage is start, spray, scrub, or dry).
+– The Sensor System (personnel detection part) is operational.
+(3) Event Flow:
+Basic Flow:
+1. While wash_cycle_active is true:
+2. The Sensor System continuously checks for the presence of a person in the wash area.
+3. If no person is detected, monitoring continues.
+Alternative Flow(s):
+– AF-1: Person Detected
+1. If the Sensor System detects a person (person_detected becomes true):
+2. This use case signals the Car Wash Control System about the detection.
+3. This triggers the execution of [UC-3] Handle Emergency Stop.
+(4) Post Conditions:
+Success (no person detected during a check cycle):
+– Monitoring continues. [UC-1] proceeds.
+Person Detected (AF-1):
+– A person detection event is flagged.
+– [UC-3] is invoked.
+(5) Special Requirements:
+– High-frequency and reliable person detection is critical.
+Use Case: [UC-3] Handle Emergency Stop (Person Detected)
+(1) Brief Description:
+This use case is triggered when a person is detected in the wash area during an active car wash cycle. It ensures all operations are immediately halted and an alarm is activated.
+(2) Preconditions:
+– A car wash cycle is in progress (wash_cycle_active is true).
+– [UC-2] Monitor for Person Presence has signaled that a person has been detected (person_detected is true).
+(3) Event Flow:
+Basic Flow:
+1. Car Wash Control System receives person detection signal (while wash_cycle_active).
+2. Car Wash Control System immediately interrupts any active stage of [UC-1].
+3. Car Wash Control System commands all wash actuators (start, spray, scrub, dry mechanisms) to stop (operations_halted state).
+4. Car Wash Control System activates the Alarm System (alarm_triggered state).
+5. System logs the emergency event.
+Alternative Flow(s): (Could include details from your first "精化后" UC3's alternative flow if desired, e.g., secondary shutdown attempt)
+– AF-1: Primary Shutdown Fails
+1. If the primary command to halt operations fails to achieve the operations_halted state promptly:
+2. System attempts a secondary shutdown mechanism.
+3. Log failure and escalation.
+(4) Post Conditions:
+Success:
+– All car wash operations are stopped.
+– The alarm is active.
+– The system is in a safe, halted state (e.g., emergency_stop_state).
+(5) Special Requirements:
+– Stoppage of operations must be immediate.
+– Alarm activation must be clear.
+Priority of Use Cases:
+[UC-1] Initiate and Execute Normal Wash Cycle: medium
+[UC-2] Monitor for Person Presence: High
+[UC-3] Handle Emergency Stop (Person Detected):High
+Data Requirements:
+[D-1]: Car Detected Status (Boolean: car_detected)
+[D-2]: Person Detected Status (Boolean: person_detected)
+[D-3]: Wash Cycle Active Status (Boolean: wash_cycle_active - true if current_stage is StartOp, Spray, Scrub, or Dry)
+[D-4]: Current Wash Stage (Enum: Idle, StartOp, Spray, Scrub, Dry, DryComplete_ReadyToLeave, EmergencyStop, SystemReset)
+[D-5]: Operations Halted Status (Boolean: operations_halted)
+[D-6]: Alarm Triggered Status (Boolean: alarm_triggered)
+[D-7]: Car Has Left Station Event (Event: car_has_left_station_event)
+[D-8]: Start Operation Complete Event (Event: start_op_complete)
+[D-9]: Spray Time Met Event (Event: spray_time_met)
+[D-10]: Scrub Time Met Event (Event: scrub_time_met)
+[D-11]: Dry Time Met Event (Event: dry_time_met)
+[D-12]: Personnel Sensor Check Event (Event: person_sensor_check_event)
+[D-13]: Primary Shutdown Failed Event (Event: primary_shutdown_failed)
+[D-14]: Secondary Shutdown Attempted Event (Event: secondary_shutdown_attempted)
+Business Rules:
+[B-1]: The car wash cycle ([UC-1]) can only begin if a car is detected AND no person is detected AND the system is in an idle state.
+[B-2]: If a person is detected (via [UC-2]) while a wash cycle ([UC-1]) is active, then [UC-3] must be invoked to immediately stop all wash operations AND trigger an alarm.
+[B-3]: The normal wash cycle ([UC-1]) follows the sequence: StartOp -> Spray -> Scrub -> Dry.
+[B-4]: During an active wash cycle ([UC-1]), continuous monitoring for person presence ([UC-2]) must occur.
+[B-5]: Each wash stage (StartOp, Spray, Scrub, Dry) has a defined completion condition (e.g., timer elapsed or other conditions met) before transitioning to the next stage or completing the cycle.
+
+CTL/LTL Expressions (with Source Mapping)
+1.AG((car_detected & !person_detected & current_stage_is_idle) -> AX car_wash_starts)
+2.AG((car_wash_starts & start_op_complete) -> AX current_stage_is_spray)
+3.AG((current_stage_is_spray & spray_time_met) -> AX current_stage_is_scrub)
+4.AG((current_stage_is_scrub & scrub_time_met) -> AX current_stage_is_dry)
+5.AG((current_stage_is_dry & dry_time_met) -> AX car_ready_to_leave)
+6.AG((wash_cycle_active & person_detected) -> AX (operations_halted & alarm_triggered & current_stage_is_emergency_stop))
+7.G(car_ready_to_leave -> F(car_has_left_station_event & X current_stage_is_idle))
+8.AG(wash_cycle_active -> AF person_sensor_check_event)
+9.AG((wash_cycle_active & person_detected) -> AF(operations_halted & alarm_triggered & current_stage_is_emergency_stop))
+10.AG(primary_shutdown_failed -> AX secondary_shutdown_attempted)

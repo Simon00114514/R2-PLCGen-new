@@ -1,0 +1,57 @@
+PROGRAM SprayStationControl
+
+VAR
+    state: INT := 0;              // Current state of the spray station
+    prevState: INT := 0;          // Previous state
+    Vehicle_Sensor: BOOL;         // Detects if a vehicle is present
+    Spray_Button: BOOL;           // Button to initiate spraying
+    Stop_Button: BOOL;            // Button to stop the conveyor manually
+    Conveyor: BOOL := TRUE;       // Conveyor belt actuator, default ON
+    Sprayer: BOOL := FALSE;       // Sprayer actuator, default OFF
+    resetSprayButton: BOOL := FALSE; // Flag to reset the spray button after spraying
+    sprayDuration: TP;            // Timer for 3 seconds spraying
+END_VAR
+
+// Initialize the spray duration timer with a time of 3 seconds.
+sprayDuration(IN := FALSE, PT := T#3S);
+
+(* State transition logic *)
+CASE state OF
+    0: // STATE 0: IDLE
+        Conveyor := TRUE;
+        Sprayer := FALSE;
+        IF Vehicle_Sensor AND NOT Stop_Button THEN
+            state := 1; // TRANSITION: When vehicle is detected and not stopped, move to READY_TO_SPRAY
+        END_IF;
+
+    1: // STATE 1: READY_TO_SPRAY
+        Conveyor := TRUE;
+        Sprayer := FALSE;
+        IF Spray_Button THEN
+            state := 2; // TRANSITION: When spray button is pressed, move to SPRAYING
+            sprayDuration(IN := TRUE); // Start the spray duration timer
+        END_IF;
+
+    2: // STATE 2: SPRAYING
+        Conveyor := FALSE;
+        Sprayer := TRUE;
+        IF sprayDuration.Q THEN
+            state := 3; // TRANSITION: After timer elapses, move to SPRAY_COMPLETE
+            resetSprayButton := TRUE; // Set the reset flag for the spray button
+            sprayDuration(IN := FALSE); // Reset the timer
+        END_IF;
+
+    3: // STATE 3: SPRAY_COMPLETE
+        Conveyor := TRUE;
+        Sprayer := FALSE;
+        // Reset the spray button here, might depend on actual implementation logic
+        IF resetSprayButton THEN
+            resetSprayButton := FALSE; // Reset the flag
+            state := 0; // TRANSITION: Reset state to IDLE
+        END_IF;
+
+    ELSE
+        state := 0; // Default to IDLE state
+END_CASE;
+
+END_PROGRAM

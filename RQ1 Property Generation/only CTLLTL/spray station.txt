@@ -1,0 +1,21 @@
+1. **Preconditions:**
+   - The car is on the conveyor system and the spray system is ready to spray.
+   - CTL Expression: `AG (car_on_conveyor_system AND spray_system_ready)`
+
+2. **Basic Flow:**
+   - The operator presses the conveyor system button to move the car to the spray station.
+   - CTL Expression: `AG (operator_presses_conveyor_button -> AF car_at_spray_station)`
+
+   - The operator presses the spray button, and the spray system sprays the car for 3 seconds.
+   - CTL Expression: `AG (operator_presses_spray_button -> AF (spray_system_spraying AND EF[3] spray_system_stops))`
+
+   - The spray button resets, and the conveyor system restarts to move the car away.
+   - CTL Expression: `AG (spray_system_stops -> AF (spray_button_resets AND conveyor_system_restarts))`
+
+3. **Alternative Flow:**
+   - If the conveyor stop button is pressed while the car is detected by the sensor, the conveyor system stops.
+   - CTL Expression: `AG (conveyor_stop_button_pressed AND car_detected_by_sensor -> AF conveyor_system_stops)`
+
+4. **Post Conditions:**
+   - Success: The car has been sprayed, the spray button is reset, and the car is moved away from the spray station.
+   - CTL Expression: `AG (car_sprayed AND spray_button_reset AND car_moved_away)`

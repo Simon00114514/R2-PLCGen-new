@@ -1,0 +1,36 @@
+FUNCTION_BLOCK FB_AbsoluteValue
+VAR_INPUT
+    inputValue : INT; // The input value to the function block
+END_VAR
+VAR_OUTPUT
+    output : INT; // The output value, which is the absolute of inputValue
+END_VAR
+VAR
+    state : INT; // The state variable used to track the state of the function block
+END_VAR
+
+// Initialize the state to STATE 0
+state := 0;
+
+CASE state OF
+    0: // STATE 0: INITIALIZE
+        output := 0; // Output is set to 0
+        // Transition to STATE 1 unconditionally
+        state := 1;
+        
+    1: // STATE 1: CALCULATE ABSOLUTE VALUE
+        IF inputValue < 0 THEN
+            output := -inputValue; // If input is negative, output the negation (abs value)
+        ELSE
+            output := inputValue; // If input is positive or zero, output the same value
+        END_IF;
+        // This state can transition back to STATE 0 if needed
+        // For this self-contained example, we assume it stays in STATE 1
+    
+    ELSE
+        // Handle unexpected state gracefully
+        // This is more for robustness; in a simple example, unreachable.
+        output := 0;
+        state := 0;
+END_CASE;
+END_FUNCTION_BLOCK

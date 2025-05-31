@@ -1,0 +1,101 @@
+
+### Complete Use Case Design
+
+#### Use Case: Fill Tank
+
+1. **Brief Description**: The user starts the water pump to fill the tank until the level sensor detects a high water level.
+2. **Preconditions**: 
+   - The tank is not full.
+   - The water pump is not latched.
+3. **Event Flow**:
+   - **Basic Flow**: 
+     1. The user presses the Start Button (START PB) when the pump is not latched.
+     2. The water pump starts filling the tank.
+     3. The system uses the SET instruction to latch the motor once the pump is running.
+     4. The level sensor detects the high water level.
+     5. The system uses the RESET instruction to unlatch the motor and stop the pump.
+   - **Alternative Flow**: 
+     1. If the water pump is latched, the user must press the Stop Button (STOP PB) to use the RESET instruction and unlatch it before pressing the Start Button.
+4. **Exception Flow**:
+   - **Sensor Failure**: 
+     1. If the level sensor fails, the system should trigger an alarm and use the RESET instruction to stop the water pump.
+   - **Button Malfunction**:
+     1. If the Start or Stop Button malfunctions, the user should manually disconnect the power to stop the pump.
+5. **Postconditions**: 
+   - The tank is full.
+   - The water pump is not latched.
+6. **Use Case Scenario**: The user wants to fill the tank. They press the Start Button when the pump is not latched, the pump starts, and the system latches the motor using the SET instruction. When the tank is full, the level sensor detects the high water level, and the system unlatches the motor using the RESET instruction to stop the pump.
+7. **Special Requirements**: 
+   - The water pump must not be latched when the Start Button is pressed.
+
+#### Use Case: Empty Tank
+
+1. **Brief Description**: The user empties the tank using the discharge valve.
+2. **Preconditions**: 
+   - The tank is full.
+3. **Event Flow**:
+   - **Basic Flow**: 
+     1. The user opens the Discharge Valve.
+     2. The water in the tank is emptied.
+4. **Exception Flow**:
+   - **Valve Malfunction**: 
+     1. If the Discharge Valve fails, the user should manually empty the tank.
+5. **Postconditions**: 
+   - The tank is empty.
+6. **Use Case Scenario**: The user wants to empty the tank. They open the Discharge Valve, and the water in the tank is emptied.
+7. **Special Requirements**: 
+   - The tank must be full before the Discharge Valve can be opened.
+
+### CTL Expressions
+
+1. **Use Case: Fill Tank**
+   - **Implication**: 
+     - `AG((!full_tank & !latched_pump) -> (start_button_press & pump_fill_tank & SET_latch))`
+   - **Forbidden**: 
+     - `AG(start_button_press -> !(latched_pump))`
+   - **Stop Button Unlatching**: 
+     - `AG((stop_button_press & ! latched_pump) -> RESET_unlatch)`
+   - **High Water Level Detection**: 
+     - `AG(pump_filling_tank -> (high_water_level_detected -> (RESET_unlatch & stop_pump)))`
+   - **Alarm Handling**: 
+     - `AG(sensor_failure -> (alarm_triggered & RESET_unlatch & stop_pump))`
+   - **Manual Override**: 
+     - `AG(button_malfunction -> manual_power_disconnect)`
+
+2. **Use Case: Empty Tank**
+   - **Implication**: 
+     - `AG(full_tank -> (open_discharge_valve & empty_tank))`
+   - **Forbidden**: 
+     - `AG(open_discharge_valve -> !(empty_tank))`
+   - **Invariant**: 
+     - `AG(empty_tank -> full_tank)`
+   - **Manual Override**: 
+     - `AG(valve_malfunction -> manual_empty_tank)`
+
+### LTL Expressions
+
+1. **Use Case: Fill Tank**
+   - **Implication**: 
+     - `G((!full_tank & !latched_pump) -> (start_button_press U (pump_fill_tank & SET_latch)))`
+   - **Forbidden**: 
+     - `G(start_button_press -> !latched_pump)`
+   - **Stop Button Unlatching**: 
+     - `G((stop_button_press & !latched_pump) -> X RESET_unlatch)`
+   - **High Water Level Detection**: 
+     - `G(pump_filling_tank -> (high_water_level_detected -> X (RESET_unlatch & stop_pump)))`
+   - **Alarm Handling**: 
+     - `G(sensor_failure -> (alarm_triggered U (RESET_unlatch AND stop_pump)))`
+   - **Manual Override**: 
+     - `G(button_malfunction -> F manual_power_disconnect)`
+
+2. **Use Case: Empty Tank**
+   - **Implication**: 
+     - `G(full_tank -> (open_discharge_valve U empty_tank))`
+   - **Forbidden**: 
+     - `G(open_discharge_valve -> !empty_tank)`
+   - **Invariant**: 
+     - `G(empty_tank -> F full_tank)`
+   - **Manual Override**: 
+     - `G(valve_malfunction -> F manual_empty_tank)`
+
+These comprehensive use case designs and formal specifications ensure that all requirements regarding the motor's latch state, the use of SET and RESET instructions, and the conditions for the Start and Stop Buttons are accurately captured.

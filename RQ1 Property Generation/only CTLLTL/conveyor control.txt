@@ -1,0 +1,26 @@
+Agent: To generate temporal logic expressions for the Conveyor Belt Control System, follow these steps:
+
+1. **Identify Events and States:**
+   - Events: Sensor detection, stop button press, belt start command, belt stop command.
+   - States: Belt running, belt stopped, sensors active, stop buttons active.
+
+2. **Analyze Conditions and Constraints:**
+   - [UC-1]: Sensors must be continuously monitored, and detection signals should be logged and forwarded if no stop button is pressed.
+   - [UC-2]: Stop button press must be detected, logged, and should trigger a belt stop, overriding any sensor detection.
+   - [UC-3]: The belt should start only if a sensor detects an object and no stop button is pressed.
+   - [UC-4]: The belt should stop if a stop button is pressed or if sensor conditions are not met.
+   - [UC-5]: The belt speed must be maintained at 2 meters per second.
+
+3. **CTL Expressions:**
+   - **[UC-1] Monitor Sensors for Object Detection:**
+     - `AG (sensors_active -> AF detection_signal_logged)`
+   - **[UC-2] Process Stop Button Activation:**
+     - `AG (stop_button_pressed -> AX belt_stopped)`
+   - **[UC-3] Command Conveyor Belt Start:**
+     - `AF ((sensor_detected & !stop_button_pressed) -> AX belt_started)`
+   - **[UC-4] Command Conveyor Belt Stop:**
+     - `AG ((stop_button_pressed | !sensor_detected) -> AX belt_stopped)`
+   - **[UC-5] Maintain Conveyor Belt Speed:**
+     - `AG (belt_running -> AF belt_speed=2_)`
+
+These expressions ensure that the system adheres to the specified requirements and constraints, using CTL to verify the behavior of the conveyor belt system.

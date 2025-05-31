@@ -1,0 +1,103 @@
+### Final Revised Use Case Design
+
+#### Use Case: Pouring Liquid
+
+1. **Use Case Name**: Pouring Liquid
+
+2. **Actor**:
+   - Operator: The person who operates the system by pressing buttons and observing the liquid level.
+
+3. **Brief Description**: 
+   - The operator uses buttons S1 and S2 to pour unmixed solutions into the tank.
+
+4. **Preconditions**: 
+   - The tank is not full.
+
+5. **Event Flow**:
+   - **Basic Flow**: 
+     - The operator presses button S1, and Liquid 1 is poured into the tank in the next state.
+     - The operator presses button S2, and Liquid 2 is poured into the tank in the next state.
+   - **Alternative Flow**: 
+     - If the tank is full, buttons S1 and S2 are disabled in the next state.
+
+6. **Postconditions**: 
+   - The tank contains unmixed solutions, unless it is full.
+
+7. **Use Case Scenario**: 
+   - The operator wants to pour Liquid 1 into the tank, so they press button S1, and Liquid 1 is poured in the next state.
+   - The operator wants to pour Liquid 2 into the tank, so they press button S2, and Liquid 2 is poured in the next state.
+
+8. **Special Requirements**: 
+   - The system must accurately measure the liquid level in the tank and disable buttons S1 and S2 in the next state when the tank is full.
+
+#### Use Case: Preparing Mixed Solution
+
+1. **Use Case Name**: Preparing Mixed Solution
+
+2. **Actor**:
+   - Operator: The person who operates the system by pressing buttons and observing the liquid level.
+
+3. **Brief Description**: 
+   - The operator uses button S3 to prepare the mixed solution.
+
+4. **Preconditions**: 
+   - The tank contains unmixed solutions.
+
+5. **Event Flow**:
+   - **Basic Flow**: 
+     - The operator presses button S3, buttons S1 and S2 are disabled in the next state, the mixing motor M is activated in the next state, and valve V1 is eventually opened to discharge the mixed liquid.
+   - **Alternative Flow**: 
+     - If the tank is empty, button S3 is disabled in the next state.
+
+6. **Postconditions**: 
+   - The tank is empty, and the mixed solution is ready.
+
+7. **Use Case Scenario**: 
+   - The operator wants to prepare the mixed solution, so they press button S3.
+
+8. **Special Requirements**: 
+   - The system must accurately control the mixing motor M and ensure valve V1 is eventually opened.
+
+### Final CTL Specifications
+
+1. **Pouring Liquid**:
+   - `AG(button_S1 -> AX liquid1_poured_into_tank)`
+   - `AG(button_S2 -> AX liquid2_poured_into_tank)`
+   - `AG(tank_full -> AX (!button_S1 & !button_S2))`
+
+2. **Preparing Mixed Solution**:
+   - `AG(button_S3 -> AX (!button_S1 & !button_S2 & motor_M & AX AF valve_V1))`
+   - `AG(tank_empty -> AX (!button_S3))`
+
+3. **Invariant**:
+   - `AG(measure_liquid_level & control_motor_M_and_valve_V1)`
+
+4. **State Change During Cycle**:
+   - `AG(!tank_full -> AX(pour_unmixed_solutions))`
+
+5. **State Change Between Cycles**:
+   - `G((unmixed_solutions & X(button_S3)) -> X(tank_empty & mixed_solution_ready))`
+
+6. **Reachability**:
+   - `EF(tank_full)`
+   - `EF(tank_empty)`
+
+7. **Repeatability**:
+   - `AG(EF(pour_unmixed_solutions))`
+   - `AG(EF(prepare_mixed_solution))`
+
+8. **Leads To**:
+   - `!(E[(!button_S3) U tank_empty])`
+
+### Final LTL Specifications
+
+1. **Pouring Liquid**:
+   - `G(button_S1 -> X liquid1_poured_into_tank)`
+   - `G(button_S2 -> X liquid2_poured_into_tank)`
+   - `G(tank_full -> X (!button_S1 & !button_S2))`
+
+2. **Preparing Mixed Solution**:
+   - `G(button_S3 -> X (!button_S1 & !button_S2 & motor_M & F valve_V1))`
+   - `G(tank_empty -> X (!button_S3))`
+
+These final revisions should ensure that the use case design and formal specifications are consistent and accurately reflect the intended system behavior. If further adjustments are needed, please let me know!

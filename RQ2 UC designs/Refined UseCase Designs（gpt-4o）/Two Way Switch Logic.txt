@@ -1,0 +1,76 @@
+### Complete Revised Use Case Design
+
+**1. Use Case Name**: Control Two-Way Switch
+
+**2. Actor**:
+   - **User**: The person who operates the switches on the first and second floors.
+   - **PLC**: The Programmable Logic Controller that controls the light.
+
+**3. Use Case**: Control of staircase light through two switches located on the first and second floors, where both switches function identically to toggle the light state.
+
+**4. System Boundary**: IEC 61131-3 Structured Text Program
+
+**5. Relationships Among Actors**: The user interacts with the PLC through the switches.
+
+**6. Detailed Descriptive Information for Each Use Case**:
+   - **Brief Description**: This use case describes the operation of a two-way switch system where a user can control a light at the staircase from either the first or the second floor.
+   - **Preconditions**: The PLC is operational, and the switches are in a known state (either position 1 or position 2).
+   - **Event Flow**:
+     - **Basic Flow**:
+       1. The user toggles either switch A or switch B.
+       2. The PLC receives the signal indicating a change in switch state.
+       3. The PLC evaluates the condition: if switches A and B are in different positions, the light is on; if they are in the same position, the light is off.
+     - **Alternative Flow**:
+       1. If the PLC does not receive the signal from the switch, the system logs an error and notifies maintenance.
+       2. If the light does not change state as expected, the system attempts to resend the signal and logs the incident.
+   - **Postconditions**: The light is on if switches A and B are in different positions; the light is off if they are in the same position.
+   - **Use Case Scenario**: A user is on the first floor and wants to go to the second floor. It's dark, so they press the switch on the first floor, which turns on the light. When they reach the second floor, they press the switch there, turning off the light.
+   - **Special Requirements**: The system must respond quickly to switch presses to ensure user safety. The PLC must be reliable and able to handle frequent state changes.
+
+**7. Priority of Use Cases**: Control Two-Way Switch: High (as it's critical for user safety and convenience)
+
+**8. Data Requirements**:
+   - [D-1]: The current state of the light (on or off)
+   - [D-2]: The state of the switches (position 1 or position 2)
+
+**9. Business Rules (Optional)**: None.
+
+### Complete CTL/LTL Specifications with XOR Logic
+
+1. **Implication**:
+   ```plaintext
+   SPEC AG(((switch_A_position != switch_B_position) -> light_on))
+   ```
+
+2. **Invariant**:
+   ```plaintext
+   SPEC AG(light_state_known)
+   ```
+
+3. **Forbidden**:
+   ```plaintext
+   SPEC AG(!(light_on & light_off))
+   ```
+
+4. **State Change During Cycle**:
+   ```plaintext
+   SPEC AG(((switch_A_position != switch_B_position) -> A[ !light_state_changed U light_state_changed]))
+   ```
+
+5. **State Change Between Cycles**:
+   ```plaintext
+   SPEC G((light_on & X( !(switch_A_position != switch_B_position) U (switch_A_position != switch_B_position))) -> X( !light_on U !light_on))
+   ```
+
+6. **Reachability**:
+   ```plaintext
+   SPEC EF(light_on | light_off)
+   ```
+
+7. **Repeatability**:
+   ```plaintext
+   SPEC AG(EF((switch_A_position != switch_B_position) -> light_state_changed))
+   ```
+
+
+These specifications and the use case design now accurately reflect the XOR logic, ensuring that the light is controlled based on the relative positions of the two switches. This setup guarantees that the light is on when the switches are in different positions and off when they are in the same position, aligning with the intended functionality of a two-way switch system.

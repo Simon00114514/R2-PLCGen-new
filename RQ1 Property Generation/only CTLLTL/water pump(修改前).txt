@@ -1,0 +1,38 @@
+1. **Use Case [UC-1]: Fill Tank**
+
+   - **Precondition**: The pump must be unlocked and the tank not full before starting.
+     ```plaintext
+     SPEC AG ((?Tank_Full_Status & Pump_Unlocked_Status) -> AX Start_Button_Press_Event)
+     ```
+
+   - **Basic Flow**: Once the pump starts, it should become latched, and the pump should run until the high water level is detected.
+     ```plaintext
+     SPEC AG (Start_Button_Press_Event -> AX (Pump_Running_Status & ?Pump_Unlocked_Status))
+     SPEC AG (Pump_Running_Status -> AF High_Water_Level_Detected_Event)
+     ```
+
+   - **Postcondition**: The pump should stop and become unlocked when the high water level is detected.
+     ```plaintext
+     SPEC AG (High_Water_Level_Detected_Event -> AX (?Pump_Running_Status & Pump_Unlocked_Status))
+     ```
+
+   - **Exception Flow**: If the sensor fails, the pump should stop and an alarm should trigger.
+     ```plaintext
+     SPEC AG (Sensor_Failure_Status -> AX (?Pump_Running_Status & Alarm_Triggered_Status))
+     ```
+
+2. **Use Case [UC-2]: Empty Tank**
+
+   - **Precondition**: The tank must be full before the discharge valve can be opened.
+     ```plaintext
+     SPEC AG (Tank_Full_Status -> AX Discharge_Valve_Open_Status)
+     ```
+
+   - **Basic Flow**: Once the discharge valve is opened, the tank should eventually become empty.
+     ```plaintext
+     SPEC AG (Discharge_Valve_Open_Status -> AF Tank_Empty_Status)
+     ```
+
+   - **Exception Flow**: If the valve malfunctions, the tank should be manually emptied.
+     ```plaintext
+     SPEC AG (Valve_Malfunction_Status -> AX Manual_Empty_Tank_Action)

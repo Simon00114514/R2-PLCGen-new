@@ -1,0 +1,74 @@
+PROGRAM SequentialMotorControl
+  VAR
+    (* State Variable *)
+    state : INT := 0;  // Current state of the finite state machine
+
+    (* Timer Function Block instances: TON is assumed to be available in the runtime environment *)
+    timer1 : TON;      // Timer for delay between Motor1 start and Motor2 start
+    timer2 : TON;      // Timer for delay between Motor2 start and Motor3 start
+
+    (* Delay durations for each motor startup delay *)
+    delay_M2_start : TIME := T#3s;  // Delay from Motor1 ON to Motor2 start
+    delay_M3_start : TIME := T#3s;  // Delay from Motor2 ON to Motor3 start
+
+    (* Motor output variables *)
+    MOTOR1 : BOOL := FALSE;  // Output for Motor 1
+    MOTOR2 : BOOL := FALSE;  // Output for Motor 2
+    MOTOR3 : BOOL := FALSE;  // Output for Motor 3
+  END_VAR
+
+  (* Main Finite State Machine *)
+  CASE state OF
+    0:  (* STATE 0: INITIALIZATION *)
+      MOTOR1 := FALSE;
+      MOTOR2 := FALSE;
+      MOTOR3 := FALSE;
+      (* Initialization complete - proceed to Motor1 startup on next cycle *)
+      state := 1;
+
+    1:  (* STATE 1: MOTOR1_STARTUP *)
+      MOTOR1 := TRUE;    (* Turn Motor1 ON *)
+      (* Start Timer1 for delay before Motor2 startup *)
+      timer1(IN := TRUE, PT := delay_M2_start);
+      state := 2;  (* Move to waiting state *)
+      
+    2:  (* STATE 2: WAIT_DELAY_BEFORE_MOTOR2 *)
+      (* Continue calling timer1 to ensure its internal update on each scan *)
+      timer1(IN := TRUE, PT := delay_M2_start);
+      IF timer1.Q THEN
+         (* Timer1 delay elapsed: disable timer and proceed *)
+         timer1(IN := FALSE);  // Reset timer1, if needed, for clean restart
+         state := 3;
+      END_IF;
+      
+    3:  (* STATE 3: MOTOR2_STARTUP *)
+      MOTOR2 := TRUE;  (* Turn Motor2 ON *)
+      (* Start Timer2 for delay before Motor3 startup *)
+      timer2(IN := TRUE, PT := delay_M3_start);
+      state := 4;
+      
+    4:  (* STATE 4: WAIT_DELAY_BEFORE_MOTOR3 *)
+      (* Continue calling timer2 to update its internal counter *)
+      timer2(IN := TRUE, PT := delay_M3_start);
+      IF timer2.Q THEN
+         (* Timer2 delay elapsed: disable timer and proceed *)
+         timer2(IN := FALSE);  // Reset timer2, if needed, for clean restart
+         state := 5;
+      END_IF;
+      
+    5:  (* STATE 5: MOTOR3_STARTUP *)
+      MOTOR3 := TRUE;  (* Turn Motor3 ON *)
+      (* All motors are now started; transition to complete state *)
+      state := 6;
+      
+    6:  (* STATE 6: OPERATION_COMPLETE *)
+      (* Operation complete; maintain motor outputs ON *)
+      (* Remain in this state indefinitely *)
+      ;
+      
+    ELSE
+      (* Default fallback: reset state to initialization *)
+      state := 0;
+  END_CASE;
+  
+END_PROGRAM

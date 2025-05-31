@@ -1,0 +1,142 @@
+PROGRAM CoffeeMachine
+VAR
+    // FSM states
+    state       : INT := 0;   // Current state
+    prevState   : INT := 0;   // Previous state (for debugging/transition tracking)
+    
+    // Sensor and button inputs
+    tankLevel      : INT;       // Current liquid level in the mixer tank (in ml), updated externally
+    startButton    : BOOL;      // Start machine button (TRUE when pressed)
+    emergencyButton: BOOL;      // Emergency stop button (TRUE when pressed)
+    modeCoffeeMilk : BOOL;      // Button for selecting coffee & milk mode (TRUE when pressed)
+    modeCoffeeOnly : BOOL;      // Button for selecting coffee only mode (TRUE when pressed)
+    
+    // Output control variables
+    coffeeValve  : BOOL;      // TRUE = OPEN; FALSE = CLOSED
+    milkValve    : BOOL;      // TRUE = OPEN; FALSE = CLOSED
+    outputValve  : BOOL;      // TRUE = OPEN; FALSE = CLOSED
+    mixer        : BOOL;      // TRUE = ON; FALSE = OFF
+    
+    // Timer for mixing duration (4 seconds)
+    mixingTimer  : TON;       // Instance of TON timer block
+END_VAR
+
+// Execute Timer block update always (cycle update)
+// Note: In many PLC systems, the timer is called each cycle.
+mixingTimer(IN := mixingTimer.IN, PT := T#4s);
+
+// FSM Processing using CASE statement
+CASE state OF
+
+    // STATE 0: INITIALIZE/IDLE
+    0:
+        coffeeValve := FALSE;
+        milkValve   := FALSE;
+        outputValve := FALSE;
+        mixer       := FALSE;
+        mixingTimer.IN := FALSE;  // Ensure timer is not running
+        
+        IF emergencyButton THEN
+            state := 6;  // Immediate transition to emergency stop
+        ELSIF startButton THEN
+            IF modeCoffeeOnly THEN
+                state := 1;  // Transition to FILLING_COFFEE_ONLY
+            ELSIF modeCoffeeMilk THEN
+                state := 3;  // Transition to FILLING_COFFEE_MILK
+            END_IF;
+        END_IF;
+        
+    // STATE 1: FILLING_COFFEE_ONLY
+    1:
+        coffeeValve := TRUE;     // Open coffee valve
+        milkValve   := FALSE;    // Milk valve remains closed
+        outputValve := FALSE;
+        mixer       := FALSE;
+        mixingTimer.IN := FALSE;
+        
+        IF emergencyButton THEN
+            state := 6;
+        ELSIF tankLevel >= 130 THEN  // Mixer tank full (130ml reached)
+            state := 2;              // Transition to DISPENSING_COFFEE_ONLY
+        END_IF;
+        
+    // STATE 2: DISPENSING_COFFEE_ONLY
+    2:
+        coffeeValve := FALSE;
+        milkValve   := FALSE;
+        outputValve := TRUE;    // Open output valve to dispense liquid
+        mixer       := FALSE;
+        mixingTimer.IN := FALSE;
+        
+        IF emergencyButton THEN
+            state := 6;
+        ELSIF tankLevel = 0 THEN    // Tank is emptied (dispensing complete)
+            state := 0;             // Return to IDLE
+        END_IF;
+        
+    // STATE 3: FILLING_COFFEE_MILK
+    3:
+        coffeeValve := TRUE;
+        milkValve   := TRUE;     // Both valves open for coffee & milk
+        outputValve := FALSE;
+        mixer       := FALSE;
+        mixingTimer.IN := FALSE;
+        
+        IF emergencyButton THEN
+            state := 6;
+        ELSIF tankLevel >= 130 THEN  // Mixer tank full (130ml)
+            state := 4;             // Transition to MIXING
+        END_IF;
+        
+    // STATE 4: MIXING
+    4:
+        // Ensure valves are closed and mixer is activated
+        coffeeValve := FALSE;
+        milkValve   := FALSE;
+        outputValve := FALSE;
+        mixer       := TRUE;
+        
+        // Start the 4-second mixing timer if not already running
+        IF NOT mixingTimer.IN THEN
+            mixingTimer.IN := TRUE;
+        END_IF;
+        
+        IF emergencyButton THEN
+            state := 6; // Emergency transition
+        ELSIF mixingTimer.Q THEN   // Timer elapsed (4 sec reached)
+            mixingTimer.IN := FALSE; // Reset timer
+            state := 5;              // Transition to DISPENSING_COFFEE_MILK
+        END_IF;
+        
+    // STATE 5: DISPENSING_COFFEE_MILK
+    5:
+        coffeeValve := FALSE;
+        milkValve   := FALSE;
+        outputValve := TRUE;    // Open output valve to dispense blended liquid
+        mixer       := FALSE;
+        mixingTimer.IN := FALSE;
+        
+        IF emergencyButton THEN
+            state := 6;
+        ELSIF tankLevel = 0 THEN   // Dispensing complete detected via sensor
+            state := 0;            // Return to IDLE
+        END_IF;
+        
+    // STATE 6: EMERGENCY_STOP
+    6:
+        coffeeValve := FALSE;
+        milkValve   := FALSE;
+        outputValve := FALSE;
+        mixer       := FALSE;
+        mixingTimer.IN := FALSE;
+        // Remain in emergency state until reset externally.
+        
+    ELSE
+        state := 0;  // Default transition to IDLE
+END_CASE;
+
+(* For debugging or tracking purposes, you may assign prevState here if needed:
+prevState := state;
+*)
+
+END_PROGRAM

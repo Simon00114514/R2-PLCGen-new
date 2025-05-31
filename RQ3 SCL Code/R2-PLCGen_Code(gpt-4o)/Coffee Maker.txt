@@ -1,0 +1,84 @@
+Based on the refined requirements and the syntax guidelines provided, here is the Structured Text (ST) code for the coffee machine control program, adhering to the IEC 61131-3 standards and Siemens SCL syntax:
+
+```iec
+PROGRAM CoffeeMachineControl
+VAR_INPUT
+    emergencyStopButton : BOOL; // Input from the emergency stop button
+    startButton : BOOL; // Input from the start button
+    coffeeAndMilkButton : BOOL; // Input to select coffee and milk mode
+    coffeeOnlyButton : BOOL; // Input to select coffee only mode
+    maxLevelSensor : BOOL; // Sensor to detect if the mixer tank is at max level
+END_VAR
+
+VAR_OUTPUT
+    coffeeValve : BOOL; // Controls the coffee valve
+    milkValve : BOOL; // Controls the milk valve
+    outputValve : BOOL; // Controls the output valve
+    mixer : BOOL; // Controls the mixer
+    alarm : BOOL; // Activates an alarm in case of an error
+END_VAR
+
+VAR
+    mixerTimer : TON; // Timer for the mixer operation
+    mixerTimerDone : BOOL; // Flag to indicate timer completion
+END_VAR
+
+(* Initialize the mixer timer *)
+mixerTimer(IN := FALSE, PT := T#4s);
+
+(* Emergency Stop logic *)
+IF emergencyStopButton THEN
+    coffeeValve := FALSE;
+    milkValve := FALSE;
+    outputValve := FALSE;
+    mixer := FALSE;
+    mixerTimer(IN := FALSE); // Reset the mixer timer
+    RETURN; // Stop further processing
+END_IF;
+
+(* Coffee and Milk Mode logic *)
+IF coffeeAndMilkButton AND NOT maxLevelSensor THEN
+    coffeeValve := TRUE;
+    milkValve := TRUE;
+ELSIF coffeeAndMilkButton AND maxLevelSensor THEN
+    coffeeValve := FALSE;
+    milkValve := FALSE;
+    mixer := TRUE;
+    mixerTimer(IN := TRUE); // Start the mixer timer
+    mixerTimerDone := mixerTimer.Q;
+    IF mixerTimerDone THEN
+        mixer := FALSE;
+        outputValve := TRUE;
+    END_IF;
+ELSE
+    coffeeValve := FALSE;
+    milkValve := FALSE;
+    mixer := FALSE;
+    mixerTimer(IN := FALSE); // Reset the mixer timer
+END_IF;
+
+(* Coffee Only Mode logic *)
+IF coffeeOnlyButton AND NOT maxLevelSensor THEN
+    coffeeValve := TRUE;
+ELSIF coffeeOnlyButton AND maxLevelSensor THEN
+    coffeeValve := FALSE;
+    outputValve := TRUE;
+ELSE
+    coffeeValve := FALSE;
+END_IF;
+
+(* Alarm logic *)
+IF (coffeeAndMilkButton OR coffeeOnlyButton) AND maxLevelSensor AND (NOT coffeeValve OR NOT milkValve) THEN
+    alarm := TRUE;
+ELSE
+    alarm := FALSE;
+END_IF;
+
+END_PROGRAM
+```
+
+Please note that this code assumes the existence of a `TON` timer function block that is compatible with the Siemens SCL environment. The `mixerTimer` is used to control the mixer's operation time.
+
+The code is structured to handle the basic flows of the use cases provided. It includes logic for the emergency stop, coffee and milk mode, and coffee only mode. The alarm logic is also included to handle situations where the valves do not close when the maximum level is reached.
+
+Remember to test the code in a simulation environment or with the actual hardware to ensure that it behaves as expected and complies with all safety requirements.

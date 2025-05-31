@@ -1,0 +1,33 @@
+Agent: Here are the CTL expressions formatted to fit the nuXmv syntax:
+
+1. **Normal Traffic Light Cycle (UC-1):**
+   ```plaintext
+   AG (?pedestrian_request & ?vehicle_detected & ?emergency_detected -> AF (green & AX (yellow & AX red)))
+   ```
+   This ensures that if no external requests are pending, the traffic light will eventually cycle through green, yellow, and red.
+
+2. **Process Pedestrian Request (UC-2):**
+   ```plaintext
+   AG (pedestrian_button_pressed & current_light = red & ?vehicle_detected & ?emergency_detected -> AF green)
+   ```
+   This ensures that when a pedestrian presses the button under safe conditions, the light will eventually turn green.
+
+3. **Process Approaching Vehicle (UC-3):**
+   ```plaintext
+   AG (vehicle_detected & ?emergency_detected -> AX (yellow & AX red))
+   ```
+   This ensures that when a vehicle is detected, the light transitions to yellow and then to red.
+
+4. **Process Emergency Vehicle Request (UC-4):**
+   ```plaintext
+   AG (emergency_detected -> AX red)
+   ```
+   This ensures that when an emergency vehicle is detected, the system immediately transitions to a red light, overriding other operations.
+
+5. **Handle System/Sensor Failure (UC-5):**
+   ```plaintext
+   AG (sensor_error | system_error -> AX safe_state)
+   ```
+   This ensures that upon detecting a system or sensor error, the system transitions to a safe state.
+
+These expressions are structured to comply with nuXmv syntax for CTL model checking.

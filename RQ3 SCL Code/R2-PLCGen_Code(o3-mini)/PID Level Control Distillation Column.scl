@@ -1,0 +1,67 @@
+ PROGRAM ControlDistillationTowerLevel
+VAR_INPUT
+   LiquidLevel : INT;       // Current liquid level value
+   SensorFault : BOOL;      // TRUE if the liquid level sensor fails
+   ValveFault  : BOOL;      // TRUE if the inlet valve reports a fault
+END_VAR
+
+VAR_OUTPUT
+   InletValve : BOOL;       // TRUE: open valve, FALSE: close valve
+   Alert      : BOOL;       // TRUE: alert condition triggered
+END_VAR
+
+VAR
+   LowThreshold : INT := 5000;  // Threshold for liquid level (unit defined by application)
+   Error        : INT;         // Difference between threshold and liquid level
+   PrevError    : INT := 0;      // Previous error for derivative calculation
+   Integral     : INT := 0;      // Integral sum (accumulated error)
+   Derivative   : INT;         // Difference between current and previous error
+   PIDOutput    : INT;         // PID controller output (scaled result)
+   Kp           : INT := 1000;   // Proportional gain (represents 1.0, scaled by 1000)
+   Ki           : INT := 100;    // Integral gain (represents 0.1, scaled by 1000)
+   Kd           : INT := 50;     // Derivative gain (represents 0.05, scaled by 1000)
+   DeltaT       : INT := 1;      // Sample period (chosen as unit 1 for simplicity)
+   I_Max        : INT := 10000;  // Upper saturation limit for the integral term
+   I_Min        : INT := -10000; // Lower saturation limit for the integral term
+END_VAR
+
+// Check for sensor or valve faults and enter safe mode if necessary
+IF SensorFault = TRUE THEN
+   Alert := TRUE;
+   InletValve := FALSE;
+ELSIF ValveFault = TRUE THEN
+   Alert := TRUE;
+   InletValve := FALSE;
+ELSE
+   Alert := FALSE;
+   // Compute PID error
+   Error := LowThreshold - LiquidLevel;
+   
+   // Update and saturate the integral term to avoid overflow
+   Integral := Integral + (Error * DeltaT);
+   IF Integral > I_Max THEN
+      Integral := I_Max;
+   ELSIF Integral < I_Min THEN
+      Integral := I_Min;
+   END_IF;
+   
+   // Compute derivative term
+   Derivative := Error - PrevError;
+   PrevError := Error;
+   
+   //
+   // Calculate PID output. The product terms are scaled by 1000,
+   // so the final summation is divided by 1000 to recover the proper scale.
+   //
+   PIDOutput := (Kp * Error + Ki * Integral + Kd * Derivative) / 1000;
+   
+   // Control logic: open the inlet valve if the PID output is positive,
+   // which implies the liquid level is below the desired threshold.
+   IF PIDOutput > 0 THEN
+      InletValve := TRUE;
+   ELSE
+      InletValve := FALSE;
+   END_IF;
+END_IF;
+
+END_PROGRAM

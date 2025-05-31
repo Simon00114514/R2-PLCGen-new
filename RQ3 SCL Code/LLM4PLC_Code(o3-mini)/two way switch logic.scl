@@ -1,0 +1,49 @@
+PROGRAM TwoWaySwitchLogic
+   //***************************************************************
+   // Variable Declarations
+   //***************************************************************
+   VAR
+      // State variable: 0 = LIGHT_OFF, 1 = LIGHT_ON
+      state : INT := 0;
+      
+      // Input buttons (These would be linked to actual hardware inputs)
+      BTN_FIRST : BOOL;    // Button on the first floor
+      BTN_SECOND : BOOL;   // Button on the second floor
+      
+      // Previous states for rising edge detection
+      prev_BTN_FIRST : BOOL := FALSE;
+      prev_BTN_SECOND : BOOL := FALSE;
+      
+      // Output light variable
+      LIGHT : BOOL := FALSE;
+   END_VAR
+
+   //***************************************************************
+   // Rising Edge Detection on Both Buttons
+   //***************************************************************
+   // If a rising edge is detected on either button, toggle the light state
+   IF ((BTN_FIRST AND NOT prev_BTN_FIRST) OR (BTN_SECOND AND NOT prev_BTN_SECOND)) THEN
+      // Toggle the state: LIGHT_OFF -> LIGHT_ON or LIGHT_ON -> LIGHT_OFF
+      IF state = 0 THEN
+         state := 1;
+      ELSE
+         state := 0;
+      END_IF;
+   END_IF;
+   
+   //***************************************************************
+   // Update the Light Output Based on the State
+   //***************************************************************
+   IF state = 0 THEN
+      LIGHT := FALSE;  // STATE 0: LIGHT_OFF
+   ELSE
+      LIGHT := TRUE;   // STATE 1: LIGHT_ON
+   END_IF;
+   
+   //***************************************************************
+   // Update Previous Button States for Next Cycle
+   //***************************************************************
+   prev_BTN_FIRST := BTN_FIRST;
+   prev_BTN_SECOND := BTN_SECOND;
+   
+END_PROGRAM

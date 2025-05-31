@@ -1,0 +1,53 @@
+Agent: Here is a comprehensive set of CTL specifications for the Traffic Light Control System, formatted for nuXmv:
+
+1. **Normal Traffic Light Cycle:**
+   - **Basic Flow:**
+     ```
+     SPEC AG(system_active & !pedestrian_request & !vehicle_detected & !emergency_detected -> AF(light_green & AX(light_yellow & AX(light_red)));
+     ```
+
+2. **Process Pedestrian Request:**
+   - **Basic Flow:**
+     ```
+     SPEC AG(pedestrian_button_pressed & light_red & !vehicle_detected & !emergency_detected -> (light_green));
+     ```
+
+   - **Alternative Flow:**
+     ```
+     SPEC AG(pedestrian_button_pressed & (vehicle_detected | emergency_detected) -> AX(!light_green));
+     ```
+
+3. **Process Approaching Vehicle:**
+   - **Basic Flow:**
+     ```
+     SPEC AG(vehicle_detected & !emergency_detected -> AF(light_yellow & AX(light_red)));
+     ```
+
+   - **Alternative Flow:**
+     ```
+     SPEC AG(vehicle_detected & AX(vehicle_detected) -> AF(light_red));
+     ```
+
+4. **Process Emergency Vehicle Request:**
+   - **Basic Flow:**
+     ```
+     SPEC AG(emergency_detected -> AF(light_red));
+     ```
+
+   - **Alternative Flow:**
+     ```
+     SPEC AG(emergency_detected & pedestrian_request -> (light_red));
+     ```
+
+5. **Handle System/Sensor Failure:**
+   - **Basic Flow:**
+     ```
+     SPEC AG(sensor_error | system_error -> AF(safe_state));
+     ```
+
+   - **Post Conditions:**
+     ```
+     SPEC AG(sensor_error | system_error -> AX(maintenance_alerted));
+     ```
+
+These CTL expressions are designed to ensure that the system adheres to the specified requirements and handles various scenarios appropriately, using the correct syntax for nuXmv.

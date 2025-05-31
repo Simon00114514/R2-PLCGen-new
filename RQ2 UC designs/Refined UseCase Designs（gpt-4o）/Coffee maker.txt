@@ -1,0 +1,80 @@
+### Revised Use Case Design
+
+#### Use Case 1: Select Coffee and Milk Mode
+
+- **Brief Description**: The user selects the coffee and milk mode. Once the mixer tank reaches the maximum level, the coffee and milk valves close, the mixer runs for four seconds, and then the output valve opens.
+- **Preconditions**: The coffee and milk tanks are filled. The mixer tank is empty.
+- **Event Flow**:
+  - **Basic Flow**:
+    1. The user presses the coffee and milk button.
+    2. The mixer tank begins to fill.
+    3. When the mixer tank reaches the maximum level, the coffee and milk valves close immediately.
+    4. The mixer starts.
+    5. The mixer runs for four seconds.
+    6. After the mixer stops, the output valve opens.
+  - **Alternative Flow**:
+    - If the valves do not close upon reaching the maximum level, an alarm is triggered and the operation stops.
+    - If the mixer does not start, an alarm is triggered and the operation stops.
+- **Postconditions**: The coffee and milk mixture is dispensed. The mixer tank is empty.
+- **Use Case Scenario**: The user wants a coffee and milk mixture. After pressing the corresponding button, the coffee machine dispenses the mixture.
+- **Special Requirements**: The mixer must run for exactly four seconds.
+- **Priority**: High
+
+#### Use Case 2: Select Coffee Only Mode
+
+- **Brief Description**: The user selects the coffee-only mode. The mixer tank fills with coffee, the coffee valve closes, and the output valve opens.
+- **Preconditions**: The coffee tank is filled. The mixer tank is empty.
+- **Event Flow**:
+  - **Basic Flow**:
+    1. The user presses the coffee-only button.
+    2. The mixer tank fills with coffee.
+    3. When the mixer tank reaches the maximum level, the coffee valve closes immediately.
+    4. The output valve opens.
+  - **Alternative Flow**:
+    - If the valve does not close upon reaching the maximum level, an alarm is triggered and the operation stops.
+- **Postconditions**: Coffee is dispensed. The mixer tank is empty.
+- **Use Case Scenario**: The user wants only coffee. After pressing the corresponding button, the coffee machine dispenses coffee.
+- **Special Requirements**: None
+- **Priority**: Medium
+
+#### Use Case 3: Emergency Stop
+
+- **Brief Description**: The user presses the emergency stop button. All valves close, and the mixer stops.
+- **Preconditions**: The coffee machine is in operation.
+- **Event Flow**:
+  - **Basic Flow**:
+    1. The user presses the emergency stop button.
+    2. All valves close.
+    3. The mixer stops.
+  - **Alternative Flow**: Not applicable.
+- **Postconditions**: The coffee machine stops operation. All valves are closed. The mixer is stopped.
+- **Use Case Scenario**: The user notices a problem with the coffee machine. They press the emergency stop button, and the coffee machine stops operation.
+- **Special Requirements**: The coffee machine must stop operation immediately when the emergency stop button is pressed.
+- **Priority**: High
+
+### Adjusted CTL Expressions
+
+#### Use Case 1: Select Coffee and Milk Mode
+
+- **CTL Expression**:
+  - **Pattern: Implication**
+    - `AG(milk_and_coffee_mode & max_level_reached -> AX(coffee_valve_closes & milk_valve_closes))`
+    - `AG(milk_and_coffee_mode & max_level_reached -> AX(start_mixer & AF(mixer_runs_for_four_seconds & mixer_stops)))`
+  - **Pattern: Invariant**
+    - `AG(mixer_runs_for_four_seconds -> AX(output_valve_opens))`
+
+#### Use Case 2: Select Coffee Only Mode
+
+- **CTL Expression**:
+  - **Pattern: Implication**
+    - `AG(coffee_only_mode & max_level_reached -> AX(coffee_valve_closes & AX(output_valve_opens)))`
+
+#### Use Case 3: Emergency Stop
+
+- **CTL Expression**:
+  - **Pattern: Forbidden**
+    - `AG(emergency_stop_button_pressed -> AX(! coffee_machine_continues_operation))`
+  - **Pattern: Implication**
+    - `AG(emergency_stop_button_pressed -> AX(all_valves_close & AX(mixer_stops)))`
+
+These modifications ensure that the use case design and CTL expressions accurately reflect the original requirements and maintain semantic consistency.

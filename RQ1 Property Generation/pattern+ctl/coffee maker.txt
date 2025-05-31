@@ -1,0 +1,47 @@
+Agent: 1. (UC-1 – Perform Emergency Stop: Basic Flow – When the emergency‐stop or critical fault condition occurs, then all valves must close and the mixer must stop)
+SPEC
+AG((emergency_stop_pressed | critical_fault_detected) -> (coffeeValve='Closed' & milkValve='Closed' & outputValve='Closed' & mixer='Off'));
+
+2. (UC-1 – Perform Emergency Stop: State Change Between Cycles – When an emergency condition holds in one cycle, then in the next cycle the system enters the EmergencyStop state with all valves closed and the mixer off)
+SPEC
+G((emergency_stop_pressed | critical_fault_detected) -> X(system_state='EmergencyStop' & coffeeValve='Closed' & milkValve='Closed' & outputValve='Closed' & mixer='Off'));
+
+3. (UC-2 – Start Machine: Basic Flow – When the start button is pressed while the system is in Standby and self-test passes, then the system must transition to Idle)
+SPEC
+G((start_button_pressed & system_state='Standby' & selfTestPassed) -> (system_state='Idle'));
+
+4. (UC-2 – Start Machine: State Change During a Cycle – When the start button is pressed in Standby with a passed self-test, the next state must be Idle)
+SPEC
+G((start_button_pressed & system_state='Standby' & selfTestPassed) -> X(system_state='Idle'));
+
+5. (UC-3 – Prepare Coffee and Milk Beverage: Leads to Earlier – When Coffee & Milk mode is selected, then at some past moment the coffee and milk valves were open)
+SPEC
+G((coffeeMilkMode_selected) -> O(coffeeValve='Open' & milkValve='Open'));
+
+6. (UC-3 – Prepare Coffee and Milk Beverage: Leads to Trigger – When the maximum level is reached, then there must have been a prior change from both valves open to both valves closed with the mixer on)
+SPEC
+G((maxLevelReached) -> O((coffeeValve='Open' & milkValve='Open') U (coffeeValve='Closed' & milkValve='Closed' & mixer='On')));
+
+7. (UC-3 – Prepare Coffee and Milk Beverage: Timed Trigger Response – When the mixer is on and the mix timer equals 4 seconds, then in the next state the mixer is turned off)
+SPEC
+G((mixer='On' & mixTimer = 4) -> X(mixer='Off'));
+
+8. (UC-3 – Prepare Coffee and Milk Beverage: Leads to Earlier (Output Valve) – When the mixer is off and the mix timer is at least 4, then at some past moment the output valve was commanded open)
+SPEC
+G((mixer='Off' & mixTimer >= 4) -> O(outputValve='Open'));
+
+9. (UC-3 – Prepare Coffee and Milk Beverage: Repeatability – It is always possible to eventually reach a state where the system is Idle)
+SPEC
+G(F(system_state = 'Idle'));
+
+10. (UC-4 – Prepare Coffee Only Beverage: Basic Flow – When Coffee Only mode is selected and the maximum level is reached, then the coffee valve must close and the output valve must open)
+SPEC
+G((coffeeOnlyMode_selected & maxLevelReached) -> X(coffeeValve='Closed' & outputValve='Open'));
+
+11. (UC-4 – Prepare Coffee Only Beverage: State Change Between Cycles – If Coffee Only mode is selected with maximum level reached and in the next state the coffee valve is closed, then in that next state the output valve must be open and the system state must become Idle)
+SPEC
+G((coffeeOnlyMode_selected & maxLevelReached) -> X(outputValve='Open' & system_state='Idle'));
+
+12. (UC-4 – Prepare Coffee Only Beverage: Leads to Trigger – When Coffee Only mode is selected and the maximum level is reached, then there must have been an earlier change from the coffee valve being open to it being closed while the output valve was opened)
+SPEC
+G((coffeeOnlyMode_selected & maxLevelReached) -> O((coffeeValve='Open') U (coffeeValve='Closed' & outputValve='Open')));

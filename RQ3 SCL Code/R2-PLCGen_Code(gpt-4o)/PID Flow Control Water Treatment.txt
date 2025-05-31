@@ -1,0 +1,58 @@
+PROGRAM ChemicalDosingControl
+VAR_INPUT
+    start : BOOL; (* 指示是否启动PID控制 *)
+    concentration : REAL; (* 当前水中氯的浓度 *)
+    setpoint : REAL := 3.0; (* 设定的氯浓度，单位ppm *)
+END_VAR
+
+VAR_OUTPUT
+    controlOutput : REAL; (* 控制器输出，用于调整流量 *)
+    adjustedFlow : REAL; (* 调整后的氯流量 *)
+END_VAR
+
+VAR
+    kp : REAL := 1.0; (* PID授数P *)
+    ki : REAL := 0.1; (* PID授数I *)
+    kd : REAL := 0.01; (* PID授数D *)
+    error : REAL; (* 偏差 *)
+    integral : REAL; (* 积分项 *)
+    derivative : REAL; (* 微分项 *)
+    prevError : REAL; (* 上一次的偏差 *)
+    flowDecreased : BOOL; (* 流速是否降低 *)
+    flowIncreased : BOOL; (* 流速是否提升 *)
+    flowConstant : BOOL; (* 流速是否保持不变 *)
+    samplingTime_ms : REAL := 100.0; (* 采样时间，单位毫秒 *)
+END_VAR
+
+IF start THEN
+    error := setpoint - concentration;
+    integral := integral + error * (samplingTime_ms / 1000.0);
+    derivative := (error - prevError) / (samplingTime_ms / 1000.0);
+    controlOutput := kp * error + ki * integral + kd * derivative;
+    prevError := error;
+ELSE
+    controlOutput := 0.0; (* 如果未启动，则控制输出为0 *)
+    integral := 0.0; (* 重置积分项 *)
+    derivative := 0.0; (* 重置微分项 *)
+    prevError := 0.0; (* 重置上一次的偏差 *)
+    adjustedFlow := 0.0; (* 重置调整后的流量 *)
+END_IF;
+
+(* 初始化流速状态标志 *)
+flowDecreased := FALSE;
+flowIncreased := FALSE;
+flowConstant := FALSE;
+//concentration :=5;
+//setpoint := 10;
+(* 根据浓度调整流速并更新状态标志 *)
+IF concentration < (setpoint - 2) THEN
+    adjustedFlow := adjustedFlow + 1; (* 浓度低于阈值则降低流速 *)
+    flowDecreased := TRUE;
+ELSIF concentration > (setpoint + 2) THEN
+    adjustedFlow := adjustedFlow - 1; (* 浓度高于阈值则提升流速 *)
+    flowIncreased := TRUE;
+ELSE
+    flowConstant := TRUE; (* 浓度在范围内流速不变 *)
+END_IF;
+
+END_PROGRAM

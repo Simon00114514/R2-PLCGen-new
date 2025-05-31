@@ -1,0 +1,83 @@
+### Revised Use Case Design
+
+#### Use Case Name: Underground Parking Entrance/Exit Control
+
+1. **Actor**: PLC Program
+
+2. **Use Case**: Control of Underground Parking Entrance/Exit
+
+3. **System Boundary**: The system includes sensors (X1, X2), intermediate variables (M1, M2, M3, M4, M20, M30), and output devices (Y1, Y2).
+
+4. **Relationships**: The PLC program interacts with sensors, intermediate variables, and output devices to control the traffic lights at the entrance/exit of the underground parking lot.
+
+5. **Brief Description**: The PLC program controls the traffic lights at the entrance/exit of the underground parking lot according to the IEC 61131-3 standard. The program responds to sensor signals and changes the state of the traffic lights accordingly.
+
+6. **Event Flow**:
+
+   - **Basic Flow**:
+     - **Preconditions**: Traffic lights are initially set to green.
+     - **Events**:
+       1. A car enters the passage from the ground floor, triggering sensor X1.
+       2. The PLC program responds by turning on the red lights (Y1) at both the ground floor and basement entrances/exits, and turning off the green lights (Y2).
+       3. The car leaves the entrance and enters the basement, triggering sensor X2.
+       4. The PLC program responds by turning off the red lights and turning on the green lights (fulfilling original requirement 2).
+     - **Postconditions**: Traffic lights return to their initial state (green).
+
+   - **Alternative Flow**:
+     - **Preconditions**: Traffic lights are initially set to green.
+     - **Events**:
+       1. A car leaves the basement and enters the exit, triggering sensor X2.
+       2. The PLC program responds by turning on the red lights at both the ground floor and basement entrances/exits, and turning off the green lights.
+       3. The car leaves the exit and reaches the ground floor, triggering sensor X1.
+       4. The PLC program responds by turning off the red lights and turning on the green lights (fulfilling original requirement 4).
+     - **Postconditions**: Traffic lights return to their initial state (green).
+
+7. **Exception Flow**:
+   - **Sensor Failure**: If a sensor fails to trigger correctly, the system will maintain the current light state and issue an alert.
+
+8. **Special Requirements**: The PLC program must comply with the IEC 61131-3 standard.
+
+9. **Priority**: High (Critical for the operation of the underground parking lot)
+
+10. **Intermediate Variables**:
+    - M20: Activated when a car enters the passage from the ground floor.
+    - M30: Activated when a car enters the passage from the basement.
+
+### Revised CTL/LTL Specifications
+
+1. **Basic Flow State Change**:
+   - CTL: `AG((X1) -> AX(Y1 & ! Y2 & M20))`
+   - LTL: `G((X1) -> X(Y1 & !Y2 & M20))`
+
+2. **Alternative Flow State Change**:
+   - CTL: `AG((X2) -> AX(Y1 & !Y2 & M30))`
+   - LTL: `G((X2) -> X(Y1 & !Y2 & M30))`
+
+3. **Activation of Intermediate Variables**:
+   - CTL: `AG((X1) -> AX(M20)) & AG((X2) -> AX(M30))`
+   - LTL: `G((X1) -> X(M20)) & G((X2) -> X(M30))`
+
+4. **Green Light Restoration Conditions**:
+   - CTL: `AG((X2 & M20) -> AX(! Y1 & Y2))`  // After the car enters the basement
+   - LTL: `G((X2 & M20) -> X(! Y1 & Y2))`
+   - CTL: `AG((X1 & M30) -> AX(! Y1 & Y2))`  // After the car leaves the parking lot
+   - LTL: `G((X1 & M30) -> X(! Y1 & Y2))`
+
+5. **Exception Handling**:
+   - CTL: `AG((! X1 & ! X2) -> AX(Y2 & ! Y1))`
+   - LTL: `G((! X1 & ! X2) -> X(Y2 & ! Y1))`
+
+6. **Forbidden State**:
+   - CTL: `AG(!(Y1 & Y2))`
+   - LTL: `G(!Y1 & Y2))`
+
+7. **Reachability**:
+   - CTL: `EF(Y1 & !Y2)`
+   - LTL: `F(Y1 & !Y2)`
+
+8. **Repeatability**:
+   - CTL: `AG(EF(Y1 & !Y2))`
+   - LTL: `G(F(Y1 & !Y2))`
+
+This revised design and specification ensure that the original requirements, particularly regarding the restoration of green lights, are fully addressed.
+autogen_requirementbot.py completed with return code 0.

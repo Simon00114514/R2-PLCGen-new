@@ -1,0 +1,63 @@
+Agent: Use case name: Control Mixing Process
+
+1. Actor:
+- Operator: The user who interacts with the system to control the mixing process.
+
+2. Use case:
+- UC1: Adjust Mixture Ratio
+
+3. System boundary:
+- The system includes the software controlling the mixing process and the hardware components such as sensors and actuators.
+
+4. Relationships among actors:
+- There is no direct relationship between actors as there is only one actor, the Operator.
+
+Use case specification for UC1: Adjust Mixture Ratio
+
+Brief Description:
+This use case allows the Operator to control the mixing process of two reactants to achieve and maintain a ratio of 100:1. The system will adjust the input rate of the mixture based on the current ratio detected by the sensors.
+
+Event Flow:
+Basic Flow:
+- Preconditions: The system is operational, and the sensors and actuators are functioning correctly.
+- The Operator starts the mixing process.
+- The system continuously monitors the ratio of the reactants.
+- If the ratio is within the acceptable range (98 to 102), the system maintains the current input rate.
+- Postconditions: The mixture is maintained at the desired ratio within the acceptable error margin.
+
+Alternative Flow A (Ratio above 102):
+- Preconditions: The system is operational, and the ratio detected is above 102.
+- The system decreases the input rate of the reactants.
+- Postconditions: The mixture ratio is adjusted to approach the target ratio of 100:1.
+
+Alternative Flow B (Ratio below 98):
+- Preconditions: The system is operational, and the ratio detected is below 98.
+- The system increases the input rate of the reactants.
+- Postconditions: The mixture ratio is adjusted to approach the target ratio of 100:1.
+
+Use Case Scenario:
+- Scenario 1: The Operator initiates the mixing process, and the system maintains the ratio without adjustments.
+- Scenario 2: The Operator initiates the mixing process, and the system adjusts the input rate due to a ratio above 102.
+- Scenario 3: The Operator initiates the mixing process, and the system adjusts the input rate due to a ratio below 98.
+
+Special Requirements:
+- The system must be able to process inputs without floating-point numbers, using multiplication to express ratios.
+- The system should have a high reliability and performance to continuously monitor and adjust the mixing process.
+- The system must be user-friendly to allow easy operation by the Operator.
+
+Preconditions:
+- The system is initialized and in a ready state.
+- All sensors and actuators are calibrated and operational.
+
+Postconditions:
+- The mixing process is either ongoing with the correct ratio or has been adjusted to achieve the correct ratio.
+- The system is ready for further adjustments or to be stopped by the Operator.
+
+Priority:
+- The priority of this use case is high, as it is essential for the core functionality of the system to maintain the correct mixture ratio.
+
+Errors and Deficiencies:
+- The requirement does not specify the behavior of the system in case of sensor or actuator failure, which should be addressed in the use case.
+- The requirement does not detail the user interface or how the Operator will be informed of the current ratio or adjustments made, which should be included in the special requirements.
+
+The properties mentioned in the initial requirement, such as the mixture ratio and the constraints on expressing floating-point numbers, have been reflected in the use case design.

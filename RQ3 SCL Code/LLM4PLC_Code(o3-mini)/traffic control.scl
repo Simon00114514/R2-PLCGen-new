@@ -1,0 +1,130 @@
+PROGRAM TrafficLightController
+VAR
+    // State Definitions:
+    // 0: INITIALIZE
+    // 1: NORMAL_GREEN
+    // 2: NORMAL_YELLOW
+    // 3: NORMAL_RED
+    // 4: VEHICLE_OVERRIDE
+    // 5: PEDESTRIAN_OVERRIDE
+    state         : INT := 0;   // Current state of the finite state machine
+    prevState     : INT;        // Previous state for tracking transitions if needed
+
+    // Timer variables for managing state durations
+    timer         : INT := 0;   // General purpose timer counter for state durations
+    greenTimerMax : INT := 50;  // Duration for NORMAL_GREEN (adjust as needed)
+    yellowTimerMax: INT := 10;  // Duration for NORMAL_YELLOW (adjust as needed)
+    redTimerMax   : INT := 30;  // Duration for NORMAL_RED (adjust as needed)
+    overrideTimer : INT := 0;   // Timer for override states (used in STATE 4 and STATE 5)
+
+    // Input variables
+    pedestrianButton : BOOL := FALSE;  // Pedestrian button press input
+    vehicleDetected  : BOOL := FALSE;   // Detection of non-emergency approaching vehicle
+    emergencyVehicle : BOOL := FALSE;   // Detection of an emergency vehicle
+
+    // Output variables for the traffic lights
+    GREEN  : BOOL := FALSE;  // Green light output
+    YELLOW : BOOL := FALSE;  // Yellow light output
+    RED    : BOOL := FALSE;  // Red light output
+END_VAR
+
+// Main State Machine Execution
+
+// Initialization State: Set all lights off and default to NORMAL_RED
+IF state = 0 THEN
+    GREEN := FALSE;
+    YELLOW := FALSE;
+    RED := FALSE;
+    timer := 0;
+    state := 3;  // After initialization, default to NORMAL_RED
+
+// Check for Vehicle Override (emergency or regular vehicle) in ANY state (override has highest priority)
+ELSIF emergencyVehicle OR vehicleDetected THEN
+    IF state <> 4 THEN
+        prevState := state;  // Save previous state if needed for future logic
+        state := 4;          // Switch to VEHICLE_OVERRIDE
+        overrideTimer := 0;
+    END_IF
+
+ELSE
+    // Process state transitions based on current state
+    CASE state OF
+        1:  // NORMAL_GREEN: GREEN = ON, others OFF
+            GREEN := TRUE;
+            YELLOW := FALSE;
+            RED := FALSE;
+            
+            // Increment duration timer and transition when timer expires
+            IF timer < greenTimerMax THEN
+                timer := timer + 1;
+            ELSE
+                timer := 0;
+                state := 2; // Transition to NORMAL_YELLOW
+            END_IF;
+            
+        2:  // NORMAL_YELLOW: YELLOW = ON, others OFF
+            GREEN := FALSE;
+            YELLOW := TRUE;
+            RED := FALSE;
+            
+            IF timer < yellowTimerMax THEN
+                timer := timer + 1;
+            ELSE
+                timer := 0;
+                state := 3; // Transition to NORMAL_RED
+            END_IF;
+            
+        3:  // NORMAL_RED: RED = ON, others OFF
+            GREEN := FALSE;
+            YELLOW := FALSE;
+            RED := TRUE;
+            
+            // Check for pedestrian override ONLY in NORMAL_RED if no vehicle override is active
+            IF pedestrianButton THEN
+                state := 5;  // Switch to PEDESTRIAN_OVERRIDE
+                overrideTimer := 0;
+            ELSE
+                IF timer < redTimerMax THEN
+                    timer := timer + 1;
+                ELSE
+                    timer := 0;
+                    state := 1; // Resume normal cycle: Transition to NORMAL_GREEN
+                END_IF;
+            END_IF;
+            
+        4:  // VEHICLE_OVERRIDE: Handles both emergency and regular vehicle detections
+            // First cycle: Set YELLOW ON for immediate caution
+            IF overrideTimer = 0 THEN
+                GREEN := FALSE;
+                YELLOW := TRUE;
+                RED := FALSE;
+                overrideTimer := overrideTimer + 1;
+            ELSE
+                // Subsequent cycle: Transition to RED ON
+                GREEN := FALSE;
+                YELLOW := FALSE;
+                RED := TRUE;
+                // After override, resume normal cycle starting at NORMAL_RED
+                state := 3;
+                timer := 0;
+            END_IF;
+            
+        5:  // PEDESTRIAN_OVERRIDE: GREEN = ON for a fixed pedestrian crossing period
+            GREEN := TRUE;
+            YELLOW := FALSE;
+            RED := FALSE;
+            
+            IF overrideTimer < 5 THEN  // Fixed period for pedestrian crossing (adjustable as needed)
+                overrideTimer := overrideTimer + 1;
+            ELSE
+                state := 2; // After pedestrian crossing, transition to NORMAL_YELLOW
+                timer := 0;
+            END_IF;
+            
+        ELSE
+            // Fallback: Reset state if an unexpected value occurs
+            state := 0;
+    END_CASE;
+END_IF;
+
+END_PROGRAM

@@ -1,0 +1,89 @@
+PROGRAM SprayStation
+  VAR
+    // FSM state: 0 = IDLE, 1 = STOPPED, 2 = SPRAYING, 3 = SPRAY_COMPLETE
+    state       : INT := 0;
+    // Timer instance for 3-second spraying duration
+    sprayTimer  : TON;
+    
+    // Inputs
+    sensor      : BOOL;    // TRUE if the vehicle is detected by the sensor
+    stopButton  : BOOL;    // TRUE if the stop button is pressed
+    sprayButton : BOOL;    // TRUE if the spray button is pressed
+    
+    // Outputs
+    conveyor    : BOOL;    // TRUE (RUN) if the conveyor is moving; FALSE (STOP) if stopped
+    sprayValve  : BOOL;    // TRUE (ON) when spraying is in progress; FALSE (OFF) otherwise
+  END_VAR
+
+  // The program is cyclic. The following CASE statement implements the FSM for the spray station.
+  CASE state OF
+
+    // STATE 0: IDLE
+    0: 
+      // Outputs: Conveyor runs, spray is OFF.
+      conveyor    := TRUE;
+      sprayValve  := FALSE;
+      // Ensure the timer is deactivated in this state.
+      sprayTimer(IN := FALSE, PT := T#3s);
+      
+      // Transitions:
+      // If a vehicle is detected, check button conditions.
+      IF sensor THEN
+        IF stopButton THEN
+          // Transition to STATE 1: STOPPED when stop button is pressed.
+          state := 1;
+        ELSIF sprayButton THEN
+          // Transition to STATE 2: SPRAYING when spray button is pressed.
+          state := 2;
+        END_IF;
+      END_IF;
+      
+    // STATE 1: STOPPED
+    1:
+      // Outputs: Conveyor is stopped, spray is OFF.
+      conveyor    := FALSE;
+      sprayValve  := FALSE;
+      sprayTimer(IN := FALSE, PT := T#3s);
+      
+      // Transitions:
+      // If the vehicle leaves the station, return to IDLE.
+      IF NOT sensor THEN
+        state := 0;
+      // If the vehicle remains and spray button is pressed, transition to SPRAYING.
+      ELSIF sensor AND sprayButton THEN
+        state := 2;
+      END_IF;
+      
+    // STATE 2: SPRAYING
+    2:
+      // Outputs: Conveyor remains stopped, spray is ON.
+      conveyor    := FALSE;
+      sprayValve  := TRUE;
+      // Activate and run the timer.
+      sprayTimer(IN := TRUE, PT := T#3s);
+      
+      // Transition:
+      // Once the 3鈥憇econd timer has elapsed, move to SPRAY_COMPLETE.
+      IF sprayTimer.Q THEN
+        state := 3;
+      END_IF;
+      
+    // STATE 3: SPRAY_COMPLETE
+    3:
+      // Outputs: Conveyor resumes running, spray is turned OFF.
+      conveyor    := TRUE;
+      sprayValve  := FALSE;
+      // Reset the spray button.
+      sprayButton := FALSE;
+      // Deactivate the timer.
+      sprayTimer(IN := FALSE, PT := T#3s);
+      
+      // Transition: Automatically return to IDLE after resetting.
+      state := 0;
+
+    // Default case for safety (should never occur).
+    ELSE
+      state := 0;
+  END_CASE;
+
+END_PROGRAM

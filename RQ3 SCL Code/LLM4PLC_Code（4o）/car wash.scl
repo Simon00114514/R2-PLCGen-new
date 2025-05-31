@@ -1,0 +1,99 @@
+FUNCTION_BLOCK CarWashProcess
+VAR_INPUT
+	vehicleDetected : BOOL;
+	personDetected : BOOL;
+	start_time_elapsed : BOOL;
+	spray_time_elapsed : BOOL;
+	scrub_time_elapsed : BOOL;
+	dry_time_elapsed : BOOL;
+END_VAR
+
+VAR_OUTPUT
+	spray : BOOL;
+	scrub : BOOL;
+	dry : BOOL;
+	alarm : BOOL;
+END_VAR
+
+VAR
+	state : INT;
+END_VAR
+
+BEGIN
+	CASE state OF
+		0: // INITIALIZE
+			spray := FALSE;
+			scrub := FALSE;
+			dry := FALSE;
+			alarm := FALSE;
+			state := 1; // Automatically transition to WAIT_FOR_VEHICLE
+
+		1: // WAIT_FOR_VEHICLE
+			spray := FALSE;
+			scrub := FALSE;
+			dry := FALSE;
+			alarm := FALSE;
+			IF vehicleDetected AND NOT personDetected THEN
+				state := 2; // Transition to START_WASH
+			ELSIF personDetected THEN
+				state := 6; // Transition to ALARM
+			END_IF;
+
+		2: // START_WASH
+			spray := TRUE;
+			scrub := FALSE;
+			dry := FALSE;
+			alarm := FALSE;
+			IF start_time_elapsed THEN
+				state := 3; // Transition to SPRAY
+			ELSIF personDetected THEN
+				state := 6; // Transition to ALARM
+			END_IF;
+
+		3: // SPRAY
+			spray := TRUE;
+			scrub := FALSE;
+			dry := FALSE;
+			alarm := FALSE;
+			IF spray_time_elapsed THEN
+				state := 4; // Transition to SCRUB
+			ELSIF personDetected THEN
+				state := 6; // Transition to ALARM
+			END_IF;
+
+		4: // SCRUB
+			spray := FALSE;
+			scrub := TRUE;
+			dry := FALSE;
+			alarm := FALSE;
+			IF scrub_time_elapsed THEN
+				state := 5; // Transition to DRY
+			ELSIF personDetected THEN
+				state := 6; // Transition to ALARM
+			END_IF;
+
+		5: // DRY
+			spray := FALSE;
+			scrub := FALSE;
+			dry := TRUE;
+			alarm := FALSE;
+			IF dry_time_elapsed THEN
+				state := 1; // Loop back to WAIT_FOR_VEHICLE
+			ELSIF personDetected THEN
+				state := 6; // Transition to ALARM
+			END_IF;
+
+		6: // ALARM
+			spray := FALSE;
+			scrub := FALSE;
+			dry := FALSE;
+			alarm := TRUE;
+			IF NOT personDetected THEN
+				state := 1; // Go back to WAIT_FOR_VEHICLE when clear
+			END_IF;
+
+		ELSE
+			// Fallback if state is unknown
+			state := 0; // Re-initialize
+	END_CASE;
+END_FUNCTION_BLOCK

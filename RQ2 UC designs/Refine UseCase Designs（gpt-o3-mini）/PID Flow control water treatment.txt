@@ -1,0 +1,85 @@
+### Revised Use Case Design
+
+1. **Use Case Name**: PID Feedback Flow Control for Chlorine Dosing in Water Treatment
+
+2. **Actors**:
+   - **Actor 1**: IEC 61131-3 Structured Text Program (System)
+   - **Actor 2**: Chlorine Dosing Mechanism (External system)
+
+3. **Use Case**: Control the flow rate of chlorine dosing in water treatment based on PID feedback.
+
+4. **System Boundary**:
+   - **Internal**: IEC 61131-3 Structured Text Program
+   - **External**: Chlorine Dosing Mechanism, Water Treatment Environment
+
+5. **Relationships Among Actors**: The IEC 61131-3 Structured Text Program interacts with the Chlorine Dosing Mechanism to control the flow rate.
+
+6. **Detailed Descriptive Information for Each Use Case**:
+
+   **Use Case**: PID Feedback Flow Control for Chlorine Dosing in Water Treatment
+
+   (1) **Brief Description**: The use case involves the IEC 61131-3 Structured Text Program controlling the flow rate of chlorine dosing in a water treatment process based on PID feedback. The dosing rate is 3 ppm, and the sampling rate is 100 milliseconds.
+
+   (2) **Preconditions**: The system is operational, and all devices are in a normal working state.
+
+   (3) **Event Flow**:
+
+   - **Basic Flow**:
+     - The system samples the chlorine concentration every 100 milliseconds.
+     - If the concentration is below the threshold, the system increases the flow rate.
+     - If the concentration is above the threshold, the system reduces the flow rate.
+     - If the concentration is within the acceptable range, the flow rate remains unchanged.
+
+   - **Alternative Flow**:
+     - If the system detects an error or malfunction in the chlorine dosing mechanism, it triggers an alarm, stops the dosing process, and logs the error for further analysis.
+
+   (4) **Postconditions**: The chlorine concentration in the water is maintained within the acceptable range.
+
+   (5) **Use Case Scenario**: In a water treatment process, the system continuously monitors the chlorine concentration. If the concentration deviates from the acceptable range, the system adjusts the flow rate of the chlorine dosing mechanism accordingly.
+
+   (6) **Special Requirements**: The system must comply with the IEC 61131-3 standard for structured text programming. It must also ensure the safety and reliability of the water treatment process.
+
+7. **Priority of Use Cases**: High (as it's critical for the water treatment process)
+
+### CTL/LTL Specifications for nuXmv
+
+1. **Implication**:
+   ```ctl
+   AG ((chlorine_concentration < threshold) -> AX Flow_rate > Current rate) &
+   AG ((chlorine_concentration > threshold) -> AX Flow_rate < Current rate)
+   ```
+
+2. **Invariant**:
+   ```ctl
+   AG (sample_chlorine_concentration_every_100ms)
+   ```
+
+3. **Forbidden**:
+   ```ctl
+   AG (!(chlorine_concentration_within_range & change_flow_rate))
+   ```
+
+4. **State Change During Cycle**:
+   ```ctl
+   AG ((chlorine_concentration != previous_chlorine_concentration) -> AX change_flow_rate)
+   ```
+
+5. **State Change Between Cycles**:
+   ```ctl
+   AG ((reduce_flow_rate & AX (chlorine_concentration > threshold)) -> AX Flow_rate > Current rate)
+   ```
+
+6. **Reachability**:
+   ```ctl
+   EF change_flow_rate
+   ```
+
+7. **Repeatability**:
+   ```ctl
+   AG EF change_flow_rate
+   ```
+
+8. **Leads To**:
+   ```ctl
+   AG ((change_flow_rate) -> AF chlorine_concentration_within_range)
+   ```

@@ -1,0 +1,50 @@
+FUNCTION_BLOCK TEMPERATURE_CONTROL
+VAR_INPUT
+    temperatureSensor1 : INT; // Temperature from sensor 1
+    temperatureSensor2 : INT; // Temperature from sensor 2
+    temperatureSensor3 : INT; // Temperature from sensor 3
+END_VAR
+VAR_OUTPUT
+    heaterOn : BOOL; // Heater control output
+END_VAR
+VAR
+    state : INT; // Current state
+    prevState : INT; // Previous state
+    averageTemperature : INT; // Average temperature
+END_VAR
+
+// Calculate the average temperature
+averageTemperature := (temperatureSensor1 + temperatureSensor2 + temperatureSensor3) / 3;
+
+// State transitions
+CASE state OF
+    0: // STATE 0: INITIALIZE
+        heaterOn := FALSE;
+        IF averageTemperature < 20 THEN
+            prevState := state;
+            state := 1; // Transition to STATE 1: HEATING
+        END_IF;
+    1: // STATE 1: HEATING
+        heaterOn := TRUE;
+        IF averageTemperature >= 20 AND averageTemperature <= 25 THEN
+            prevState := state;
+            state := 2; // Transition to STATE 2: MAINTAIN TEMPERATURE
+        END_IF;
+    2: // STATE 2: MAINTAIN TEMPERATURE
+        heaterOn := FALSE;
+        IF averageTemperature > 25 THEN
+            prevState := state;
+            state := 3; // Transition to STATE 3: COOLING
+        END_IF;
+    3: // STATE 3: COOLING
+        heaterOn := FALSE;
+        IF averageTemperature <= 25 THEN
+            prevState := state;
+            state := 2; // Transition back to STATE 2
+        ELSIF averageTemperature < 20 THEN
+            prevState := state;
+            state := 1; // Transition back to STATE 1
+        END_IF;
+END_CASE;
+
+END_FUNCTION_BLOCK

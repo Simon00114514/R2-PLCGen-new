@@ -1,0 +1,63 @@
+PROGRAM ConveyorControl
+  VAR
+    // FSM state: 0 = OFF, 1 = ON
+    state : INT := 0;               
+
+    // Sensors detecting objects on the conveyor belt
+    sensor1 : BOOL; 
+    sensor2 : BOOL; 
+    sensor3 : BOOL; 
+    sensor4 : BOOL; 
+    sensor5 : BOOL; 
+
+    // Stop buttons at each station
+    stopButton1 : BOOL; 
+    stopButton2 : BOOL; 
+    stopButton3 : BOOL; 
+
+    // Outputs to control the conveyor belt
+    conveyorBeltRunning : BOOL; // TRUE if belt running; FALSE if stopped
+    conveyorBeltSpeed : INT;   // Belt speed in m/s
+
+    // Intermediate conditions
+    tempSensorCondition : BOOL; // TRUE if at least one sensor is active
+    tempStopCondition   : BOOL; // TRUE if at least one stop button is pressed
+  END_VAR
+
+  // Evaluate the sensor and stop button conditions
+  tempSensorCondition := sensor1 OR sensor2 OR sensor3 OR sensor4 OR sensor5;
+  tempStopCondition   := stopButton1 OR stopButton2 OR stopButton3;
+
+  // FSM: Generate outputs and compute state transitions
+  CASE state OF
+
+    0: // STATE 0: OFF
+         // Set outputs for OFF state
+         conveyorBeltRunning := FALSE;
+         conveyorBeltSpeed   := 0;
+
+         // Transition from OFF -> ON:
+         // Condition: At least one sensor active AND no stop button is pressed.
+         IF (tempSensorCondition AND (NOT tempStopCondition)) THEN
+           state := 1;
+         END_IF;
+
+    1: // STATE 1: ON
+         // Set outputs for ON state
+         conveyorBeltRunning := TRUE;
+         conveyorBeltSpeed   := 2;
+
+         // Transition from ON -> OFF:
+         // Condition: Either no sensor is active OR any stop button is pressed.
+         IF ((NOT tempSensorCondition) OR tempStopCondition) THEN
+           state := 0;
+         END_IF;
+
+  ELSE
+         // Fallback: any undefined state returns to OFF
+         state := 0;
+         conveyorBeltRunning := FALSE;
+         conveyorBeltSpeed   := 0;
+  END_CASE;
+
+END_PROGRAM

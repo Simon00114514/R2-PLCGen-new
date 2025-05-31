@@ -1,0 +1,46 @@
+// Declaration of variables
+VAR
+    state: INT := 0; // The current state of the FSM
+    prevState: INT; // The previous state, for debugging or additional logic
+    switchTop: BOOL; // The switch at the top of the staircase
+    switchBottom: BOOL; // The switch at the bottom of the staircase
+    light: BOOL := FALSE; // The current state of the light (ON=TRUE/OFF=FALSE)
+    switchTopPrev: BOOL := FALSE; // Previous state of the switch at the top
+    switchBottomPrev: BOOL := FALSE; // Previous state of the switch at the bottom
+END_VAR
+
+// Main logic
+BEGIN
+    // Record the previous state for debugging or further logic
+    prevState := state;
+
+    // Switch case for state machine logic
+    CASE state OF
+        // State 0: Initialize
+        0:
+            light := FALSE; // Ensure the light is OFF at initialization
+            state := 2; // Transition from STATE 0 to STATE 2 immediately after initialization
+        
+        // State 1: Light ON
+        1:
+            light := TRUE; // Turn the light ON
+
+            // Transition to STATE 2 if either switch is toggled
+            IF ((switchTop AND NOT switchTopPrev) OR (switchBottom AND NOT switchBottomPrev)) THEN
+                state := 2;
+            END_IF;
+        
+        // State 2: Light OFF
+        2:
+            light := FALSE; // Turn the light OFF
+
+            // Transition to STATE 1 if either switch is toggled
+            IF ((switchTop AND NOT switchTopPrev) OR (switchBottom AND NOT switchBottomPrev)) THEN
+                state := 1;
+            END_IF;
+
+    END_CASE;
+
+    // Update previous switch states for edge detection
+    switchTopPrev := switchTop;
+    switchBottomPrev := switchBottom;

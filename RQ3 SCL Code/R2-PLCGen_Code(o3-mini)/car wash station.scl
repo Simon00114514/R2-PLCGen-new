@@ -1,0 +1,129 @@
+PROGRAM CarWashStation
+VAR_INPUT
+    CarSensor : BOOL;          (* Sensor detecting a car entering the station *)
+    PersonSensor : BOOL;       (* Sensor detecting any person in the wash area *)
+END_VAR
+
+VAR_OUTPUT
+    CarWashActive : BOOL;      (* Indicates that the wash process is running *)
+    Rinse        : BOOL;       (* Rinse step output *)
+    Soap         : BOOL;       (* Soap step output *)
+    Scrub        : BOOL;       (* Scrub step output *)
+    RinseAgain   : BOOL;       (* Second rinse step output *)
+    Dry          : BOOL;       (* Dry step output *)
+    CarReadyToLeave : BOOL;    (* Signal that the car may leave the station *)
+    Alarm        : BOOL;       (* Alarm output triggered when a person is detected *)
+END_VAR
+
+VAR
+    state : INT;               (* Process state variable *)
+END_VAR
+
+CONST
+    STATE_IDLE       : INT := 0;
+    STATE_START      : INT := 1;
+    STATE_RINSE      : INT := 2;
+    STATE_SOAP       : INT := 3;
+    STATE_SCRUB      : INT := 4;
+    STATE_RINSEAGAIN : INT := 5;
+    STATE_DRY        : INT := 6;
+    STATE_COMPLETE   : INT := 7;
+    STATE_ALARM      : INT := 8;
+END_CONST
+
+(* Reset outputs at the beginning of each scan cycle *)
+CarWashActive    := FALSE;
+Rinse            := FALSE;
+Soap             := FALSE;
+Scrub            := FALSE;
+RinseAgain       := FALSE;
+Dry              := FALSE;
+CarReadyToLeave  := FALSE;
+Alarm            := FALSE;
+
+CASE state OF
+    STATE_IDLE:
+        (* Wait for a car and check that no person is detected *)
+        IF CarSensor = TRUE THEN
+            IF PersonSensor = FALSE THEN
+                state := STATE_START;
+            ELSE
+                state := STATE_ALARM;
+            END_IF;
+        END_IF;
+
+    STATE_START:
+        CarWashActive := TRUE;
+        (* Start wash cycle only if no person is detected *)
+        IF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        ELSE
+            state := STATE_RINSE;
+        END_IF;
+
+    STATE_RINSE:
+        Rinse         := TRUE;
+        CarWashActive := TRUE;
+        IF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        ELSE
+            state := STATE_SOAP;
+        END_IF;
+
+    STATE_SOAP:
+        Soap          := TRUE;
+        CarWashActive := TRUE;
+        IF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        ELSE
+            state := STATE_SCRUB;
+        END_IF;
+
+    STATE_SCRUB:
+        Scrub         := TRUE;
+        CarWashActive := TRUE;
+        IF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        ELSE
+            state := STATE_RINSEAGAIN;
+        END_IF;
+
+    STATE_RINSEAGAIN:
+        RinseAgain    := TRUE;
+        CarWashActive := TRUE;
+        IF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        ELSE
+            state := STATE_DRY;
+        END_IF;
+
+    STATE_DRY:
+        Dry           := TRUE;
+        CarWashActive := TRUE;
+        IF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        ELSE
+            state := STATE_COMPLETE;
+        END_IF;
+
+    STATE_COMPLETE:
+        CarReadyToLeave := TRUE;  (* Car wash finished, car can leave *)
+        CarWashActive   := FALSE;
+        IF CarSensor = FALSE THEN
+            state := STATE_IDLE;
+        ELSIF PersonSensor = TRUE THEN
+            state := STATE_ALARM;
+        END_IF;
+
+    STATE_ALARM:
+        Alarm         := TRUE;     (* Stop operation and trigger alarm *)
+        CarWashActive := FALSE;
+        IF CarSensor = FALSE THEN
+            state := STATE_IDLE;
+        END_IF;
+
+    ELSE
+        state := STATE_IDLE;
+END_CASE;
+
+END_PROGRAM

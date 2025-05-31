@@ -1,0 +1,12 @@
+1. **Pouring Liquid Use Case (UC-1):**
+   - **Precondition:** The tank is not full.
+     - CTL: `AG (TankNotFull -> AX (S1Pressed -> Liquid1Active))`
+     - CTL: `AG (TankNotFull -> AX (S2Pressed -> Liquid2Active))`
+   - **Alternative Flow:** If the tank is full, buttons S1 and S2 are disabled.
+     - CTL: `AG (TankFull -> AX (!S1Enabled & !S2Enabled))`
+
+2. **Preparing Mixed Solution Use Case (UC-2):**
+   - **Precondition:** The tank contains unmixed solutions.
+     - CTL: `AG (TankNotEmpty -> AX (S3Pressed -> (AX (MotorMActive & !S1Enabled & !S2Enabled))))`
+   - **Post Condition:** Valve V1 is eventually opened.
+     - CTL: `AG (S3Pressed -> AF ValveV1Open)`

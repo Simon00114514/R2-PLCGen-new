@@ -1,0 +1,83 @@
+PROGRAM FeedforwardControl
+VAR
+    state         : INT := 0;       // Current state, default to INITIALIZE
+    predictedLoad : INT;            // Sensor-predicted load value
+    conveyorSpeed : INT;            // Current conveyor belt speed (output)
+    lowerThreshold: INT := 10;      // Lower boundary for load (example value)
+    upperThreshold: INT := 20;      // Upper boundary for load (example value)
+    speedIncrement: INT := 5;        // Increase increment for conveyor speed (example value)
+    speedDecrement: INT := 5;        // Decrease decrement for conveyor speed (example value)
+    nominalSpeed  : INT := 10;     // Default (nominal) speed value for initialization
+END_VAR
+
+// Begin the cycle: Evaluate current state and the predicted load value to update state and adjust speed.
+BEGIN
+    // On the first cycle, state will be INITIALIZE
+    IF state = 0 THEN
+        // Set the conveyor belt speed to the nominal value.
+        conveyorSpeed := nominalSpeed;
+        
+        // Evaluate sensor predicted load and transition to the appropriate state.
+        IF predictedLoad < lowerThreshold THEN
+            state := 1; // Transition to INCREASE_SPEED
+            conveyorSpeed := conveyorSpeed + speedIncrement;
+        ELSIF predictedLoad > upperThreshold THEN
+            state := 2; // Transition to DECREASE_SPEED
+            conveyorSpeed := conveyorSpeed - speedDecrement;
+        ELSE
+            state := 3; // Transition to MAINTAIN_SPEED, no change in speed.
+        END_IF;
+        
+    ELSE
+        // For subsequent cycles, use the current state to decide further actions.
+        CASE state OF
+            
+            1: // Currently in INCREASE_SPEED state.
+                // Transition check.
+                IF (predictedLoad >= lowerThreshold) AND (predictedLoad <= upperThreshold) THEN
+                    state := 3; // Move to MAINTAIN_SPEED state.
+                ELSIF predictedLoad > upperThreshold THEN
+                    state := 2; // Switch to DECREASE_SPEED state.
+                    conveyorSpeed := conveyorSpeed - speedDecrement;
+                ELSE
+                    // Remain in INCREASE_SPEED state; increase speed further.
+                    conveyorSpeed := conveyorSpeed + speedIncrement;
+                END_IF;
+                
+            2: // Currently in DECREASE_SPEED state.
+                IF (predictedLoad >= lowerThreshold) AND (predictedLoad <= upperThreshold) THEN
+                    state := 3; // Move to MAINTAIN_SPEED state.
+                ELSIF predictedLoad < lowerThreshold THEN
+                    state := 1; // Switch to INCREASE_SPEED state.
+                    conveyorSpeed := conveyorSpeed + speedIncrement;
+                ELSE
+                    // Remain in DECREASE_SPEED state; decrease speed further.
+                    conveyorSpeed := conveyorSpeed - speedDecrement;
+                END_IF;
+                
+            3: // Currently in MAINTAIN_SPEED state.
+                IF predictedLoad < lowerThreshold THEN
+                    state := 1; // Transition to INCREASE_SPEED state.
+                    conveyorSpeed := conveyorSpeed + speedIncrement;
+                ELSIF predictedLoad > upperThreshold THEN
+                    state := 2; // Transition to DECREASE_SPEED state.
+                    conveyorSpeed := conveyorSpeed - speedDecrement;
+                END_IF;
+                // If still within thresholds, do nothing (maintain speed).
+                
+            ELSE
+                // Fallback: Reset state and speed.
+                state := 0;
+                conveyorSpeed := nominalSpeed;
+        END_CASE;
+    END_IF;
+    
+    // Optionally, if limits for conveyorSpeed are desired, they can be enforced here.
+    // For example:
+    // IF conveyorSpeed > 2000 THEN
+    //     conveyorSpeed := 2000;
+    // ELSIF conveyorSpeed < 0 THEN
+    //     conveyorSpeed := 0;
+    // END_IF;
+    
+END_PROGRAM

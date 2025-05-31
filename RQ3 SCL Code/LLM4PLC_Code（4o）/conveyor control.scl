@@ -1,0 +1,50 @@
+FUNCTION_BLOCK ConveyorControl
+VAR_INPUT
+    sensor: ARRAY[1..5] OF BOOL;  // Sensors to detect objects
+    userStopButton: ARRAY[1..3] OF BOOL;  // User stop buttons at each station
+END_VAR
+VAR_OUTPUT
+    conveyorMotor: BOOL;  // TRUE if the conveyor motor is ON
+    conveyorSpeed: INT;  // Speed of the conveyor belt in meters/second
+END_VAR
+VAR
+    state: INT;  // The current state of the system
+    ObjectDetected: BOOL;  // TRUE if any of the sensors detect an object
+    UserStop: BOOL;  // TRUE if any user stop button is pressed
+END_VAR
+
+// Check if any sensor detects an object
+ObjectDetected := sensor[1] OR sensor[2] OR sensor[3] OR sensor[4] OR sensor[5];
+
+// Check if any user stop button is pressed
+UserStop := userStopButton[1] OR userStopButton[2] OR userStopButton[3];
+
+(* State machine logic *)
+CASE state OF
+    0:  // STATE 0: INITIALIZE
+        conveyorMotor := FALSE;
+        conveyorSpeed := 0;
+        state := 1;  // Transition to STATE 1 when the system starts or is reset
+
+    1:  // STATE 1: CONVEYOR STOPPED
+        conveyorMotor := FALSE;
+        conveyorSpeed := 0;
+        // Transition to STATE 2 if object is detected and no user stop is requested
+        IF ObjectDetected AND NOT UserStop THEN
+            state := 2;
+        END_IF;
+
+    2:  // STATE 2: CONVEYOR RUNNING
+        conveyorMotor := TRUE;
+        conveyorSpeed := 2;  // Set speed to 2 meters/second
+        // Transition to STATE 1 if no object is detected or a user stop is requested
+        IF NOT ObjectDetected OR UserStop THEN
+            state := 1;
+        END_IF;
+
+    ELSE
+        // Default case to handle unexpected state values
+        state := 0;  // Reset to INITIALIZE state
+END_CASE;
+
+END_FUNCTION_BLOCK

@@ -1,0 +1,50 @@
+PROGRAM LiquidMixing
+VAR
+    S1 : BOOL; (* Button to pour liquid 1 *)
+    S2 : BOOL; (* Button to pour liquid 2 *)
+    S3 : BOOL; (* Button to prepare mixed solution *)
+    M : BOOL; (* Stirring motor *)
+    V1 : BOOL; (* Discharge valve *)
+    LiquidLevel : INT; (* Liquid level in the tank *)
+    MaxLiquidLevel : INT; (* Maximum liquid level in the tank *)
+END_VAR
+
+(* Pouring liquids *)
+IF S1 AND LiquidLevel < MaxLiquidLevel THEN
+    LiquidLevel := LiquidLevel + 1;
+    M := TRUE;
+END_IF;
+
+IF S2 AND LiquidLevel < MaxLiquidLevel THEN
+    LiquidLevel := LiquidLevel + 1;
+    M := TRUE;
+END_IF;
+
+(* Prevent overfilling *)
+IF LiquidLevel >= MaxLiquidLevel THEN
+    S1 := FALSE;
+    S2 := FALSE;
+END_IF;
+
+(* Preparing mixed solution *)
+IF S3 THEN
+    S1 := FALSE;
+    S2 := FALSE;
+    M := TRUE;
+    V1 := TRUE;
+END_IF;
+
+(* Operating stirring motor *)
+IF S1 OR S2 THEN
+    M := TRUE;
+ELSE
+    M := FALSE;
+END_IF;
+
+(* Operating discharge valve *)
+IF V1 THEN
+    LiquidLevel := 0;
+    V1 := FALSE;
+END_IF;
+
+END_PROGRAM

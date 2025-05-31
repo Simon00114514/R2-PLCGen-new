@@ -1,0 +1,56 @@
+PROGRAM pHControl
+VAR_INPUT
+    pHValue : REAL; // 当前pH值
+    liquidLevel : REAL; // 当前液位
+END_VAR
+
+VAR_OUTPUT
+    alkalinePumpSpeed : REAL; // 碱性溶液泵速
+    acidicPumpSpeed : REAL; // 酸性溶液泵速
+END_VAR
+
+VAR
+    highLevelAlarm : BOOL; // 液位高报警
+    injectingAlkaline : BOOL; // 是否正在注入碱性溶液
+    injectingAcidic : BOOL; // 是否正在注入酸性溶液
+    highLevelThreshold : REAL := 90.0; // 液位高阈值
+    pHLowerLimit : REAL := 5.0; // pH下限
+    pHUpperLimit : REAL := 8.0; // pH上限
+    pumpSpeedIncrement : REAL := 10.0; // 泵速增量
+    maxPumpSpeed : REAL := 100.0; // 泵速最大值
+    upperLimit : REAL := 100.0; // 液位上限
+END_VAR
+
+(* 控制逻辑代码 *)
+IF liquidLevel >= upperLimit THEN
+    highLevelAlarm := TRUE;
+    alkalinePumpSpeed := 0.0;
+    acidicPumpSpeed := 0.0;
+    injectingAlkaline := FALSE;
+    injectingAcidic := FALSE;
+ELSE
+    highLevelAlarm := FALSE;
+    IF pHValue < pHLowerLimit THEN
+        injectingAlkaline := TRUE;
+        alkalinePumpSpeed := alkalinePumpSpeed + pumpSpeedIncrement;
+        IF alkalinePumpSpeed > maxPumpSpeed THEN
+            alkalinePumpSpeed := maxPumpSpeed;
+        END_IF;
+    ELSE
+        injectingAlkaline := FALSE;
+        alkalinePumpSpeed := 0.0;
+    END_IF;
+    
+    IF pHValue > pHUpperLimit THEN
+        injectingAcidic := TRUE;
+        acidicPumpSpeed := acidicPumpSpeed + pumpSpeedIncrement;
+        IF acidicPumpSpeed > maxPumpSpeed THEN
+            acidicPumpSpeed := maxPumpSpeed;
+        END_IF;
+    ELSE
+        injectingAcidic := FALSE;
+        acidicPumpSpeed := 0.0;
+    END_IF;
+END_IF;
+
+END_PROGRAM

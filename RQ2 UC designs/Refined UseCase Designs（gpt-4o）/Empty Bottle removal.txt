@@ -1,0 +1,116 @@
+This adjustment ensures that the requirement for the cylinder to reset to its initial position after removing an empty bottle is explicitly captured in both the use case description and the CTL specification.Certainly! Below is the complete use case design and the corresponding CTL specifications, incorporating all necessary details, including the cylinder reset action.
+
+### Complete Use Case Design
+
+1. **Use Case Name**: Bottle Packaging System
+
+2. **Actors**:
+   - **Conveyor Belt**: Moves filled bottles to the packaging area.
+   - **Proximity Sensor**: Detects any bottle.
+   - **Empty Bottle Sensor**: Detects only empty bottles.
+   - **Cylinder**: Removes empty bottles.
+
+3. **Use Cases**:
+   - **Bottle Movement**: Moves filled bottles to the packaging area.
+   - **Bottle Detection**: Detects any bottle.
+   - **Empty Bottle Detection**: Detects only empty bottles.
+   - **Empty Bottle Removal**: Removes empty bottles and resets.
+
+4. **System Boundary**: IEC 61131-3 Structured Text Program
+
+5. **Relationships Among Actors**:
+   - The Conveyor Belt interacts with the Proximity Sensor and Empty Bottle Sensor.
+   - The Cylinder interacts with the Empty Bottle Sensor.
+
+6. **Detailed Descriptive Information for Each Use Case**:
+
+#### Use Case: Bottle Movement
+- **Brief Description**: The conveyor belt moves the filled bottles to the packaging area.
+- **Preconditions**: The bottle is filled.
+- **Event Flow**:
+  - **Basic Flow**: The conveyor belt starts when the proximity sensor detects a bottle.
+  - **Exception Flow**: If the conveyor belt fails, the system issues an alert and stops operations.
+- **Postconditions**: The bottle is moved to the packaging area.
+- **Use Case Scenario**: A filled bottle is detected by the proximity sensor, triggering the conveyor belt to move the bottle to the packaging area.
+- **Special Requirements**: The conveyor belt must be operational.
+
+#### Use Case: Bottle Detection
+- **Brief Description**: The proximity sensor detects any bottle.
+- **Preconditions**: A bottle is present.
+- **Event Flow**:
+  - **Basic Flow**: The proximity sensor detects a bottle.
+  - **Exception Flow**: If the sensor fails, the system issues an alert and switches to manual mode.
+- **Postconditions**: The bottle is detected.
+- **Use Case Scenario**: A bottle is present and is detected by the proximity sensor.
+- **Special Requirements**: The proximity sensor must be operational.
+
+#### Use Case: Empty Bottle Detection
+- **Brief Description**: The empty bottle sensor detects only empty bottles.
+- **Preconditions**: An empty bottle is present.
+- **Event Flow**:
+  - **Basic Flow**: The empty bottle sensor detects an empty bottle.
+  - **Exception Flow**: If the sensor fails, the system issues an alert and switches to manual mode.
+- **Postconditions**: The empty bottle is detected.
+- **Use Case Scenario**: An empty bottle is present and is detected by the empty bottle sensor.
+- **Special Requirements**: The empty bottle sensor must be operational.
+
+#### Use Case: Empty Bottle Removal
+- **Brief Description**: The cylinder removes empty bottles and resets to its initial position.
+- **Preconditions**: An empty bottle is detected.
+- **Event Flow**:
+  - **Basic Flow**: When both the proximity sensor and the empty bottle sensor detect a bottle, the cylinder starts and removes the empty bottle.
+  - **Exception Flow**: If the cylinder fails, the system issues an alert and stops operations.
+- **Postconditions**: 
+  - The empty bottle is removed.
+  - The cylinder resets to its initial position.
+- **Use Case Scenario**: An empty bottle is detected by the empty bottle sensor, and the proximity sensor confirms the presence of a bottle, triggering the cylinder to remove the bottle. After removal, the cylinder resets to its initial position.
+- **Special Requirements**: The cylinder must be operational.
+
+7. **Priority of Use Cases**:
+   - Bottle Movement: High
+   - Bottle Detection: High
+   - Empty Bottle Detection: Medium
+   - Empty Bottle Removal: Medium
+
+8. **Data Requirements**:
+   - D-1: Bottle status (filled or empty)
+   - D-2: Sensor status (operational or not)
+   - D-3: Cylinder status (operational or not)
+
+9. **Business Rules (Optional)**:
+   - B-1: The conveyor belt must start when a bottle is detected.
+   - B-2: The cylinder must remove the bottle when an empty bottle is detected.
+
+### Complete CTL Specifications
+
+Based on the refined use cases, here are the complete CTL specifications:
+
+1. **Use Case: Bottle Movement**
+   - **Pattern**: Implication
+   - **CTL Specification**: 
+     ```
+     AG((proximity_sensor_detects_bottle) -> (conveyor_belt_starts & bottle_moves_to_packaging_area));
+     ```
+
+2. **Use Case: Bottle Detection**
+   - **Pattern**: Reachability
+   - **CTL Specification**: 
+     ```
+     EF(proximity_sensor_detects_bottle);
+     ```
+
+3. **Use Case: Empty Bottle Detection**
+   - **Pattern**: Reachability
+   - **CTL Specification**: 
+     ```
+     EF(empty_bottle_sensor_detects_empty_bottle);
+     ```
+
+4. **Use Case: Empty Bottle Removal**
+   - **Pattern**: Implication
+   - **CTL Specification**: 
+     ```
+     AG((proximity_sensor_detects_bottle & empty_bottle_sensor_detects_empty_bottle) -> (cylinder_removes_empty_bottle & cylinder_resets_to_initial_position));
+     ```
+
+These specifications ensure that the system's behavior aligns with the detailed use case scenarios and requirements, capturing all necessary conditions and actions.

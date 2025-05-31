@@ -1,0 +1,104 @@
+PROGRAM WaterPump_Controller
+VAR
+    (* State variables *)
+    state       : INT := 0;   (* Current state of the FSM *)
+    prevState   : INT := 0;   (* Previous state (for edge detection if needed) *)
+
+    (* Input Variables *)
+    START_PB         : BOOL;       (* Start push button *)
+    STOP_PB          : BOOL;       (* Stop push button *)
+    HIGH_LEVEL_SENSOR: BOOL;       (* High water level sensor - TRUE when tank is full *)
+    DRAIN_CMD        : BOOL;       (* Command to activate the drain valve *)
+
+    (* Output Variables *)
+    PUMP         : BOOL;       (* Controls the pump relay: TRUE = ON, FALSE = OFF *)
+    DRAIN_VALVE  : BOOL;       (* Controls the drain valve relay: TRUE = OPEN, FALSE = CLOSED *)
+    MOTOR_LOCK   : BOOL;       (* Motor lock output: locked when TRUE via SET instruction or unlocked when FALSE *)
+END_VAR
+
+(* Constants representing FSM states *)
+CONST
+    STATE_INIT  : INT := 0;   (* Initialization state: All outputs off, motor unlocked *)
+    STATE_FILL  : INT := 1;   (* Filling state: Pump on, drain valve closed, motor unlocked *)
+    STATE_FULL  : INT := 2;   (* Full/Locked state: Tank full, pump off, motor locked via SET *)
+    STATE_DRAIN : INT := 3;   (* Draining state: Pump off, drain valve open, motor unlocked *)
+END_CONST
+
+(* Main FSM Execution *)
+CASE state OF
+
+    STATE_INIT:
+        (* Ensure outputs: pump off, drain valve closed, motor unlocked *)
+        PUMP := FALSE;
+        DRAIN_VALVE := FALSE;
+        (* Unlock motor if it is locked using RESET *)
+        IF MOTOR_LOCK THEN
+            RESET(MOTOR_LOCK);  (* Unlocking the motor *)
+        END_IF;
+        
+        (* Transition Conditions *)
+        (* If drain command is received, transition to draining state *)
+        IF DRAIN_CMD THEN
+            state := STATE_DRAIN;
+        (* If Start button is pressed, tank is not full, and motor is unlocked, then fill *)
+        ELSIF START_PB AND (NOT HIGH_LEVEL_SENSOR) AND (NOT MOTOR_LOCK) THEN
+            state := STATE_FILL;
+        END_IF;
+    
+    STATE_FILL:
+        (* Set outputs: pump on, drain valve closed, motor remains unlocked *)
+        PUMP := TRUE;
+        DRAIN_VALVE := FALSE;
+        IF MOTOR_LOCK THEN
+            RESET(MOTOR_LOCK);  (* Ensure the motor remains unlocked *)
+        END_IF;
+        
+        (* Transition Conditions *)
+        (* If a drain command is received, transition to draining state *)
+        IF DRAIN_CMD THEN
+            state := STATE_DRAIN;
+        (* If the tank becomes full (high-level sensor activated) or Stop button is pressed while unlocked, transition to full state *)
+        ELSIF HIGH_LEVEL_SENSOR OR (STOP_PB AND (NOT MOTOR_LOCK)) THEN
+            state := STATE_FULL;
+        END_IF;
+    
+    STATE_FULL:
+        (* Set outputs: pump off, drain valve closed.
+           Lock the motor using SET instruction since the tank is full or stop command is received. *)
+        PUMP := FALSE;
+        DRAIN_VALVE := FALSE;
+        IF NOT MOTOR_LOCK THEN
+            SET(MOTOR_LOCK);   (* Locking the motor via SET instruction *)
+        END_IF;
+        
+        (* Transition Conditions *)
+        (* If a drain command is received, transition to draining state *)
+        IF DRAIN_CMD THEN
+            state := STATE_DRAIN;
+        (* If Stop button is pressed, unlock the motor (RESET) and return to initialization *)
+        ELSIF STOP_PB THEN
+            RESET(MOTOR_LOCK);  (* Unlock the motor *)
+            state := STATE_INIT;
+        END_IF;
+    
+    STATE_DRAIN:
+        (* Set outputs: pump off, open drain valve, motor unlocked *)
+        PUMP := FALSE;
+        DRAIN_VALVE := TRUE;
+        IF MOTOR_LOCK THEN
+            RESET(MOTOR_LOCK);  (* Ensure the motor is unlocked during drain *)
+        END_IF;
+        
+        (* Transition Conditions *)
+        (* When the tank is sufficiently emptied (HIGH_LEVEL_SENSOR remains OFF) and the drain command is released,
+           return to the initialization state *)
+        IF (NOT HIGH_LEVEL_SENSOR) AND (NOT DRAIN_CMD) THEN
+            state := STATE_INIT;
+        END_IF;
+    
+    ELSE
+        (* If an undefined state is encountered, reset to initialization *)
+        state := STATE_INIT;
+END_CASE;
+
+END_PROGRAM

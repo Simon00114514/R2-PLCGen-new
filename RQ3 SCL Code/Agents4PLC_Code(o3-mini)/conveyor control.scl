@@ -1,0 +1,58 @@
+PROGRAM ConveyorControl
+VAR_INPUT
+    // Sensor inputs for object detection (from five sensors)
+    Sensor1       : BOOL;
+    Sensor2       : BOOL;
+    Sensor3       : BOOL;
+    Sensor4       : BOOL;
+    Sensor5       : BOOL;
+
+    // User stop inputs from three stations
+    StopStation1  : BOOL;
+    StopStation2  : BOOL;
+    StopStation3  : BOOL;
+END_VAR
+
+VAR_OUTPUT
+    // Output: status of the belt
+    BeltRunning   : BOOL;
+    // Speed indications 鈥 for formal verification, only one should be TRUE:
+    // When Speed2 is TRUE the belt is running at 2 m/s; when Speed0 is TRUE the belt is stopped.
+    Speed2        : BOOL;
+    Speed0        : BOOL;
+END_VAR
+
+VAR
+    // Internal flags to aggregate sensor and user stop conditions
+    ObjectDetected : BOOL;  // TRUE if any sensor detects an object
+    UserStopActive : BOOL;  // TRUE if at least one stop button is pressed
+END_VAR
+
+// Determine if any sensor detects an object
+ObjectDetected := Sensor1 OR Sensor2 OR Sensor3 OR Sensor4 OR Sensor5;
+
+// Determine if any stop command is active
+UserStopActive := StopStation1 OR StopStation2 OR StopStation3;
+
+// Establish belt running status based on inputs
+IF UserStopActive = TRUE THEN
+    BeltRunning := FALSE;
+ELSE
+    IF ObjectDetected = TRUE THEN
+        BeltRunning := TRUE;
+    ELSE
+        BeltRunning := FALSE;
+    END_IF;
+END_IF;
+
+// Set speed Booleans. When BeltRunning is TRUE, Speed2 must be TRUE and Speed0 FALSE;
+// when BeltRunning is FALSE, Speed2 must be FALSE and Speed0 TRUE.
+IF BeltRunning = TRUE THEN
+    Speed2 := TRUE;
+    Speed0 := FALSE;
+ELSE
+    Speed2 := FALSE;
+    Speed0 := TRUE;
+END_IF;
+
+END_PROGRAM

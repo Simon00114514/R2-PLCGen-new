@@ -1,0 +1,100 @@
+Use Case Name (System/Project):
+Water Pump Control System (Inferred)
+Actors:
+User (Operator)
+Use Cases:
+[UC-1]: Fill Tank – The user starts the water pump to fill the tank until the level sensor detects a high water level.
+[UC-2]: Empty Tank – The user empties the tank using the discharge valve.
+System Boundary:
+(Not explicitly defined, but implied to be the control system managing the start/stop buttons, pump, latching mechanism, level sensor, and discharge valve.)
+Relationships Among Actors:
+The User (Operator) interacts with the system by pressing Start/Stop buttons and opening/closing the discharge valve.
+Detailed Descriptive Information for Each Use Case:
+Use Case: [UC-1] Fill Tank
+(1) Brief Description: The user starts the water pump to fill the tank until the level sensor detects a high water level.
+(2) Preconditions:
+– The tank is not full.
+– The water pump is unlocked.
+(3) Event Flow:
+Basic Flow:
+1. The user presses the Start Button (START PB) when the pump is unlocked.
+2. The water pump starts filling the tank.
+3. The system uses the SET instruction to latch the motor (make it not unlocked) once the pump is running.
+4. The level sensor detects the high water level.
+5. The system uses the RESET instruction to make the motor unlocked and stop the pump.
+Alternative Flow:
+1. If the water pump is not unlocked (i.e., latched), the user must press the Stop Button (STOP PB) to use the RESET instruction and make it unlocked before pressing the Start Button.
+Exception Flow:
+Sensor Failure:
+1. If the level sensor fails, the system should trigger an alarm and use the RESET instruction to stop the water pump (and make it unlocked).
+Button Malfunction:
+1. If the Start or Stop Button malfunctions, the user should manually disconnect the power to stop the pump.
+(4) Postconditions:
+– The tank is full.
+– The water pump is unlocked.
+(5) Use Case Scenario: The user wants to fill the tank. They press the Start Button when the pump is unlocked, the pump starts, and the system latches the motor (makes it not unlocked) using the SET instruction. When the tank is full, the level sensor detects the high water level, and the system makes the motor unlocked using the RESET instruction to stop the pump.
+(6) Special Requirements:
+– The water pump must be unlocked when the Start Button is pressed.
+Priority: High
+Use Case: [UC-2] Empty Tank
+(1) Brief Description: The user empties the tank using the discharge valve.
+(2) Preconditions:
+– The tank is full.
+(3) Event Flow:
+Basic Flow:
+1. The user opens the Discharge Valve.
+2. The water in the tank is emptied.
+Exception Flow:
+Valve Malfunction:
+1. If the Discharge Valve fails, the user should manually empty the tank.
+(4) Postconditions:
+– The tank is empty.
+(5) Use Case Scenario: The user wants to empty the tank. They open the Discharge Valve, and the water in the tank is emptied.
+(6) Special Requirements:
+– The tank must be full before the Discharge Valve can be opened.
+Priority: Medium
+Data Requirements:
+(Inferred from use cases and specifications, using "unlocked" terminology)
+[D-1]: Tank Full Status (Boolean: true if full, false otherwise)
+[D-2]: Pump Unlocked Status (Boolean: true if unlocked, false if latched)
+[D-3]: Start Button Press Event
+[D-4]: Stop Button Press Event
+[D-5]: Pump Running Status (Boolean)
+[D-6]: SET Latch Command Event/Status (makes pump not unlocked)
+[D-7]: High Water Level Detected Event/Status
+[D-8]: RESET Unlatch Command Event/Status (makes pump unlocked)
+[D-9]: Sensor Failure Status (Boolean)
+[D-10]: Alarm Triggered Status (Boolean)
+[D-11]: Button Malfunction Status (Boolean)
+[D-12]: Manual Power Disconnect Action (External)
+[D-13]: Discharge Valve Open Status (Boolean)
+[D-14]: Tank Empty Status (Boolean)
+[D-15]: Valve Malfunction Status (Boolean)
+[D-16]: Manual Empty Tank Action (External)
+Business Rules:
+(Inferred from use cases and specifications, using "unlocked" terminology)
+[B-1]: Pump cannot start if not unlocked (i.e., latched) or tank is full.
+[B-2]: Pump becomes latched (not unlocked) after starting.
+[B-3]: Pump stops and becomes unlocked when high water level is detected or sensor fails.
+[B-4]: Stop button makes the pump unlocked if it was latched (not unlocked).
+[B-5]: Discharge valve can only be opened if tank is full.
+CTL/LTL Expressions (with Source Mapping and Evaluation, using "pump_is_unlocked" or similar for the pump's state):
+Core CTL Properties (Directly from or reflecting original constraints):
+AG (high_level -> !pump_on)
+AG ((start_pb_pressed_event & !locked & !high_level) -> AX pump_on)
+AG ((stop_pb_pressed_event & !locked & pump_on) -> AX !pump_on)
+AG (set_instruction_executed -> AX locked)
+AG (reset_instruction_executed -> AX !locked)
+CTL/LTL for Use Case Flows (UC-1 Fill Tank):
+6. CTL: AG ((pump_on & !locked) -> AF set_instruction_executed)
+7. LTL: G ((start_pb_pressed_event & !locked & !high_level) -> F (pump_on & XF (set_instruction_executed & X locked)))
+8. CTL: AG ((pump_on & locked & high_level) -> AX reset_instruction_executed)
+9. LTL: G ((pump_on & locked & high_level) -> X (reset_instruction_executed & X (!locked & !pump_on)))
+10. CTL: AG ((sensor_failure_detected & pump_on) -> AX (alarm_is_triggered & reset_instruction_executed))
+CTL/LTL for Use Case Flows (UC-2 Stop/Unlock Pump):
+11. CTL: AG ((stop_pb_pressed_event & locked) -> AX reset_instruction_executed)
+CTL/LTL for Use Case Flows (UC-3 Empty Tank):
+12. LTL: G ((high_level & discharge_valve_opened_event) -> F tank_is_empty)
+13. CTL: AG (discharge_valve_opened_event -> !tank_is_empty)
+General Liveness (Example):
+14. LTL: G (tank_is_empty -> F (!high_level & !locked & start_pb_pressed_event -> F pump_on))

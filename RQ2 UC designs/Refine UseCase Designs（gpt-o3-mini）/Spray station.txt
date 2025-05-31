@@ -1,0 +1,111 @@
+### Use Case Design
+
+1. **Use Case Name**: Spray Station Operation
+
+2. **Actor**:
+   - Operator: The person who operates the spray station.
+   - Conveyor System: The system that moves the car to the spray station.
+   - Spray System: The system that sprays the car.
+
+3. **Use Case**: 
+   - Spray Station Operation: The process of moving the car to the spray station, spraying it, and then moving it away.
+
+4. **System Boundary**: 
+   - IEC 61131-3 Structured Text Program
+
+5. **Relationships Among Actors**: 
+   - The Operator interacts with both the Conveyor System and the Spray System.
+
+6. **Detailed Descriptive Information for Each Use Case**:
+
+   **Use Case: Spray Station Operation**
+
+   (1) **Brief Description**: 
+       - The operator moves the car to the spray station using the conveyor system. Once the car is in position and the operator presses the spray button, the spray system automatically sprays the car for 3 seconds. After spraying, the spray button resets, and the conveyor system restarts to move the car away.
+
+   (2) **Preconditions**: 
+       - The car is on the conveyor system. The spray system is ready to spray.
+
+   (3) **Event Flow**:
+
+       **Basic Flow**:
+       1. The operator presses the conveyor system button to move the car to the spray station.
+       2. The operator presses the spray button.
+       3. The spray system sprays the car for 3 seconds.
+       4. The spray button resets.
+       5. The conveyor system restarts and moves the car away.
+
+       **Alternative Flow**:
+       - If the conveyor stop button is pressed while the car is being detected by the sensor, the conveyor system stops.
+
+   (4) **Postconditions**: 
+       - The car has been sprayed, the spray button is reset, and the car is moved away from the spray station.
+
+   (5) **Use Case Scenario**: 
+       - An operator is spraying a car. They press the conveyor system button to move the car to the spray station. Once the car is in position, they press the spray button. The spray system automatically sprays the car for 3 seconds. The spray button resets, and the conveyor system restarts to move the car away.
+
+   (6) **Special Requirements**: 
+       - The spray system must be able to detect the car and spray for exactly 3 seconds.
+
+7. **Priority of Use Cases**: 
+   - Spray Station Operation: High
+
+8. **Data Requirements**: 
+   - D-1: Car position data from the conveyor system.
+   - D-2: Spray system status data.
+
+9. **Business Rules (Optional)**: 
+   - B-1: The spray system must only spray when the car is detected and the spray button is pressed.
+   - B-2: The conveyor system must stop when the conveyor stop button is pressed and the car is detected by the sensor.
+
+### CTL Expressions
+
+1. **Implication**:
+   - SPEC
+     ``` 
+     AG((operator_presses_spray_button & car_detected) -> spray_system_sprays_for_3_seconds)
+     G(spray & spray_timer >= 3 -> X !spray)
+     ```
+
+2. **Invariant**:
+   - SPEC
+     ```
+     AG(conveyor_stop_button_pressed & car_detected -> !conveyor_system_starts)
+     ```
+
+3. **Forbidden**:
+   - SPEC
+     ```
+     AG(！(spray_system_sprays_when_no_car_detected_or_spray_button_not_pressed))
+     ```
+
+4. **State Change During Cycle**:
+   - SPEC
+     ```
+   G(spray & spray_timer >= 3 -> X !spray)
+     ```
+
+
+5. **Reachability**:
+   - SPEC
+     ```
+     EF(conveyor_stop_button_pressed & car_detected)
+     ```
+
+6. **Repeatability**:
+   - SPEC
+     ```
+     AG(EF(operator_presses_spray_button & car_detected))
+     ```
+
+7. **Button Reset After Spraying**:
+   - SPEC
+     ```
+     AG((timer >= 3 & !spray) -> AX(button_resets))
+     ```
+
+8. **Conveyor Restarts After Spraying**:
+    - SPEC
+      ```
+      AG((timer >= 3 & !spray) -> AX(conveyor_system_restarts))
+      ```

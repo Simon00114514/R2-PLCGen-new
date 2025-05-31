@@ -1,0 +1,94 @@
+PROGRAM PLC_EntranceExitControl
+VAR
+    // FSM state: 0 = IDLE, 1 = GROUND_ENTRY_PROCESS, 2 = BASEMENT_EXIT_PROCESS
+    state     : INT := 0;
+    
+    // For edge detection of sensor inputs
+    x1_prev   : BOOL := FALSE;
+    x2_prev   : BOOL := FALSE;
+    
+    // Physical sensor inputs (to be mapped to X1 and X2 in the actual hardware configuration)
+    X1        : BOOL;  // Photoelectric sensor at the ground floor entrance/exit.
+    X2        : BOOL;  // Photoelectric sensor at the basement entrance/exit.
+    
+    // Intermediate sensor signals activated for one scan cycle
+    // (derived from rising edges on X1 and X2 when appropriate)
+    M1        : BOOL;  // Initiates ground floor entry process (IDLE -> state 1)
+    M2        : BOOL;  // Completes basement exit process (state 2 -> IDLE) upon X1 rising
+    M3        : BOOL;  // Initiates basement exit process (IDLE -> state 2)
+    M4        : BOOL;  // Completes ground floor entry process (state 1 -> IDLE) upon X2 rising
+    
+    // Process indicators
+    M20       : BOOL;  // Active during ground floor entry process (state 1)
+    M30       : BOOL;  // Active during basement exit process (state 2)
+    
+    // Output control signals for traffic lights
+    Y1        : BOOL;  // Red light output
+    Y2        : BOOL;  // Green light output
+END_VAR
+
+// ----- Compute Rising Edges based on sensor signals X1 and X2 -----
+// These signals are only valid for one scan cycle.
+// When in IDLE state, a rising edge on X1 or X2 will start a new process.
+M1 := (X1 AND (NOT x1_prev)) AND (state = 0);
+M3 := (X2 AND (NOT x2_prev)) AND (state = 0);
+
+// While in process states, detect the finishing trigger signals.
+// In state 1 (ground entry), a rising edge on X2 (M4) indicates the car reached the basement end.
+// In state 2 (basement exit), a rising edge on X1 (M2) indicates the car reached the ground floor.
+M4 := (X2 AND (NOT x2_prev)) AND (state = 1);
+M2 := (X1 AND (NOT x1_prev)) AND (state = 2);
+
+// ----- State Machine ----- 
+CASE state OF
+
+    0:  // IDLE State: No car is in the passage.
+        // Set outputs: Green light ON, Red light OFF. No active process flags.
+        Y1 := FALSE;
+        Y2 := TRUE;
+        M20 := FALSE;
+        M30 := FALSE;
+        
+        // State transition: Initiate ground entry if X1 rising edge is detected.
+        IF M1 THEN
+            state := 1;
+        // Alternatively, initiate basement exit if X2 rising edge is detected.
+        ELSIF M3 THEN
+            state := 2;
+        END_IF;
+        
+    1:  // GROUND_ENTRY_PROCESS: Car enters from ground floor.
+        // Set outputs: Red light ON, Green light OFF.
+        Y1 := TRUE;
+        Y2 := FALSE;
+        M20 := TRUE;   // Indicates processing ground floor entry.
+        M30 := FALSE;
+        
+        // Transition back to idle when the car completes passage at the basement end (X2 rising edge).
+        IF M4 THEN
+            state := 0;
+        END_IF;
+        
+    2:  // BASEMENT_EXIT_PROCESS: Car exits from basement.
+        // Set outputs: Red light ON, Green light OFF.
+        Y1 := TRUE;
+        Y2 := FALSE;
+        M20 := FALSE;
+        M30 := TRUE;   // Indicates processing basement exit.
+        
+        // Transition back to idle when the car completes passage at the ground floor (X1 rising edge).
+        IF M2 THEN
+            state := 0;
+        END_IF;
+        
+    ELSE
+        // Fallback to IDLE in case of any undefined state.
+        state := 0;
+        
+END_CASE;
+
+// ----- Update edge detection variables for next scan cycle -----
+x1_prev := X1;
+x2_prev := X2;
+
+END_PROGRAM

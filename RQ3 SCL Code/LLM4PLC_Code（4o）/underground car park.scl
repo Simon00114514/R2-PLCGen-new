@@ -1,0 +1,78 @@
+FUNCTION_BLOCK LightControl
+    VAR_INPUT
+        X1: BOOL; // Photoelectric switch at the ground floor
+        X2: BOOL; // Photoelectric switch at the basement
+        M1: BOOL; // Trigger for ground floor
+        M2: BOOL; // Trigger for basement move to ground floor
+        M3: BOOL; // Trigger for ground floor move to basement
+        M4: BOOL; // Trigger for basement
+        M20: BOOL; // Passage clear signal for ground floor
+        M30: BOOL; // Passage clear signal for basement
+    END_VAR
+
+    VAR_OUTPUT
+        Y1: BOOL; // Red light control
+        Y2: BOOL; // Green light control
+    END_VAR
+
+    VAR
+        state: INT := 0; // Current State Variable
+        prevState: INT := 0; // Previous State Variable
+    END_VAR
+
+    BEGIN
+        // State Transition Conditions
+        CASE state OF
+            0: // INITIALIZE
+                Y1 := FALSE;
+                Y2 := TRUE;
+                
+                IF X1 = TRUE AND M1 = TRUE THEN
+                    prevState := state;
+                    state := 1;
+                ELSIF X2 = TRUE AND M3 = TRUE THEN
+                    prevState := state;
+                    state := 3;
+                END_IF;
+                
+            1: // PASSAGE_ENTRY_GROUND
+                Y1 := TRUE;
+                Y2 := FALSE;
+                
+                IF X2 = TRUE AND M4 = TRUE THEN
+                    prevState := state;
+                    state := 4;
+                END_IF;
+                
+            2: // PASSAGE_EXIT_BASEMENT
+                Y1 := FALSE;
+                Y2 := TRUE;
+                
+                IF M30 = TRUE THEN
+                    prevState := state;
+                    state := 0;
+                END_IF;
+
+            3: // PASSAGE_ENTRY_BASEMENT
+                Y1 := TRUE;
+                Y2 := FALSE;
+
+                IF X1 = TRUE AND M2 = TRUE THEN
+                    prevState := state;
+                    state := 2;
+                END_IF;
+
+            4: // PASSAGE_EXIT_GROUND
+                Y1 := FALSE;
+                Y2 := TRUE;
+
+                IF M20 = TRUE THEN
+                    prevState := state;
+                    state := 0;
+                END_IF;
+                
+            // Add default to handle unexpected states
+            ELSE
+                state := 0;
+        END_CASE;
+    END_FUNCTION_BLOCK

@@ -1,0 +1,11 @@
+Agent: 1. Sequential Motor Control System - Sequential Motor Operation: Basic Flow  
+   SPEC  
+   CTL: AG (ready1 & ready2 & ready3 -> AF (start1 & AX (stop1 -> AX (start2 & AX (stop2 -> AX start3)))))
+
+2. Sequential Motor Control System - Sequential Motor Operation: Postconditions  
+   SPEC  
+   CTL: AG (start1 & AX (stop1 -> AX (start2 & AX (stop2 -> AX start3))) -> AF (completed & time <= 10))
+
+3. Sequential Motor Control System - Sequential Motor Operation: Special Requirements  
+   SPEC  
+   CTL: AG (!(start1 & start2) & !(start2 & start3) & !(start1 & start3))

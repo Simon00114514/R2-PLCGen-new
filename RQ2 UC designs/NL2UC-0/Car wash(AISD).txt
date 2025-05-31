@@ -1,0 +1,13 @@
+Based on the task provided, the use cases for the PLC program for an automatic car wash station with a single station as per IEC 61131-3 standard are as follows:
+
+{
+  1: "User can initiate the car wash program when a vehicle is detected by the vehicle sensor and no persons are detected by the personnel sensor.",
+  2: "User can view the status of the vehicle sensor (whether a vehicle is detected or not).",
+  3: "User can view the status of the personnel sensor (whether a person is detected or not).",
+  4: "User can view the current state of the car wash program (idle, in progress, stopped, alerting).",
+  5: "User can receive an immediate program stop and an alert if the personnel sensor detects a person during the car wash process.",
+  6: "User can reset the alert and restart the car wash program after ensuring the area is clear of persons.",
+  7: "User can view a history log of car wash sessions including any incidents where the program was stopped due to personnel detection."
+} 
+
+These use cases are designed to ensure that the car wash program operates safely and effectively, adhering to the constraints provided in the task.

@@ -1,0 +1,36 @@
+Agent: Below is a complete set of formal specifications that translate the design‐patterns (and any missing related use cases) into separate, single–logic expressions. In the following, each specification is provided on its own line (separated by semicolons) using the proper syntax, clear variable names, and mutual–exclusivity of events. Note that whenever cycle markers were originally present (for instance, at the end or start of a PLC cycle), they have been omitted in the final expressions so that only the relevant process conditions appear.
+
+ For UC1 (“Fill Tank”) the original “state change between cycles” patterns become:
+
+SPEC
+ltl: G((start_pb_pressed_event & !high_level & !locked) -> X(pump_on & locked));
+
+SPEC
+ltl: G((sensor_high | sensor_failure) -> X((!pump_on) & (!locked)));
+
+For UC2 (“Empty Tank”) the provided patterns become:
+
+SPEC
+ltl: G((discharge_valve_opened & high_level) -> X(tank_empty));
+
+SPEC
+ctl: AG(high_level | (!discharge_valve_opened));
+
+In addition, the following properties cover the missing use cases and business rules inferred from the use-case descriptions:
+
+(1) The pump must not be started when it is not unlocked or when the tank is full:
+
+SPEC
+ctl: AG((!pump_unlocked_status | tank_full_status) -> !pump_on);
+
+(2) In case of sensor failure the pump must stop, the pump’s latch must be reset (i.e. the pump becomes unlocked) and an alarm is triggered:
+
+SPEC
+ctl: AG(sensor_failure -> ((!pump_on) & pump_unlocked_status & alarm_triggered_status));
+
+(3) The discharge valve may be opened only when the tank is full:
+
+SPEC
+ctl: AG(discharge_valve_opened -> tank_full_status);
+
+Each specification is written in either pure CTL (using AG) or pure LTL (using G, X) so as not to mix the two paradigms. Variables capturing event flows have been split to ensure mutual exclusivity (for example, “locked” vs. “!locked” for the pump’s latch status), and all patterns plus missing use cases have been formally captured.

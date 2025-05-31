@@ -1,0 +1,67 @@
+PROGRAM ElevatorControl
+VAR
+    FloorButtons: ARRAY [1..5] OF BOOL;
+    UpButton: BOOL;
+    DownButton: BOOL;
+    LimitSwitches: ARRAY [1..5] OF BOOL;
+    DoorOpenTimer: TIME := T#7S;
+    NoButtonPressTimer: TIME := T#10S;
+    ElevatorStatus: INT;
+    CurrentFloor: INT;
+    Direction: INT;
+    i: INT;  (* Loop variable defined as INT *)
+END_VAR
+
+(* Initialize elevator status, current floor and direction *)
+ElevatorStatus := 0;
+CurrentFloor := 1;
+Direction := 0;
+
+(* Main control loop *)
+WHILE TRUE DO
+    (* Check floor buttons and set direction *)
+    FOR i := 1 TO 5 DO
+        IF FloorButtons[i] THEN
+            IF i > CurrentFloor THEN
+                Direction := 1;
+            ELSIF i < CurrentFloor THEN
+                Direction := -1;
+            END_IF;
+            EXIT;
+        END_IF;
+    END_FOR;
+
+    (* Move elevator based on direction *)
+    IF Direction = 1 THEN
+        CurrentFloor := CurrentFloor + 1;
+    ELSIF Direction = -1 THEN
+        CurrentFloor := CurrentFloor - 1;
+    END_IF;
+
+    (* Check limit switches *)
+    IF LimitSwitches[CurrentFloor] THEN
+        ElevatorStatus := 0;
+        Direction := 0;
+    END_IF;
+
+    (* Open doors and start timers *)
+    IF ElevatorStatus = 0 THEN
+        DoorOpenTimer := T#7S;
+        WHILE DoorOpenTimer > T#0S DO
+            DoorOpenTimer := DoorOpenTimer - T#1S;
+        END_WHILE;
+        ElevatorStatus := 1;
+        NoButtonPressTimer := T#10S;
+    END_IF;
+
+    (* Reopen doors if no button press *)
+    IF NoButtonPressTimer = T#0S AND ElevatorStatus = 1 THEN
+        ElevatorStatus := 0;
+    END_IF;
+
+    (* Decrement no button press timer *)
+    IF NoButtonPressTimer > T#0S THEN
+        NoButtonPressTimer := NoButtonPressTimer - T#1S;
+    END_IF;
+END_WHILE;
+END_PROGRAM

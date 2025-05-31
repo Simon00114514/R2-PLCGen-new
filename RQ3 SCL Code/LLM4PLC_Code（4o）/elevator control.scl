@@ -1,0 +1,107 @@
+FUNCTION_BLOCK ElevatorControl
+VAR
+    // Variable to hold the current state
+    state: INT;
+    prevState: INT;
+
+    // Elevator properties
+    currentFloor: INT;
+    targetFloor: INT;
+    door: BOOL; // TRUE for open, FALSE for closed
+    motorDirection: INT; // 0 for STOP, 1 for UP, 2 for DOWN
+
+    // Button states
+    upButtonPressed: BOOL;
+    downButtonPressed: BOOL;
+    anyButtonPressed: BOOL;
+
+    // Timers
+    buttonPressTimer: TON; // Timer for button press action
+    reopenDoorTimer: TON; // Timer for reopening door after no button press
+
+END_VAR
+
+VAR_TEMP
+    // Temporary variable
+    buttonPressElapsed: BOOL;
+    reopenDoorElapsed: BOOL;
+END_VAR
+
+BEGIN
+    // Output values based on states
+    CASE state OF
+        0: // STATE 0: IDLE
+            motorDirection := 0; // STOP
+            door := FALSE; // CLOSED
+
+        1: // STATE 1: MOVING UP
+            motorDirection := 1; // UP
+            door := FALSE; // CLOSED
+
+        2: // STATE 2: MOVING DOWN
+            motorDirection := 2; // DOWN
+            door := FALSE; // CLOSED
+
+        3: // STATE 3: DOOR OPENING
+            motorDirection := 0; // STOP
+            door := TRUE; // OPEN
+        
+        4: // STATE 4: DOOR CLOSING
+            motorDirection := 0; // STOP
+            door := FALSE; // CLOSED
+            
+        5: // STATE 5: WAITING FOR BUTTON_PRESS
+            motorDirection := 0; // STOP
+            door := FALSE; // CLOSED
+
+        6: // STATE 6: REOPEN DOOR
+            motorDirection := 0; // STOP
+            door := TRUE; // OPEN
+    END_CASE;
+
+    // Transition between states
+    CASE state OF
+        0:
+            IF upButtonPressed AND currentFloor < targetFloor THEN
+                state := 1;
+            ELSIF downButtonPressed AND currentFloor > targetFloor THEN
+                state := 2;
+            END_IF;
+
+        1, 2:
+            IF currentFloor = targetFloor THEN
+                state := 3;
+            END_IF;
+
+        3:
+            reopenDoorTimer(IN := TRUE, PT := T#7s);
+            IF reopenDoorTimer.Q THEN
+                reopenDoorTimer(IN := FALSE);
+                state := 4;
+            END_IF;
+
+        4:
+            IF NOT door THEN // When door is closed
+                state := 5;
+            END_IF;
+
+        5:
+            buttonPressTimer(IN := NOT anyButtonPressed, PT := T#10s);
+            IF anyButtonPressed THEN
+                buttonPressTimer(IN := FALSE);
+                state := 0;
+            ELSIF buttonPressTimer.Q THEN
+                buttonPressTimer(IN := FALSE);
+                state := 6;
+            END_IF;
+
+        6:
+            IF door THEN  // When the door is already open
+                state := 3;
+            END_IF;
+    END_CASE;
+
+    // Update previous state
+    prevState := state;
+
+END_FUNCTION_BLOCK

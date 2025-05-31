@@ -1,0 +1,121 @@
+
+**Use Case Design: Conveyor Belt Control**
+
+1. **Actors:**
+   - User
+   - Conveyor Belt System
+   - Sensors
+
+2. **Use Cases:**
+   - Start Conveyor Belt
+   - Stop Conveyor Belt
+   - Monitor Conveyor Belt
+
+3. **System Boundary:**
+   - The boundary of the system is the Conveyor Belt System itself, which includes the conveyor belt, the three stations, and the five sensors.
+
+4. **Relationships Among Actors:**
+   - The User interacts with the Conveyor Belt System through the three stations.
+   - The Sensors are part of the Conveyor Belt System and provide input to the system.
+
+---
+
+**Use Case: Start Conveyor Belt**
+
+- **Brief Description:** The user starts the conveyor belt, which moves at a speed of 2 meters per second unless overridden by a stop command.
+  
+- **Event Flow:**
+  - **Basic Flow:** 
+    - The user sends a start command to the conveyor belt system.
+    - The system checks sensor status.
+    - If a sensor detects an object and the user has not pressed the stop button, the system starts the conveyor belt.
+  - **Alternative Flow:** 
+    - If a sensor detects an object and the user has pressed the stop button, the system does not start the conveyor belt.
+
+- **Use Case Scenario:** 
+  - The user sends a start command. The system checks sensors. If conditions are met, the conveyor belt moves at a speed of 2 meters per second.
+
+- **Special Requirements:** 
+  - The system must ensure that once started, the conveyor belt maintains a speed of 2 meters per second unless stopped by the user.
+
+- **Preconditions:** 
+  - The conveyor belt is not moving.
+
+- **Postconditions:** 
+  - The conveyor belt is moving at a speed of 2 meters per second if conditions are met.
+
+---
+
+**Use Case: Stop Conveyor Belt**
+
+- **Brief Description:** The user stops the conveyor belt, or it stops automatically if a stop condition is met.
+  
+- **Event Flow:**
+  - **Basic Flow:** 
+    - The user sends a stop command to the conveyor belt system.
+    - The system stops the conveyor belt.
+  - **Alternative Flow:** 
+    - If a sensor detects an object and the user has not pressed the stop button, the conveyor belt continues to run at a speed of 2 meters per second.
+
+- **Use Case Scenario:** 
+  - The user sends a stop command. The system stops the conveyor belt unless conditions dictate otherwise.
+
+- **Special Requirements:** 
+  - The system must be able to start and stop the conveyor belt based on user commands and sensor input.
+
+- **Preconditions:** 
+  - The conveyor belt is moving.
+
+- **Postconditions:** 
+  - The conveyor belt is not moving unless conditions dictate otherwise.
+
+---
+
+**Use Case: Monitor Conveyor Belt**
+
+- **Brief Description:** The sensors monitor the conveyor belt for objects and influence its operation.
+  
+- **Event Flow:**
+  - **Basic Flow:** 
+    - The sensors continuously monitor the conveyor belt for objects.
+    - If a sensor detects an object, the system checks user commands.
+    - If the user has not pressed the stop button, the conveyor belt continues to run at a speed of 2 meters per second; otherwise, it stops.
+
+- **Use Case Scenario:** 
+  - Sensors detect objects. The system checks user commands and acts accordingly.
+
+- **Special Requirements:** 
+  - The sensors must be able to detect objects on the conveyor belt and send signals to the system.
+
+- **Preconditions:** 
+  - The conveyor belt is moving.
+
+- **Postconditions:** 
+  - The system stops the conveyor belt if conditions dictate.
+
+---
+
+**Priority of Use Cases:**
+1. Start Conveyor Belt High
+2. Stop Conveyor Belt HIgh
+3. Monitor Conveyor Belt High
+
+
+---
+
+CTL/LTL Expressions
+1.Start Conveyor Belt Condition:
+CTL: AG((user_start_command_event & object_detected & !stop_command_active & belt_motor_is_stopped) -> AX belt_motor_is_running)
+2.Maintain Speed When Running:
+CTL: AG((belt_motor_is_running & !stop_command_active) -> belt_speed_is_2mps)
+3.User Stop Command Effect:
+CTL: AG(user_stop_command_event -> AX belt_motor_is_stopped)
+4.Monitoring Influences Running (Object Present, No Stop):
+LTL:G((object_detected & !stop_command_active & was_started_successfully) -> F belt_motor_is_running)
+5.Monitoring Influences Stopping (Object Present, Stop Active):
+CTL: AG((object_detected & stop_command_active) -> AX belt_motor_is_stopped)
+6.Safety/Integrity: Belt does not run if stop command is active:
+CTL: AG(stop_command_active -> !belt_motor_is_running)
+7.Liveness of Monitoring:
+LTL: G(system_is_operational -> F sensor_data_is_evaluated)
+

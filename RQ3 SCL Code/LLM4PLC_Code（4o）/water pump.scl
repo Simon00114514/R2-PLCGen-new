@@ -1,0 +1,59 @@
+PROGRAM WaterPumpControl
+
+// Declare variables
+VAR
+    state: INT := 0; // The state variable initialized to STATE 0 (IDLE)
+    startButton: BOOL; // Start button pressed status
+    stopButton: BOOL; // Stop button pressed status
+    highLevelSensor: BOOL; // High level sensor status
+    drainCompleted: BOOL; // Drain completion status
+    pump: BOOL := FALSE; // Pump status (ON/OFF), initialized to OFF
+    valve: BOOL := FALSE; // Valve status (OPEN/CLOSED), initialized to CLOSED
+END_VAR
+
+// Main Program Execution Block
+BEGIN
+
+    // State Transition Logic
+    CASE state OF
+
+        0: // STATE 0: IDLE
+            pump := FALSE;
+            valve := FALSE;
+            // Transition to STATE 1: FILLING
+            IF startButton AND NOT highLevelSensor THEN
+                state := 1;
+            END_IF;
+
+        1: // STATE 1: FILLING
+            pump := TRUE;
+            valve := FALSE;
+            // Transition to STATE 2: FULL
+            IF highLevelSensor THEN
+                state := 2;
+            END_IF;
+
+        2: // STATE 2: FULL
+            pump := FALSE;
+            valve := FALSE;
+            // Transition to STATE 0: IDLE
+            IF stopButton THEN
+                state := 0;
+            END_IF;
+
+        3: // STATE 3: DRAINING
+            pump := FALSE;
+            valve := TRUE;
+            // Transition to STATE 0: IDLE
+            IF drainCompleted THEN
+                state := 0;
+            END_IF;
+
+    END_CASE;
+
+    // Ensure pump is off if water level is high and prevent false starts
+    IF highLevelSensor THEN
+        pump := FALSE;
+    END_IF;
+
+END_PROGRAM

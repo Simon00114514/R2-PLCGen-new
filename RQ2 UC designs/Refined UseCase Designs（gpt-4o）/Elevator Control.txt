@@ -1,0 +1,92 @@
+
+These modifications ensure that the use case design and CTL/LTL expressions better reflect the original requirements and address potential exceptional conditions.To ensure that the refined use case design accurately reflects the original requirements regarding the elevator stopping at floors with active call buttons in the same direction of travel, we need to explicitly incorporate these conditions into both the use case description and the CTL/LTL expressions.
+
+### Updated Use Case Design
+
+#### Use Case Name: Elevator Control System
+
+1. **Actor**: User (Person using the elevator)
+
+2. **Use Case**: Control Elevator
+
+3. **System Boundary**: Elevator Control System
+
+4. **Relationships among Actors**: The user interacts directly with the Elevator Control System.
+
+#### Brief Description
+
+This use case describes the behavior of the Elevator Control System in response to user inputs and internal timers. The system controls a 5-floor elevator equipped with top and bottom limit switches on each floor. There are two timers: a 7-second timer for opening the elevator doors and a 10-second timer for reopening the doors if no buttons are pressed inside the elevator. The operation of the elevator is based on the current direction and the direction imposed by the up and down call buttons on each floor.
+
+#### Event Flow
+
+**Basic Flow**:
+- The user presses a button to call the elevator.
+- The system moves the elevator to the user's floor, considering the current direction and the direction imposed by the call buttons.
+- The system opens the elevator doors for 7 seconds.
+- The user enters the elevator and presses a button for the destination floor.
+- The system moves the elevator to the destination floor, considering the current direction and the direction imposed by the call buttons.
+- The system opens the elevator doors for 7 seconds.
+- If no buttons are pressed within 10 seconds after the doors close, the system reopens the doors.
+
+**Alternative Flows**:
+- If the user presses an up button and the elevator is moving down, the system continues to the bottom floor before moving up to the user's floor.
+- If the user presses a down button and the elevator is moving up, the system continues to the top floor before moving down to the user's floor.
+- **Directional Call Handling**:
+  - While moving up, if the elevator passes a floor with an active up call button, it stops at that floor.
+  - While moving down, if the elevator passes a floor with an active down call button, it stops at that floor.
+
+**Exception Flows**:
+- If the elevator encounters an obstacle or fault during operation, the system should immediately stop and issue an alert, while attempting to return to a safe state.
+
+#### Special Requirements
+
+- The system must accurately detect the elevator's position using the top and bottom limit switches on each floor.
+- The system must ensure safety during exceptional conditions.
+
+#### Preconditions
+
+- The elevator is in a state where it can receive and respond to user inputs.
+
+#### Postconditions
+
+- The elevator has moved to the user's desired floor and opened its doors.
+
+#### Priority
+
+- High (Critical for core functionality)
+
+#### Data Requirements
+
+- The system needs to know the current position and direction of the elevator, the state of the limit switches on each floor, and the state of the call buttons.
+
+#### Business Rules
+
+- The elevator must stop at a floor if the direction imposed by the call button on that floor matches the current direction of the elevator.
+
+### Adjusted CTL/LTL Expressions
+
+1. **Limit Switch Detection**:
+   - Invariant: `AG(System accurately detects the elevator's position using the top and bottom limit switches on each floor)`
+
+2. **Reopening Logic**:
+   - State Change Between Cycles: `AG((!Doors_Open & timer_10_seconds & !Button_Pressed) -> Doors_Open)`
+
+3. **Exception Handling**:
+   - Forbidden: `AG(! (System continues operation if an obstacle or fault is detected))`
+
+4. **Directional Call Handling**:
+   - Upward Movement: `AG((Elevator is moving up & Up call button is pressed at a floor) -> AF(Elevator stops at that floor))`
+   - Downward Movement: `AG((Elevator is moving down & Down call button is pressed at a floor) -> AF(Elevator stops at that floor))`
+
+5. **Basic Operation Logic**:
+   - Implication: `AG((User presses a button to call the elevator) -> AX(System moves the elevator to the user's floor, considering the current direction and the direction imposed by the call buttons))`
+   - State Change During Cycle: `AG((User enters the elevator & presses a button for the destination floor) -> AX(System moves the elevator to the destination floor, considering the current direction and the direction imposed by the call buttons))`
+
+6. **Door Operation**:
+   - Implication: `AG((Doors_Open & timer_7_seconds) -> AX(!Doors_Open))`
+
+7. **Reachability and Repeatability**:
+   - Reachability: `AF(Elevator can reach all floors from any initial floor)`
+   - Repeatability: `AG(AF(System can always eventually move the elevator to the user's desired floor and open its doors))`
+
+These updates ensure that the use case design and CTL/LTL expressions accurately reflect the requirement for the elevator to stop at floors with active call buttons in the same direction of travel.

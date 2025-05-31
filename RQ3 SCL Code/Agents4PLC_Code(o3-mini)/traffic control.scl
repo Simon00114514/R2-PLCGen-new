@@ -1,0 +1,91 @@
+PROGRAM TrafficLightController
+VAR
+    (* Input signals *)
+    PedButton    : BOOL;    (* Pedestrian button press *)
+    VehApproach  : BOOL;    (* Approaching vehicle detected *)
+    EmergVeh     : BOOL;    (* Emergency vehicle present *)
+
+    (* Output signals *)
+    Green        : BOOL;    (* Green light *)
+    Yellow       : BOOL;    (* Yellow light *)
+    Red          : BOOL;    (* Red light *)
+
+    (* Internal state: 0 = Green, 1 = Yellow, 2 = Red *)
+    State        : INT := 0;  
+
+    (* Timer instance of type TON for managing state durations *)
+    Tmr          : TON;       
+    (* Duration constants for each state *)
+    T_Green      : TIME := T#10s;  
+    T_Yellow     : TIME := T#3s;   
+    T_Red        : TIME := T#10s;
+END_VAR
+
+(* Determine the timer preset based on the current state *)
+CASE State OF
+    0: Tmr.PT := T_Green;   (* Green duration *)
+    1: Tmr.PT := T_Yellow;  (* Yellow duration *)
+    2: Tmr.PT := T_Red;     (* Red duration *)
+END_CASE;
+
+(* Start the timer each cycle when a state is active *)
+Tmr(IN := TRUE);
+
+(* Priority overrides *)
+IF EmergVeh THEN
+    (* Highest priority: force red immediately *)
+    State := 2;
+    Tmr(IN := FALSE);  (* Reset the timer so that a fresh duration is applied on next cycle *)
+ELSIF VehApproach THEN
+    (* If a vehicle is detected and not already in yellow, initiate a transition *)
+    IF State <> 1 THEN
+        State := 1;    (* Force yellow *)
+        Tmr(IN := FALSE);  (* Reset timer for yellow duration *)
+    ELSIF Tmr.Q THEN
+        (* Once yellow duration is complete, move to red *)
+        State := 2;
+        Tmr(IN := FALSE);  (* Reset timer for red duration *)
+    END_IF;
+ELSIF PedButton AND (NOT VehApproach) THEN
+    (* Pedestrian request only applies if there is no vehicle approaching *)
+    IF State = 2 THEN
+        State := 0;   (* When in red, switch immediately to green *)
+        Tmr(IN := FALSE);  (* Reset timer for green duration *)
+    END_IF;
+ELSE
+    (* Normal cycle transitions based on timer expiration *)
+    IF Tmr.Q THEN
+        CASE State OF
+            0:  (* Green completed, go to yellow *)
+                State := 1;
+            1:  (* Yellow completed, go to red *)
+                State := 2;
+            2:  (* Red completed, go to green *)
+                State := 0;
+        END_CASE;
+        Tmr(IN := FALSE);  (* Reset timer when state changes *)
+    END_IF;
+END_IF;
+
+(* Set outputs so that only one light is on at a time *)
+CASE State OF
+    0:
+        Green := TRUE;
+        Yellow := FALSE;
+        Red := FALSE;
+    1:
+        Green := FALSE;
+        Yellow := TRUE;
+        Red := FALSE;
+    2:
+        Green := FALSE;
+        Yellow := FALSE;
+        Red := TRUE;
+    ELSE
+        (* Failsafe: all off if state is invalid *)
+        Green := FALSE;
+        Yellow := FALSE;
+        Red := FALSE;
+END_CASE;
+
+END_PROGRAM

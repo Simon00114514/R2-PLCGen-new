@@ -1,0 +1,104 @@
+PROGRAM LiquidMixing
+VAR
+    // State definitions
+    state         : INT := 0;  // Current state: 0=IDLE, 1=POURING, 2=FULL, 3=MIXING/DISCHARGE
+    prevState     : INT := 0;  // Previous state, for any state-dependent logic
+    liquidLevel   : INT := 0;  // Current liquid level (updated externally)
+    maxLevel      : INT := 100;  // Maximum liquid level (can be adjusted as needed)
+    
+    // Operator inputs
+    S1            : BOOL;      // Button for pouring liquid 1
+    S2            : BOOL;      // Button for pouring liquid 2
+    S3            : BOOL;      // Button to initiate mixing/discharge
+    
+    // Outputs
+    M             : BOOL := FALSE;  // Stirring motor (TRUE=ON, FALSE=OFF)
+    V1            : BOOL := FALSE;  // Discharge valve (TRUE=OPEN, FALSE=CLOSED)
+    
+    // Internal flags for pouring actions
+    pourLiquid1   : BOOL := FALSE;  
+    pourLiquid2   : BOOL := FALSE;
+    
+    // Flag for discharge completion (assumed to be determined by external logic or tank empty condition)
+    dischargeComplete : BOOL := FALSE;  
+END_VAR
+
+// *********************************************************************
+// State Transitions - Priority given to Mixing/Discharge (State 3)
+// *********************************************************************
+
+// Global transition: In any state (except when already in MIXING/DISCHARGE) if S3 is pressed, switch to State 3.
+IF S3 AND (state <> 3) THEN
+    prevState := state;
+    state := 3;
+END_IF
+
+// *********************************************************************
+// Finite State Machine (FSM) Implementation
+// *********************************************************************
+CASE state OF
+
+    // STATE 0: IDLE
+    0:
+        // In idle, operator input is accepted but no automatic pouring.
+        // Transition: If S1 or S2 is pressed and tank is not full, start pouring.
+        IF ((S1 OR S2) AND (liquidLevel < maxLevel)) THEN
+            state := 1;
+        END_IF;
+        
+        // Outputs for IDLE state
+        pourLiquid1 := FALSE;
+        pourLiquid2 := FALSE;
+        M           := FALSE;
+        V1          := FALSE;
+
+    // STATE 1: POURING
+    1:
+        // In pouring state, allow pouring of either liquid based on operator input.
+        pourLiquid1 := S1;
+        pourLiquid2 := S2;
+        
+        // Activate the stirring motor during pouring.
+        M           := TRUE;
+        V1          := FALSE;
+        
+        // Transition: When the tank is full (liquidLevel reaches/exceeds maxLevel), switch to FULL state.
+        IF (liquidLevel >= maxLevel) THEN
+            state := 2;
+        END_IF;
+
+    // STATE 2: FULL
+    2:
+        // Full tank: Automatically disable pouring.
+        pourLiquid1 := FALSE;
+        pourLiquid2 := FALSE;
+        
+        // As per requirement, pouring stops. The stirring motor is turned off (stirring only required during mixing).
+        M           := FALSE;
+        V1          := FALSE;
+        
+        // Transition: Optionally, if the tank is discharged (liquid level becomes 0), return to idle.
+        IF (liquidLevel = 0) THEN
+            state := 0;
+        END_IF;
+
+    // STATE 3: MIXING/DISCHARGE
+    3:
+        // Immediately cancel any pouring actions.
+        pourLiquid1 := FALSE;
+        pourLiquid2 := FALSE;
+        
+        // Ensure stirring motor is ON for mixing and open the discharge valve.
+        M           := TRUE;
+        V1          := TRUE;
+        
+        // Transition: After discharge operation completes (assuming tank is empty when liquidLevel is 0), return to idle.
+        IF (liquidLevel = 0) THEN
+            state := 0;
+        END_IF;
+
+    // Default: For any undefined state, reset to IDLE.
+    ELSE
+        state := 0;
+        
+END_CASE;

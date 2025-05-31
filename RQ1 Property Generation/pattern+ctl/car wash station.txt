@@ -1,0 +1,30 @@
+
+1. **Pattern Type: Implication**
+   - **Formal requirement:** AG(({PLC_END} AND (car_detected AND !person_detected AND idle_state)) -> (current_stage_is_start_op))
+   - **Final CTL Specification:** 
+     - {1}: AG((car_detected & !person_detected & idle_state) -> current_stage_is_start_op);
+
+2. **Pattern Type: Implication**
+   - **Formal requirement:** AG(({PLC_END} AND (current_stage_is_start_op)) -> (current_stage_is_spray AND spray_time_met))
+   - **Final CTL Specification:** 
+     - {2}: AG(current_stage_is_start_op -> (current_stage_is_spray & spray_time_met));
+
+3. **Pattern Type: Implication**
+   - **Formal requirement:** AG(({PLC_END} AND (current_stage_is_spray AND spray_time_met)) -> (current_stage_is_scrub))
+   - **Final CTL Specification:** 
+     - {3}: AG((current_stage_is_spray & spray_time_met) -> current_stage_is_scrub);
+
+4. **Pattern Type: Implication**
+   - **Formal requirement:** AG(({PLC_END} AND (current_stage_is_scrub)) -> (current_stage_is_dry AND dry_time_met))
+   - **Final CTL Specification:** 
+     - {4}: AG(current_stage_is_scrub -> (current_stage_is_dry & dry_time_met));
+
+5. **Pattern Type: Implication**
+   - **Formal requirement:** AG(({PLC_END} AND (current_stage_is_dry AND dry_time_met)) -> (car_is_ready_to_leave))
+   - **Final CTL Specification:** 
+     - {5}: AG((current_stage_is_dry & dry_time_met) -> car_is_ready_to_leave);
+
+6. **Pattern Type: Statechange-Betweencycles**
+   - **Formal requirement:** G(({PLC_END} AND (car_has_left_statio}) AND X( [ NOT {PLC_END} U ({PLC_END} AND ({2})) ] )) --> X( [ NOT {PLC_END} U ({PLC_END} AND ({3})) ] ))
+   - **Final LTL Specification:** 
+     - {5}: G((car_has_left_station) -> X idle_state);

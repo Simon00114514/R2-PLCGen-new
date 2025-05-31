@@ -1,0 +1,331 @@
+1. Use Case Name:Process Floor Call Request
+
+2. Actor:
+• Building User (external caller using specified floor panels)
+• Passenger (internal user operating the elevator’s call panel)
+
+3. Use Case:
+This use case registers call requests generated from floor buttons (up/down) and the elevator’s internal call panel. It logs the requested floor and direction, then passes the call to the movement control module.
+
+4. System Boundary:
+IEC 61131-3 Structured Text Elevator Control Program
+
+5. Relationships Among Actors:
+• Building User interacts with floor call buttons.
+• Passenger interacts with the internal call panel.
+• Both combine to generate directional call requests that feed into the overall elevator operation.
+
+6. Detailed Descriptive Information for Each Use Case:
+
+Use Case: Process Floor Call Request – UC1
+
+(1) Brief Description:
+Registers floor call requests by detecting button presses from external panels and internal panels, logs the floor and desired direction, and queues the request for elevator movement.
+
+(2) Preconditions:
+1. The control program is active and monitoring button signals.
+2. Sensors for external and internal call buttons are operational.
+
+(3) Event Flow:
+
+Basic Flow (Event Flow):
+1. A Building User or Passenger presses a call button.
+2. The system detects the button press.
+3. The requested floor and associated direction (up or down) are recorded.
+4. The request is queued in the call queue.
+5. The movement control module is notified to update its request list.
+6. End event.
+
+Alternative Flow (Alternative Flow):
+Alternate Flow 1 – Button Signal Noise:
+a. If a transient signal is detected, the input is ignored.
+b. A debounce check is performed.
+c. If confirmed, the request is processed as in the Basic Flow.
+d. End alternative flow.
+
+Alternate Flow 2 – Simultaneous Conflicting Signals:
+a. If both up and down buttons are activated concurrently on a floor, an error is logged.
+b. The system prioritizes the request matching the current elevator movement.
+c. The conflicting request is deferred until the elevator changes direction.
+d. End alternative flow.
+
+(4) Postconditions:
+• The call queue is updated with the floor and direction.
+• The control module is ready to schedule the elevator stop.
+• A log entry is created with the request details.
+
+(5) Use Case Scenario:
+A user presses a button and the call is successfully recorded along with its directional intent. In cases of noise or conflict, the system employs a debounce mechanism or logs an error before proceeding.
+
+(6) Special Requirements:
+• Rapid registration of the call request.
+• Debounce algorithms to filter out noise.
+• Priority adjustments when simultaneous requests are received.
+
+7. Priority of Use Case:
+UC1: Process Floor Call Request – High
+
+8. Data Requirements:
+[D-1]: Call Queue Data Structure containing floor numbers, requested direction, timestamp, and source indicator.
+
+9. Business Rules (Optional):
+[B-1]: If multiple requests occur, priority is given to requests aligning with the current elevator direction.
+
+────────────────────────────
+1. Use Case Name:
+Manage Elevator Movement
+
+2. Actor:
+• Elevator Control System (internal logic triggered by sensor data and call requests)
+• Building User / Passenger (indirectly by generating call inputs)
+
+3. Use Case:
+This use case directs elevator movement based on the current direction, ensuring that during upward travel the elevator stops at any floor where an up button has been pressed, and during downward travel it stops where a down button has been pressed. It utilizes sensor input from floor limit switches for arrival verification.
+
+4. System Boundary:
+IEC 61131-3 Structured Text Elevator Control Program
+
+5. Relationships Among Actors:
+• Receives directional call data from UC1.
+• Interfaces with floor limit switch sensors for type and floor verification.
+• Collaborates with door control use case to commence door operations on arrival.
+
+6. Detailed Descriptive Information for Each Use Case:
+
+Use Case: Manage Elevator Movement – UC2 (Revised)
+
+(1) Brief Description:
+Controls the elevator’s travel between floors by selecting the next stop based on directional requests. When moving upward, it stops only at floors with active up button requests; when moving downward, it stops only at floors with active down button requests.
+
+(2) Preconditions:
+1. The call queue contains valid floor requests with associated direction indicators.
+2. All floor limit switch sensors are functioning properly.
+3. The current floor position and elevator direction are known.
+
+(3) Event Flow:
+
+Basic Flow (Event Flow):
+1. The system identifies the elevator’s current direction.
+2. If the elevator is moving upward:
+  a. The call queue is scanned for active up button requests on floors above the current position.
+  b. The next immediate floor (the smallest numbered floor above the current floor with an active up request) is selected.
+  c. The elevator is commanded to move upward.
+  d. As the elevator nears the selected floor, the floor’s limit switch is monitored.
+  e. On activation of the limit switch, the elevator stops, the related request is cleared, and the door operation processes are triggered.
+3. If the elevator is moving downward:
+  a. The call queue is scanned for active down button requests on floors below the current position.
+  b. The closest floor (the highest numbered floor below the current floor with an active down request) is selected.
+  c. The elevator is commanded to move downward.
+  d. As the elevator nears the floor, the corresponding floor limit switch is monitored.
+  e. On activation, the elevator stops, the request is removed from the queue, and door operations are initiated.
+4. If no matching directional call is found:
+  a. The system checks for any pending call in the opposite direction.
+  b. If found, the elevator changes direction and follows the respective process.
+  c. Otherwise, the system enters a standby state awaiting new call requests.
+5. End event.
+
+Alternative Flow (Alternative Flow):
+Alternate Flow 1 – No Valid Directional Call:
+a. If there are no up requests while moving upward or down requests while moving downward, the system inspects if calls exist in the opposite direction.
+b. If such calls exist, the elevator changes direction.
+c. If none are present, the elevator holds its current position until a new request arrives.
+d. End alternative flow.
+
+Alternate Flow 2 – Sensor or Limit Switch Failure:
+a. If a floor arrival is not confirmed due to sensor/limit switch malfunction, the elevator issues a safe-stop command.
+b. An error is logged and the system enters emergency mode requiring manual intervention.
+c. End alternative flow.
+
+(4) Postconditions:
+• The elevator stops at the designated floor corresponding to the matched directional request.
+• The fulfilled call request is removed from the call queue.
+• The door control use case is activated.
+• The elevator’s current position and direction are updated.
+
+(5) Use Case Scenario:
+During upward transit, the system continuously monitors for any active up button request above the current floor, and similarly for downward transit. When such a request is detected, the elevator is commanded to stop accordingly and the request is cleared once the stop is confirmed via the floor’s limit switch.
+
+(6) Special Requirements:
+• Real-time evaluation of directional call requests.
+• Accurate synchronization with floor sensor inputs for reliable stopping.
+• Priority in processing calls that match the present elevator motion.
+• Immediate emergency handling in case of sensor anomalies.
+
+(7) Priority of Use Case:
+UC2: Manage Elevator Movement – High
+
+(8) Data Requirements:
+[D-2]: Current Elevator Status including the current floor, travel direction, and sensor state.
+[D-3]: Movement Command Log capturing issued movement orders and confirmed stops.
+
+(9) Business Rules (Optional):
+[B-2]: The elevator must always halt for an active up button request during upward movement and for an active down button request during downward movement, whenever such a request exists.
+
+────────────────────────────
+1. Use Case Name:
+Control Elevator Door Operation
+
+2. Actor:
+• Elevator Control System (internal door management routine)
+• Passenger (affected by door state changes)
+
+3. Use Case:
+This use case manages the door operations after arriving at a floor. It opens the door for a fixed duration of 7 seconds upon arrival and then closes it, unless overridden by safety or sensor input.
+
+4. System Boundary:
+IEC 61131-3 Structured Text Elevator Control Program
+
+5. Relationships Among Actors:
+• Triggered by the stop event from the movement control use case.
+• Affects passenger experience by controlling door open/close states.
+• Provides input for the inactivity monitoring use case (door reopen).
+
+6. Detailed Descriptive Information for Each Use Case:
+
+Use Case: Control Elevator Door Operation – UC3
+
+(1) Brief Description:
+Manages the opening of the elevator door for 7 seconds upon floor arrival and then closes it. The process may be interrupted if a safety condition is detected.
+
+(2) Preconditions:
+1. Elevator has successfully arrived at a designated floor.
+2. Door mechanism and its sensors are operational.
+
+(3) Event Flow:
+
+Basic Flow (Event Flow):
+1. Following floor arrival, the door is commanded to open.
+2. A 7-second timer is initiated concurrently.
+3. After 7 seconds, the door is commanded to close.
+4. End event.
+
+Alternative Flow (Alternative Flow):
+Alternate Flow 1 – Premature Door Closure:
+a. If a safety sensor or fault detection triggers an override while the door is open, a close command is issued immediately.
+b. The system logs the override event and recalibrates the timer if needed.
+c. End alternative flow.
+
+(4) Postconditions:
+• The door remains open for 7 seconds and then closes, unless a safety override occurs.
+• The door state is updated in the control system.
+• The closure event signals subsequent monitoring for internal button activity (see UC4).
+
+(5) Use Case Scenario:
+After landing on a floor, the door opens automatically and remains open for the set duration unless a safety-related event necessitates an earlier closure, in which case the timer is adjusted.
+
+(6) Special Requirements:
+• The door open timer must adhere strictly to the 7-second duration.
+• A safety override must immediately cancel the timer.
+• All door operations are logged for maintenance.
+
+(7) Priority of Use Case:
+UC3: Control Elevator Door Operation – High
+
+(8) Data Requirements:
+[D-4]: Door Timer Record including start time, duration, and end time of each operation cycle.
+[D-5]: Door Sensor Status data for real-time monitoring of door positions.
+
+(9) Business Rules (Optional):
+[B-3]: The door shall remain open for 7 seconds unless a safety override condition forces an immediate closure.
+
+────────────────────────────
+1. Use Case Name:
+Reopen Elevator Door on Inactivity
+
+2. Actor:
+• Elevator Control System (internal timer routine)
+• Passenger (awaiting door response)
+
+3. Use Case:
+This use case handles situations in which no internal button press is detected within 10 seconds after the door has closed. Under such conditions, the door is automatically reopened to prompt further passenger input.
+
+4. System Boundary:
+IEC 61131-3 Structured Text Elevator Control Program
+
+5. Relationships Among Actors:
+• Triggered following the door closure from UC3.
+• Monitors internal button sensors continuously during the idle period.
+• Extends the door operation cycle when inactivity is detected.
+
+6. Detailed Descriptive Information for Each Use Case:
+
+Use Case: Reopen Elevator Door on Inactivity – UC4
+
+(1) Brief Description:
+If no internal floor request is detected within 10 seconds after the door closes, the system reopens the door to prompt passenger input.
+
+(2) Preconditions:
+1. The door has closed as per the normal cycle.
+2. No internal call button press has been registered within the 10-second window following door closure.
+3. Internal sensors for button press detection are operational.
+
+(3) Event Flow:
+
+Basic Flow (Event Flow):
+1. Immediately after door closure, a 10-second inactivity timer is started.
+2. The system monitors internal buttons during this period.
+3. If no button press is detected by the end of 10 seconds, the door is automatically commanded to reopen.
+4. End event.
+
+Alternative Flow (Alternative Flow):
+Alternate Flow 1 – Button Press Detected During Timer:
+a. If an internal button is pressed before the 10-second timer expires, the inactivity timer is canceled.
+b. The door remains closed and the new request is processed through UC1.
+c. End alternative flow.
+
+(4) Postconditions:
+• If inactivity persists, the door is reopened.
+• If a button press occurs within 10 seconds, the system continues normal operation.
+• The inactivity timer is reset after each cycle.
+
+(5) Use Case Scenario:
+Upon door closure, the system briefly awaits any further passenger input. Lack of input triggers an automatic door reopening to invite a new floor selection.
+
+(6) Special Requirements:
+• The 10-second timer must be precise and initiated immediately after door closure.
+• Sensor monitoring for internal requests must remain uninterrupted during this period.
+• All door reopen events are logged for system diagnostics.
+
+(7) Priority of Use Case:
+UC4: Reopen Elevator Door on Inactivity – Medium
+
+(8) Data Requirements:
+[D-6]: Inactivity Timer Log capturing start and stop times.
+[D-7]: Internal Button Press Records with timestamps during the inactivity period.
+
+(9) Business Rules (Optional):
+[B-4]: On reopening due to inactivity, the cycle resets and any subsequent button press restarts the door control process.
+
+────────────────────────────
+Summary of Use Case Priorities:
+• UC1: Process Floor Call Request – High
+• UC2: Manage Elevator Movement – High
+• UC3: Control Elevator Door Operation – High
+• UC4: Reopen Elevator Door on Inactivity – Medium
+
+────────────────────────────
+### CTL Specifications
+
+1. **Pattern Type: pattern-implication**
+   - CTL Specification: `AG((Elevator_Moving_Up & Up_Call_Button_Active | Elevator_Moving_Down & Down_Call_Button_Active) -> Elevator_Stops_At_Floor);`
+
+2. **Pattern Type: timed-trigger**
+   - Ensure the door opens for exactly 7 seconds upon arrival at a floor, and then closes:
+     - CTL Specification: `AG((Elevator_Stops_At_Floor) -> A[ !Doors_Open U (Timer < 7 & Doors_Open) ]);`
+     - CTL Specification: `AG((Doors_Open & Timer >= 7) -> Doors_Closing);`
+     - CTL Specification: `AG((Doors_Closing & Timer >= 7) -> Doors_Closed);`
+
+3. **Pattern Type: timed-trigger**
+   - Ensure the door reopens if no buttons are pressed within 10 seconds after closing:
+     - CTL Specification: `AG((Doors_Closed & Timer >= 10 & !Button_Pressed) -> Door_Reopen);`
+
+4. **Pattern Type: pattern-invariant**
+   - CTL Specification: `AG(!(Doors_Open & Doors_Closed));`
+
+5. **Pattern Type: pattern-forbidden**
+   - CTL Specification: `AG(!(Elevator_Moving_Up & Top_Limit_Switch_Activated | Elevator_Moving_Down & Bottom_Limit_Switch_Activated));`
+
+6. **Pattern Type: pattern-implication**
+   - CTL Specification: `AG(Button_Pressed -> Request_Stored);`
+
+This refined requirements analysis organizes the interactions between physical inputs, elevator movement, and door control. Event flows and alternative paths are clearly delineated. Any ambiguities in the original requirement have been addressed by introducing explicit preconditions, error handling measures, and proper priority assignments.

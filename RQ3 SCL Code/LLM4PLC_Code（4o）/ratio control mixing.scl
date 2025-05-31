@@ -1,0 +1,47 @@
+PROGRAM ReactantMixControl
+VAR
+    state: INT; // THE STATE VARIABLE
+    prevState: INT; // THE PREVIOUS STATE VARIABLE
+    reactant1_flow: INT; // THE FLOW RATE OF REACTANT 1
+    reactant2_flow: INT; // THE FLOW RATE OF REACTANT 2
+    inputRateControl: INT; // CONTROL SIGNALS REPRESENTED BY INTEGERS: 0 = OFF, 1 = MAINTAIN_CURRENT_RATE, 2 = ADJUST_RATE
+END_VAR
+
+// INITIALIZE VARIABLES
+state := 0;
+prevState := -1;
+reactant1_flow := 0;
+reactant2_flow := 0;
+inputRateControl := 0; // START WITH INPUT RATE OFF
+
+// MAIN PROGRAM LOOP
+REPEAT
+    CASE state OF
+        0: // STATE 0: INITIALIZE
+            inputRateControl := 0; // OFF
+            state := 1; // TRANSITION TO STATE 1
+
+        1: // STATE 1: CHECK_RATIO
+            IF (reactant1_flow * 100) > (reactant2_flow * 102) THEN
+                // MORE THAN 102: REDUCE INPUT RATE
+                inputRateControl := 2; // ADJUST_RATE
+                state := 2; // TRANSITION TO STATE 2
+            ELSIF (reactant1_flow * 100) < (reactant2_flow * 98) THEN
+                // LESS THAN 98: INCREASE INPUT RATE
+                inputRateControl := 2; // ADJUST_RATE
+                state := 2; // TRANSITION TO STATE 2
+            ELSE
+                // WITHIN ([98, 102]): MAINTAIN
+                inputRateControl := 1; // MAINTAIN_CURRENT_RATE
+                state := 1; // CONTINUE IN STATE 1
+            END_IF;
+
+        2: // STATE 2: ADJUST_INPUT_RATE
+            // HERE WE WOULD ADJUST THE RATE PHYSICALLY, SIMULATED HERE
+            // TRANSITION BACK TO CHECK_RATIO
+            state := 1;
+    END_CASE;
+UNTIL FALSE // OR SOME TERMINATION CONDITION
+END_REPEAT;
+
+END_PROGRAM

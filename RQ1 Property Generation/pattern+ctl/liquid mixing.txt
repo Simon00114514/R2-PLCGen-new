@@ -1,0 +1,36 @@
+Agent: Certainly! Here are the revised CTL specifications with the requested changes:
+
+### Use Case: [UC-1] Pouring Liquid
+
+1. **Pattern Type: Implication**
+   - **CTL Specification:** `AG((tank_not_full) -> (button_S1_enabled & button_S2_enabled));`
+
+2. **Pattern Type: Forbidden State**
+   - **CTL Specification:** `AG(!((button_S1_enabled | button_S2_enabled) & tank_full));`
+
+3. **Pattern Type: Statechange-betweencycles**
+   - **LTL Specification:** `G((button_S1_pressed & !tank_full) -> X liquid_1_pouring_active);`
+
+4. **Pattern Type: Statechange-betweencycles**
+   - **LTL Specification:** `G((button_S1_pressed & !tank_full) -> X liquid_2_pouring_active);`
+
+5. **Pattern Type: Statechange-betweencyclese**
+   - **LTL Specification:** `G((button_S3_pressed) -> X (!button_S1_pressed & button_S2_pressed & motor_M & F valve_V1_open);`
+
+### Use Case: [UC-2] Preparing Mixed Solution
+
+1. **Pattern Type: Implication**
+   - **CTL Specification:** `AG((tank_contains_unmixed_solutions) -> button_S3_enabled);`
+
+2. **Pattern Type: Implication**
+   - **CTL Specification:** `AG((button_S3_pressed) -> (motor_M_active & AF(valve_V1_open)));`
+
+3. **Pattern Type: Forbidden State**
+   - **CTL Specification:** `AG(!(button_S3_enabled & tank_empty));`
+
+4. **Pattern Type: Reachability**
+   - **CTL Specification:** `EF(tank_empty & mixed_solution_ready);`
+
+5. **Pattern Type: Forbidden State**
+   - **CTL Specification:** `AG(!(tank_empty & button_S3_pressed));`
+

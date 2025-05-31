@@ -1,0 +1,60 @@
+PROGRAM LiquidMixing
+VAR_INPUT
+    S1 : BOOL; // 按钮S1，用于倾倒液体1
+    S2 : BOOL; // 按钮S2，用于倾倒液体2
+    S3 : BOOL; // 按钮S3，用于制备混合溶液
+    V1_Input : BOOL; // 阀门V1的输入信号，用于排放液体
+END_VAR
+
+VAR_OUTPUT
+    M : BOOL; // 搅拌电机M
+    V1_Output : BOOL; // 阀门V1的输出控制信号
+END_VAR
+
+VAR
+    isFull : BOOL := FALSE; // 罐是否已满的标志
+    isPouring1 : BOOL := FALSE; // 是否正在倾倒液体1
+    isPouring2 : BOOL := FALSE; // 是否正在倾倒液体2
+    tank : REAL := 0.0; // 罐内液体的量，用实数表示
+END_VAR
+
+CONST
+    MAX_TANK_LEVEL : REAL := 10; // 罐的最大容量
+END_CONST
+
+// 更新罐是否已满的状态
+isFull := tank >= MAX_TANK_LEVEL;
+
+// 倾倒液体1的逻辑
+IF S1 AND NOT isFull THEN
+    isPouring1 := TRUE;
+    tank := tank + 1.0; // 增加罐内液体量
+ELSE
+    isPouring1 := FALSE;
+END_IF;
+
+// 倾倒液体2的逻辑
+IF S2 AND NOT isFull THEN
+    isPouring2 := TRUE;
+    tank := tank + 1.0; // 增加罐内液体量
+ELSE
+    isPouring2 := FALSE;
+END_IF;
+
+
+// 制备混合溶液的逻辑
+IF S3 AND isFull THEN
+    M := TRUE;
+    V1_Output := TRUE; // 开启阀门排放液体
+ELSE
+    V1_Output := FALSE; // 如果S3没有被按下或罐子不满，确保阀门关闭
+END_IF;
+
+// 排放液体的逻辑
+IF V1_Input THEN
+    tank := 0.0; // 清空罐内液体
+    isFull := FALSE; // 更新罐是否已满的状态
+    V1_Output := FALSE; // 关闭阀门
+END_IF;
+
+END_PROGRAM

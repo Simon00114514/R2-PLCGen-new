@@ -1,0 +1,88 @@
+PROGRAM
+// Declare the variables
+VAR
+    state: Int; // Current state
+    prevState: Int; // Previous state
+    timeInState: Time; // Time tracking in the current state
+    MOTOR1: Bool; // Output control for Motor 1
+    MOTOR2: Bool; // Output control for Motor 2
+    MOTOR3: Bool; // Output control for Motor 3
+    systemInitialized: Bool; // To check if the system is initialized
+    externalReset: Bool; // External reset signal for state 5
+END_VAR
+
+// Initial state setup
+IF NOT systemInitialized THEN
+    state := 0;
+    prevState := 0;
+    timeInState := T#0s;
+    MOTOR1 := FALSE;
+    MOTOR2 := FALSE;
+    MOTOR3 := FALSE;
+ELSE
+    // State machine
+    CASE state OF
+        0: // STATE 0: INITIALIZE
+            MOTOR1 := FALSE;
+            MOTOR2 := FALSE;
+            MOTOR3 := FALSE;
+            IF systemInitialized THEN
+                prevState := state;
+                state := 1;
+                timeInState := T#0s;
+            END_IF;
+        
+        1: // STATE 1: START MOTOR 1
+            MOTOR1 := TRUE;
+            MOTOR2 := FALSE;
+            MOTOR3 := FALSE;
+            IF timeInState >= T#3s THEN
+                prevState := state;
+                state := 2;
+                timeInState := T#0s;
+            END_IF;
+
+        2: // STATE 2: DELAY AFTER MOTOR 1
+            MOTOR1 := TRUE;
+            MOTOR2 := FALSE;
+            MOTOR3 := FALSE;
+            IF timeInState >= T#2s THEN
+                prevState := state;
+                state := 3;
+                timeInState := T#0s;
+            END_IF;
+
+        3: // STATE 3: START MOTOR 2
+            MOTOR1 := FALSE;
+            MOTOR2 := TRUE;
+            MOTOR3 := FALSE;
+            IF timeInState >= T#3s THEN
+                prevState := state;
+                state := 4;
+                timeInState := T#0s;
+            END_IF;
+
+        4: // STATE 4: DELAY AFTER MOTOR 2
+            MOTOR1 := FALSE;
+            MOTOR2 := TRUE;
+            MOTOR3 := FALSE;
+            IF timeInState >= T#2s THEN
+                prevState := state;
+                state := 5;
+                timeInState := T#0s;
+            END_IF;
+
+        5: // STATE 5: START MOTOR 3
+            MOTOR1 := FALSE;
+            MOTOR2 := FALSE;
+            MOTOR3 := TRUE;
+            IF externalReset THEN
+                prevState := state;
+                state := 0;
+                timeInState := T#0s;
+            END_IF;
+    END_CASE;
+
+    // Update time in the current state
+    timeInState := timeInState + T#100ms; // Assuming this cycle time for update
+END_IF;

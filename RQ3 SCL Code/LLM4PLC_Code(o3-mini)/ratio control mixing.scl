@@ -1,0 +1,59 @@
+PROGRAM MixControl
+  VAR
+    state      : INT := 0;         // 0=INITIALIZE, 1=INCREASE, 2=MAINTAIN, 3=DECREASE
+    ratio      : INT;              // Measured ratio from sensor (e.g., 100 corresponds to 100:1)
+    RateCmd    : INT := 0;         // Output command for reactant feed adjustment.
+                                   //   Positive value: increase feed, 0: hold, negative value: decrease feed.
+    IncreaseVal: INT := 10;        // Command value for increasing the feed rate.
+    DecreaseVal: INT := -10;       // Command value for decreasing the feed rate.
+  END_VAR
+
+  (* State Machine Implementation *)
+  IF state = 0 THEN   (* INITIALIZE *)
+    // Upon initialization, check the measured ratio and transition immediately as appropriate.
+    IF ratio < 98 THEN
+       state := 1;              (* Transition to INCREASE_REACTANT_INPUT_RATE *)
+       RateCmd := IncreaseVal;  (* Command to increase the input rate *)
+    ELSIF (ratio >= 98) AND (ratio <= 102) THEN
+       state := 2;              (* Transition to MAINTAIN_REACTANT_INPUT_RATE *)
+       RateCmd := 0;            (* No adjustment needed *)
+    ELSIF ratio > 102 THEN
+       state := 3;              (* Transition to DECREASE_REACTANT_INPUT_RATE *)
+       RateCmd := DecreaseVal;  (* Command to decrease the input rate *)
+    END_IF;
+
+  ELSIF state = 1 THEN   (* INCREASE_REACTANT_INPUT_RATE *)
+    // When in increasing state, continuously monitor the ratio.
+    IF (ratio >= 98) AND (ratio <= 102) THEN
+       state := 2;              (* Transition to MAINTAIN_REACTANT_INPUT_RATE *)
+       RateCmd := 0;            (* Command to hold the input rate *)
+    ELSE
+       (* If ratio is still below 98, remain in state 1 and continue increasing the rate *)
+       RateCmd := IncreaseVal;  
+    END_IF;
+
+  ELSIF state = 2 THEN   (* MAINTAIN_REACTANT_INPUT_RATE *)
+    // When maintaining, check if the ratio deviates from the acceptable range.
+    IF ratio < 98 THEN
+       state := 1;              (* Transition to INCREASE_REACTANT_INPUT_RATE *)
+       RateCmd := IncreaseVal;  (* Command to increase the input rate *)
+    ELSIF ratio > 102 THEN
+       state := 3;              (* Transition to DECREASE_REACTANT_INPUT_RATE *)
+       RateCmd := DecreaseVal;  (* Command to decrease the input rate *)
+    ELSE
+       RateCmd := 0;            (* Remain in hold mode *)
+    END_IF;
+
+  ELSIF state = 3 THEN   (* DECREASE_REACTANT_INPUT_RATE *)
+    // When decreasing, continuously check the ratio.
+    IF (ratio >= 98) AND (ratio <= 102) THEN
+       state := 2;              (* Transition to MAINTAIN_REACTANT_INPUT_RATE *)
+       RateCmd := 0;            (* Command to hold the input rate *)
+    ELSE
+       // If ratio is still above 102, remain in state 3 and continue to decrease the rate.
+       RateCmd := DecreaseVal;
+    END_IF;
+    
+  END_IF;
+
+END_PROGRAM

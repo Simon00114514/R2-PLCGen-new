@@ -1,0 +1,35 @@
+// Variable Declarations
+VAR
+    state: INT := 0; // The state variable
+    prevState: INT := 0; // The previous state variable
+    load: REAL; // The load sensor value
+    beltSpeed: REAL := INITIAL_SPEED; // The conveyor belt speed
+    load_lower_threshold: REAL; // Lower threshold for load
+    load_upper_threshold: REAL; // Upper threshold for load
+    SPEED_INCREMENT: REAL; // Value to increment speed
+    SPEED_DECREMENT: REAL; // Value to decrement speed
+    INITIAL_SPEED: REAL; // Initial speed of the belt
+END_VAR
+
+// Main Logic
+IF state = 0 THEN // INITIALIZE
+    IF load < load_lower_threshold THEN
+        state := 1; // Transition to INCREASE SPEED
+    ELSIF load > load_upper_threshold THEN
+        state := 2; // Transition to DECREASE SPEED
+    ELSE
+        state := 3; // Transition to MAINTAIN SPEED
+    END_IF
+    
+ELSIF state = 1 THEN // INCREASE SPEED
+    beltSpeed := beltSpeed + SPEED_INCREMENT; // Increase the belt speed
+    state := 0; // After adjusting speed, go back to INITIALIZE
+    
+ELSIF state = 2 THEN // DECREASE SPEED
+    beltSpeed := beltSpeed - SPEED_DECREMENT; // Decrease the belt speed
+    state := 0; // After adjusting speed, go back to INITIALIZE
+    
+ELSIF state = 3 THEN // MAINTAIN SPEED
+    // No change in beltSpeed
+    state := 0; // Go back to INITIALIZE
+END_IF

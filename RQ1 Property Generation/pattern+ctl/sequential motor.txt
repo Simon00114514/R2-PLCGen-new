@@ -1,0 +1,32 @@
+Agent: To translate the patterns design into CTL or LTL logic specifications for the Sequential Motor Control System, follow these steps:
+
+1. **Variable Design:**
+   - Define separate variables for each motor's start and stop states to ensure mutual exclusivity.
+   - Example variables: `Motor1_Start`, `Motor1_Stop`, `Motor2_Start`, `Motor2_Stop`, `Motor3_Start`, `Motor3_Stop`.
+
+2. **Property Specifications:**
+   - **Sequential Start:** Ensure motors start in sequence with delays.
+     - CTL: `AG(Motor1_Stop -> AX(Motor2_Start))`
+     - CTL: `AG(Motor2_Stop -> AX(Motor3_Start))`
+   - **Mutual Exclusivity:** No two motors should start simultaneously.
+     - CTL: `AG(!(Motor1_Start & Motor2_Start))`
+     - CTL: `AG(!(Motor2_Start & Motor3_Start))`
+     - CTL: `AG(!(Motor1_Start & Motor3_Start))`
+   - **Completion within Time Constraint:** Ensure the sequence completes within 10 seconds.
+     - CTL: AG(timer = 10)
+   - **Error Handling:** If a motor fails to start, halt operation.
+     - CTL: `AG((Motor1_Error | Motor2_Error | Motor3_Error) -> AX(Operation_Halt))`
+
+3. **Syntax Rules:**
+   - Use CTL for branching-time properties and LTL for linear-time constraints.
+   - Ensure no mixing of CTL and LTL in a single specification.
+
+4. **Output Format:**
+   - Each pattern corresponds to one CTL or LTL specification.
+   - Separate specifications with semicolons.
+   - Example:
+     - `{1}: AG(Motor1_Stop -> AX(Motor2_Start));`
+     - `{2}: AG(!(Motor1_Start & Motor2_Start));`
+     - `{3}: G((Motor1_Start & X(Motor3_Stop)) -> F(timer <= 10));`
+
+By following these guidelines, the Sequential Motor Control System's operation can be accurately modeled and verified using CTL and LTL logic specifications.

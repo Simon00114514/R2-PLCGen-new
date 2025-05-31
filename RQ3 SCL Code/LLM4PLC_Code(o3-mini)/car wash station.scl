@@ -1,0 +1,146 @@
+PROGRAM CarWashStation
+CONST
+  STATE_IDLE     : INT := 0;
+  STATE_START    : INT := 1;
+  STATE_SPRAY    : INT := 2;
+  STATE_SCRUB    : INT := 3;
+  STATE_DRY      : INT := 4;
+  STATE_FINISHED : INT := 5;
+  STATE_ALARM    : INT := 99;
+END_CONST
+
+// Declaration of variables
+VAR
+  // State variables
+  state     : INT := STATE_IDLE;    // Current state of the process
+  prevState : INT := STATE_IDLE;    // For diagnostics or future recovery use
+
+  // Sensor inputs
+  vehicleSensor   : BOOL;    // TRUE if a vehicle is present
+  personnelSensor : BOOL;    // TRUE if a person is detected in the bay
+  resetRequested  : BOOL;    // TRUE when a manual reset is requested (only used in ALARM state)
+
+  // Output variables for car wash mechanisms
+  sprayOutput : BOOL := FALSE;  // Controls the water spray system
+  brushOutput : BOOL := FALSE;  // Controls the brush/scrub system
+  dryerOutput : BOOL := FALSE;  // Controls the dryer system
+  alarmOutput : BOOL := FALSE;  // Controls the alarm output
+
+  // Timer function block instances (TON from IEC 61131-3)
+  initTimer  : TON;  // Timer used in the START phase for initialization delay
+  sprayTimer : TON;  // Timer for SPRAY stage duration
+  scrubTimer : TON;  // Timer for SCRUB stage duration
+  dryTimer   : TON;  // Timer for DRY stage duration
+END_VAR
+
+// Main cyclic program logic using a CASE structure based on the current state.
+CASE state OF
+
+  STATE_IDLE:
+    // In IDLE state, all outputs are OFF.
+    sprayOutput := FALSE;
+    brushOutput := FALSE;
+    dryerOutput := FALSE;
+    alarmOutput := FALSE;
+    
+    // Transition to START if vehicle is detected and no person is in the bay.
+    IF vehicleSensor AND (NOT personnelSensor) THEN
+      prevState := state;
+      // Optionally, initialize the timer for a short delay before starting.
+      initTimer(IN := TRUE, PT := T#1S);
+      state := STATE_START;
+    END_IF;
+    
+  STATE_START:
+    // Check for emergency at any time.
+    IF personnelSensor THEN
+      prevState := state;
+      state := STATE_ALARM;
+    ELSE
+      // Wait for the initialization timer to complete.
+      initTimer(IN := TRUE, PT := T#1S);
+      IF initTimer.Q THEN
+        initTimer(IN := FALSE, PT := T#1S);
+        prevState := state;
+        state := STATE_SPRAY;
+      END_IF;
+    END_IF;
+    
+  STATE_SPRAY:
+    IF personnelSensor THEN
+      prevState := state;
+      state := STATE_ALARM;
+    ELSE
+      // Activate spray output and run spray timer.
+      sprayOutput := TRUE;
+      sprayTimer(IN := TRUE, PT := T#5S);
+      IF sprayTimer.Q THEN
+        sprayTimer(IN := FALSE, PT := T#5S);
+        sprayOutput := FALSE;
+        prevState := state;
+        state := STATE_SCRUB;
+      END_IF;
+    END_IF;
+    
+  STATE_SCRUB:
+    IF personnelSensor THEN
+      prevState := state;
+      state := STATE_ALARM;
+    ELSE
+      // Activate brush output and run scrub timer.
+      brushOutput := TRUE;
+      scrubTimer(IN := TRUE, PT := T#5S);
+      IF scrubTimer.Q THEN
+        scrubTimer(IN := FALSE, PT := T#5S);
+        brushOutput := FALSE;
+        prevState := state;
+        state := STATE_DRY;
+      END_IF;
+    END_IF;
+    
+  STATE_DRY:
+    IF personnelSensor THEN
+      prevState := state;
+      state := STATE_ALARM;
+    ELSE
+      // Activate dryer output and run dry timer.
+      dryerOutput := TRUE;
+      dryTimer(IN := TRUE, PT := T#5S);
+      IF dryTimer.Q THEN
+        dryTimer(IN := FALSE, PT := T#5S);
+        dryerOutput := FALSE;
+        prevState := state;
+        state := STATE_FINISHED;
+      END_IF;
+    END_IF;
+    
+  STATE_FINISHED:
+    // All mechanical outputs are OFF in this state.
+    sprayOutput := FALSE;
+    brushOutput := FALSE;
+    dryerOutput := FALSE;
+    alarmOutput := FALSE;
+    // Process complete; reset the system.
+    prevState := state;
+    state := STATE_IDLE;
+    
+  STATE_ALARM:
+    // Emergency state: force all outputs to OFF except the alarm which is ON.
+    sprayOutput := FALSE;
+    brushOutput := FALSE;
+    dryerOutput := FALSE;
+    alarmOutput := TRUE;
+    // Remain in ALARM until a manual reset is requested.
+    IF resetRequested THEN
+      alarmOutput := FALSE;
+      prevState := state;
+      state := STATE_IDLE;
+    END_IF;
+    
+  ELSE
+    // In case of an undefined state, reset the system.
+    state := STATE_IDLE;
+    
+END_CASE;
+  
+END_PROGRAM

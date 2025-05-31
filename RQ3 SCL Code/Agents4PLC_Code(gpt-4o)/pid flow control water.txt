@@ -1,0 +1,99 @@
+FUNCTION_BLOCK FLOW_METER
+VAR_INPUT
+    VX : INT;
+END_VAR
+
+VAR_OUTPUT
+    OutputFlowRate : INT;
+END_VAR
+
+VAR
+    (* Add necessary internal variables here *)
+END_VAR
+
+(* Define the functionality of the flow meter here *)
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK INTEGRATE
+VAR_INPUT
+    E : BOOL;
+    X : INT;
+    K : INT;
+END_VAR
+
+VAR_OUTPUT
+    Y : INT;
+    X_Prev : INT;
+END_VAR
+
+VAR
+    (* Internal variables for integrating *)
+    Sum : INT;
+END_VAR
+
+(* Define the functionality of the integrator here *)
+END_FUNCTION_BLOCK
+
+PROGRAM ChlorineDosingControl
+VAR
+    Setpoint :  int:= 3; (* Setpoint in ppm *)
+    CurrentConcentration : INT; (* Current concentration in ppm *)
+    Error : INT; (* Difference between setpoint and current concentration *)
+    Kp : INT := 2; (* Proportional gain *)
+    Ki : INT := 1; (* Integral gain *)
+    Kd : INT := 1; (* Derivative gain *)
+    P_Term : INT; (* Proportional term *)
+    I_Term : INT; (* Integral term *)
+    D_Term : INT; (* Derivative term *)
+    ControlOutput : INT; (* Output of the PID controller *)
+    FlowMeter : FLOW_METER; (* Flow meter function block *)
+    Integrator : INTEGRATE; (* Integrator function block *)
+    SamplingTimer : TON; (* Timer for sampling *)
+    FlowRateAdjustment : INT; (* Adjusted flow rate value *)
+END_VAR
+
+(* Start the sampling timer *)
+SamplingTimer(IN := TRUE, PT := T#100ms);
+
+IF SamplingTimer.Q THEN
+    (* Measure the current flow rate *)
+    FlowMeter(VX := CurrentConcentration);
+
+    (* Simulate some logic to calculate the current concentration *)
+    CurrentConcentration := FlowMeter.OutputFlowRate;
+
+    (* Calculate the error *)
+    Error := Setpoint - CurrentConcentration;
+
+    (* Calculate the proportional term *)
+    P_Term := Kp * Error;
+
+    (* Calculate the integral term *)
+    Integrator(E := TRUE, X := Error, K := Ki);
+    I_Term := Integrator.Y;
+
+    (* Calculate the derivative term *)
+    D_Term := Kd * (Error - Integrator.X_Prev);
+    Integrator.X_Prev := Error;  (* Store current error as previous for next cycle *)
+
+    (* Sum the PID terms to get the control output *)
+    ControlOutput := P_Term + I_Term + D_Term;
+
+    (* Adjust the flow rate based on the control output *)
+    IF ControlOutput < 0 THEN
+        (* Reduce the flow rate logic *)
+        FlowRateAdjustment := -1; (* Example adjustment value *)
+    ELSIF ControlOutput > 0 THEN
+        (* Increase the flow rate logic *)
+        FlowRateAdjustment := 1;  (* Example adjustment value *)
+    ELSE
+        (* Maintain the current flow rate *)
+        FlowRateAdjustment := 0; (* No adjustment *)
+    END_IF;
+
+    (* Implement logic to actuate based on FlowRateAdjustment *)
+
+    (* Reset the sampling timer *)
+    SamplingTimer(IN := FALSE);
+END_IF;
+END_PROGRAM

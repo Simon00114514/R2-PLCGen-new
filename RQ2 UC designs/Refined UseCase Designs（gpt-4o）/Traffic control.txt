@@ -1,0 +1,71 @@
+### Use Case Design
+
+#### Use Case Name: Control Traffic Light System
+
+1. **Actors**:
+   - Traffic Light System
+   - Pedestrian
+   - Emergency Vehicle
+
+2. **Use Cases**:
+   - Control Traffic Light
+   - Respond to Pedestrian Button
+   - Respond to Emergency Vehicle
+
+3. **System Boundary**:
+   - The system boundary is the Traffic Light System, which includes the traffic lights and sensors for detecting the presence of vehicles and pedestrian button presses.
+
+4. **Relationships among Actors**:
+   - The Traffic Light System includes the Control Traffic Light use case.
+   - The Pedestrian extends the Respond to Pedestrian Button use case.
+   - The Emergency Vehicle extends the Respond to Emergency Vehicle use case.
+
+#### Use Case Specification
+
+- **Brief Description**:
+  - This use case describes the behavior of the Traffic Light System in controlling the traffic lights, responding to the pedestrian button, and giving priority to emergency vehicles.
+
+- **Event Flow**:
+  - **Basic Flow**:
+    - The Traffic Light System controls the traffic lights in a normal cycle (green -> yellow -> red). Only one light is on at a time.
+  - **Alternative Flows**:
+    1. When the pedestrian button is pressed, there are no vehicles, and the current light is red, the system switches to green.
+    2. When a vehicle is detected, the system immediately switches to yellow and then to red.
+    3. When an emergency vehicle is detected, the system immediately switches to red, even if the pedestrian button has been pressed, ensuring priority for the emergency vehicle.
+
+- **Use Case Scenario**:
+  - The Traffic Light System operates under normal conditions, responding to the pedestrian button and giving priority to emergency vehicles when detected.
+
+- **Special Requirements**:
+  - The system sensors must be able to detect the presence of vehicles and pedestrian button presses. It must also be able to distinguish between regular vehicles and emergency vehicles.
+
+- **Preconditions**:
+  - The Traffic Light System is operational, and the sensors for detecting vehicles and pedestrian button presses are functioning properly.
+
+- **Postconditions**:
+  - The Traffic Light System continues to operate, controlling the traffic lights, responding to the pedestrian button, and giving priority to emergency vehicles.
+
+- **Priority**:
+  - High (Critical for core functionality)
+
+- **Data Requirements**:
+  - The system needs to receive data from the sensors for detecting vehicles and pedestrian button presses.
+
+- **Business Rules**:
+  - The system must give priority to emergency vehicles over pedestrian button presses.
+  - The system must switch to green when the pedestrian button is pressed, there are no vehicles, and the current light is red.
+  - The system must switch to yellow and then to red when a vehicle is detected.
+  - The system must immediately switch to red when an emergency vehicle is detected, ensuring priority for the emergency vehicle.
+
+- **Notes**:
+  - The system must be able to handle multiple scenarios and respond appropriately. The priority of this use case is high as it is critical for the core functionality of the system.
+
+### CTL/LTL Expressions
+
+1.AG((light = green & !Vehicle_Detected & !emergency_vehicle_detected& !Pedestrian_Button) -> AF(light = yellow));
+2.AG((light = yellow & !Vehicle_Detected & !emergency_vehicle_detected& !Pedestrian_Button) -> AF(light = red));
+3.AG((light = red & !Vehicle_Detected & !emergency_vehicle_detected& !Pedestrian_Button) -> AF(light = green));
+4.AG(!( (light = green & light = yellow) | (light = green & light = red) | (light = yellow & light = red) )); 
+5.AG(EF(light = green | light = yellow | light = red))
+6.AG((Pedestrian_Button & light = red & !emergency_vehicle_detected & !Vehicle_Detected) -> AX(light = green)); 
+7.AG((emergency_vehicle_detected & Pedestrian_Button & sensors_no_errors) -> AX(light = red));
