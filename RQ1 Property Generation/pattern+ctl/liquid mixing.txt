@@ -23,7 +23,7 @@ Agent: Certainly! Here are the revised CTL specifications with the requested cha
    - **CTL Specification:** `AG((tank_contains_unmixed_solutions) -> button_S3_enabled);`
 
 2. **Pattern Type: Implication**
-   - **CTL Specification:** `AG((button_S3_pressed) -> (motor_M_active & AF(valve_V1_open)));`
+   - **CTL Specification:** `AG((button_S3_pressed) -> (motor_M_active & valve_V1_open));`
 
 3. **Pattern Type: Forbidden State**
    - **CTL Specification:** `AG(!(button_S3_enabled & tank_empty));`
