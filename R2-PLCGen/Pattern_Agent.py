@@ -32,7 +32,7 @@ Settings.chunk_size = 512  # 根据需要设置
 Settings.chunk_overlap = 20  # 根据需要设置
 
 # define the path to the folder containing the PDF files
-folder_path = '/R2-PLCGen/Property_Info'
+folder_path = 'Property_Info'
 
 pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
 

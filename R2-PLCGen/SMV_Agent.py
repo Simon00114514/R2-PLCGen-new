@@ -22,7 +22,7 @@ try:
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
 # change the path to your own
-folder_path = '/R2-PLCGen/SMV_Info'
+folder_path = 'SMV_Info'
 # access all pdf files in the folder
 pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
 # use SimpleDirectoryReader to read all PDF files

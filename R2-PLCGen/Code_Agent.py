@@ -23,7 +23,7 @@ try:
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
 # change the path to your own
-folder_path = '/R2-PLCGen/ST_Grammar'
+folder_path = 'ST_Grammar'
 md_files = glob.glob(os.path.join(folder_path, '*.md'))
 documents = SimpleDirectoryReader(input_files=md_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
