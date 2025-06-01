@@ -148,7 +148,20 @@ R2-PLCGen_Root_Directory/
 │   ├── Patterns_design_example.txt  # Prompts for 'how to design pattern' and 'Patterns' Grammar designs(BNF formal)
 │   ├── use_case_examples.txt                # Prompts for 'how to design UC' and 'UC-diagram' Grammar designs(BNF formal)
 │   └── plcverif.py             # Interface for PLCVerif
-├── LLM4PLC/                    # Resources/modules for the LLM4PLC workflow
-├── Agents4PLC/                 # Resources/modules for the Agents4PLC workflow
+├── Baselines/                  # Our RQs Baselines
+│   ├── Agents4PLC
+│   ├── LLM4PLC
+│   ├── AISD
+├── Experiments/                 # Our Experiments Dataset & Results
+│   ├── RQ1/
+│   │    ├── RQ1-Dataset
+│   │    ├── RQ1-Experiment data
+│   ├── RQ2/
+│   │    ├── RQ2-Dataset
+│   │    ├── RQ2-Experiment data
+│   └── RQ3/
+│        ├── RQ3-Dataset
+│        └── RQ3-Experiment data
+│   
 └── README.md
 ```
