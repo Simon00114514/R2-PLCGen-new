@@ -22,7 +22,7 @@ try:
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
 
-folder_path = 'D:\\project\\R2-PLCGen\\ST_Grammar'
+folder_path = '/R2-PLCGen/ST_Grammar'
 # 使用glob模式匹配文件夹中的所有md文件
 pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
 # 使用SimpleDirectoryReader读取所有文件
