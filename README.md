@@ -159,9 +159,9 @@ R2-PLCGen_Root_Directory/
 │   ├── RQ2/
 │   │    ├── RQ2-Dataset
 │   │    ├── RQ2-Experiment data
-│   ├── RQ3/
-│   │    ├── RQ3-Dataset
-│   │    ├── RQ3-Experiment data
+│   └── RQ3/
+│        ├── RQ3-Dataset
+│        └── RQ3-Experiment data
 │   
 └── README.md
 ```
