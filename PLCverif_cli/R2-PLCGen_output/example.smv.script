@@ -1,6 +1,0 @@
-set on_failure_script_quits
-set traces_hiding_prefix ___
-set default_trace_plugin 1
-go
-check_ctlspec -o "D:\project\R2-PLCGen\PLCverif_cli\R2-PLCGen_output\example.smv.cex"
-quit

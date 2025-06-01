@@ -47,7 +47,7 @@ def run_verification():
 
     # Construct paths relative to the script's location
     # PLCverif_cli directory is expected to be your own path
-    plcverif_cli_dir = "D:\\project\\R2-PLCGen\\PLCverif_cli"
+    plcverif_cli_dir = "D:\\project\\R2-PLCGen\\R2-PLCGen\\PLCverif_cli"
     plcverif_executable = os.path.join(plcverif_cli_dir, "eclipsec.exe")
     cli_settings_file = os.path.join(plcverif_cli_dir, "cli_set.txt")
 
