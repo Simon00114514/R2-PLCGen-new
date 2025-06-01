@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cfadeclaration:CfaNetworkDeclaration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cfadeclaration="cern.plcverif.base.models.cfa.cfadeclaration" xmlns:expr="cern.plcverif.base.models.expr" xmi:id="network" name="network" displayName="network" mainAutomaton="network_VerificationLoop">
+  <automata xmi:id="network_ConveyorBeltControl" name="ConveyorBeltControl" displayName="ConveyorBeltControl" initialLocation="network_ConveyorBeltControl_init" endLocation="network_ConveyorBeltControl_l12">
+    <locations xmi:id="network_ConveyorBeltControl_init" name="init" displayName="init" frozen="true" outgoing="network_ConveyorBeltControl_t1 network_ConveyorBeltControl_t3 network_ConveyorBeltControl_t5"/>
+    <locations xmi:id="network_ConveyorBeltControl_l7" name="l7" displayName="l7" incoming="network_ConveyorBeltControl_t1 network_ConveyorBeltControl_t3 network_ConveyorBeltControl_t5" outgoing="network_ConveyorBeltControl_t10 network_ConveyorBeltControl_t12"/>
+    <locations xmi:id="network_ConveyorBeltControl_l12" name="l12" displayName="l12" incoming="network_ConveyorBeltControl_t10 network_ConveyorBeltControl_t12"/>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_ConveyorBeltControl_t1" name="t1" displayName="t1" source="network_ConveyorBeltControl_init" target="network_ConveyorBeltControl_l7">
+      <condition xsi:type="expr:BinaryLogicExpression" xmi:id="id0" operator="OR">
+        <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id1" operator="OR">
+          <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id2">
+            <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id3" field="network__global_ConveyorBeltControl_StopStation1"/>
+            <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id4" value="true">
+              <type xsi:type="expr:BoolType" xmi:id="id5"/>
+            </rightOperand>
+            <type xsi:type="expr:BoolType" xmi:id="id6"/>
+          </leftOperand>
+          <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id7">
+            <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id8" field="network__global_ConveyorBeltControl_StopStation2"/>
+            <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id9" value="true">
+              <type xsi:type="expr:BoolType" xmi:id="id10"/>
+            </rightOperand>
+            <type xsi:type="expr:BoolType" xmi:id="id11"/>
+          </rightOperand>
+        </leftOperand>
+        <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id12">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id13" field="network__global_ConveyorBeltControl_StopStation3"/>
+          <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id14" value="true">
+            <type xsi:type="expr:BoolType" xmi:id="id15"/>
+          </rightOperand>
+          <type xsi:type="expr:BoolType" xmi:id="id16"/>
+        </rightOperand>
+      </condition>
+      <assignments xmi:id="id17">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id18" field="network__global_ConveyorBeltControl_BeltActive"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id19" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id20"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_ConveyorBeltControl_t3" name="t3" displayName="t3" source="network_ConveyorBeltControl_init" target="network_ConveyorBeltControl_l7">
+      <condition xsi:type="expr:BinaryLogicExpression" xmi:id="id21">
+        <leftOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id22">
+          <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id23" operator="OR">
+            <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id24" operator="OR">
+              <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id25">
+                <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id26" field="network__global_ConveyorBeltControl_StopStation1"/>
+                <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id27" value="true">
+                  <type xsi:type="expr:BoolType" xmi:id="id28"/>
+                </rightOperand>
+                <type xsi:type="expr:BoolType" xmi:id="id29"/>
+              </leftOperand>
+              <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id30">
+                <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id31" field="network__global_ConveyorBeltControl_StopStation2"/>
+                <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id32" value="true">
+                  <type xsi:type="expr:BoolType" xmi:id="id33"/>
+                </rightOperand>
+                <type xsi:type="expr:BoolType" xmi:id="id34"/>
+              </rightOperand>
+            </leftOperand>
+            <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id35">
+              <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id36" field="network__global_ConveyorBeltControl_StopStation3"/>
+              <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id37" value="true">
+                <type xsi:type="expr:BoolType" xmi:id="id38"/>
+              </rightOperand>
+              <type xsi:type="expr:BoolType" xmi:id="id39"/>
+            </rightOperand>
+          </operand>
+        </leftOperand>
+        <rightOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id40">
+          <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id41">
+            <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id42" field="network__global_ConveyorBeltControl_Start"/>
+            <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id43" value="true">
+              <type xsi:type="expr:BoolType" xmi:id="id44"/>
+            </rightOperand>
+            <type xsi:type="expr:BoolType" xmi:id="id45"/>
+          </leftOperand>
+          <rightOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id46" operator="OR">
+            <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id47" operator="OR">
+              <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id48" operator="OR">
+                <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id49" operator="OR">
+                  <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id50">
+                    <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id51" field="network__global_ConveyorBeltControl_Sensor1"/>
+                    <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id52" value="true">
+                      <type xsi:type="expr:BoolType" xmi:id="id53"/>
+                    </rightOperand>
+                    <type xsi:type="expr:BoolType" xmi:id="id54"/>
+                  </leftOperand>
+                  <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id55">
+                    <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id56" field="network__global_ConveyorBeltControl_Sensor2"/>
+                    <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id57" value="true">
+                      <type xsi:type="expr:BoolType" xmi:id="id58"/>
+                    </rightOperand>
+                    <type xsi:type="expr:BoolType" xmi:id="id59"/>
+                  </rightOperand>
+                </leftOperand>
+                <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id60">
+                  <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id61" field="network__global_ConveyorBeltControl_Sensor3"/>
+                  <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id62" value="true">
+                    <type xsi:type="expr:BoolType" xmi:id="id63"/>
+                  </rightOperand>
+                  <type xsi:type="expr:BoolType" xmi:id="id64"/>
+                </rightOperand>
+              </leftOperand>
+              <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id65">
+                <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id66" field="network__global_ConveyorBeltControl_Sensor4"/>
+                <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id67" value="true">
+                  <type xsi:type="expr:BoolType" xmi:id="id68"/>
+                </rightOperand>
+                <type xsi:type="expr:BoolType" xmi:id="id69"/>
+              </rightOperand>
+            </leftOperand>
+            <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id70">
+              <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id71" field="network__global_ConveyorBeltControl_Sensor5"/>
+              <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id72" value="true">
+                <type xsi:type="expr:BoolType" xmi:id="id73"/>
+              </rightOperand>
+              <type xsi:type="expr:BoolType" xmi:id="id74"/>
+            </rightOperand>
+          </rightOperand>
+        </rightOperand>
+      </condition>
+      <assignments xmi:id="id75">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id76" field="network__global_ConveyorBeltControl_BeltActive"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id77" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id78"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_ConveyorBeltControl_t5" name="t5" displayName="t5" source="network_ConveyorBeltControl_init" target="network_ConveyorBeltControl_l7">
+      <condition xsi:type="expr:BinaryLogicExpression" xmi:id="id79">
+        <leftOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id80">
+          <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id81" operator="OR">
+            <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id82" operator="OR">
+              <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id83">
+                <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id84" field="network__global_ConveyorBeltControl_StopStation1"/>
+                <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id85" value="true">
+                  <type xsi:type="expr:BoolType" xmi:id="id86"/>
+                </rightOperand>
+                <type xsi:type="expr:BoolType" xmi:id="id87"/>
+              </leftOperand>
+              <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id88">
+                <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id89" field="network__global_ConveyorBeltControl_StopStation2"/>
+                <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id90" value="true">
+                  <type xsi:type="expr:BoolType" xmi:id="id91"/>
+                </rightOperand>
+                <type xsi:type="expr:BoolType" xmi:id="id92"/>
+              </rightOperand>
+            </leftOperand>
+            <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id93">
+              <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id94" field="network__global_ConveyorBeltControl_StopStation3"/>
+              <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id95" value="true">
+                <type xsi:type="expr:BoolType" xmi:id="id96"/>
+              </rightOperand>
+              <type xsi:type="expr:BoolType" xmi:id="id97"/>
+            </rightOperand>
+          </operand>
+        </leftOperand>
+        <rightOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id98">
+          <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id99">
+            <leftOperand xsi:type="expr:UnaryLogicExpression" xmi:id="id100">
+              <operand xsi:type="expr:BinaryLogicExpression" xmi:id="id101" operator="OR">
+                <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id102" operator="OR">
+                  <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id103">
+                    <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id104" field="network__global_ConveyorBeltControl_StopStation1"/>
+                    <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id105" value="true">
+                      <type xsi:type="expr:BoolType" xmi:id="id106"/>
+                    </rightOperand>
+                    <type xsi:type="expr:BoolType" xmi:id="id107"/>
+                  </leftOperand>
+                  <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id108">
+                    <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id109" field="network__global_ConveyorBeltControl_StopStation2"/>
+                    <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id110" value="true">
+                      <type xsi:type="expr:BoolType" xmi:id="id111"/>
+                    </rightOperand>
+                    <type xsi:type="expr:BoolType" xmi:id="id112"/>
+                  </rightOperand>
+                </leftOperand>
+                <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id113">
+                  <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id114" field="network__global_ConveyorBeltControl_StopStation3"/>
+                  <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id115" value="true">
+                    <type xsi:type="expr:BoolType" xmi:id="id116"/>
+                  </rightOperand>
+                  <type xsi:type="expr:BoolType" xmi:id="id117"/>
+                </rightOperand>
+              </operand>
+            </leftOperand>
+            <rightOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id118">
+              <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id119">
+                <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id120" field="network__global_ConveyorBeltControl_Start"/>
+                <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id121" value="true">
+                  <type xsi:type="expr:BoolType" xmi:id="id122"/>
+                </rightOperand>
+                <type xsi:type="expr:BoolType" xmi:id="id123"/>
+              </leftOperand>
+              <rightOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id124" operator="OR">
+                <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id125" operator="OR">
+                  <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id126" operator="OR">
+                    <leftOperand xsi:type="expr:BinaryLogicExpression" xmi:id="id127" operator="OR">
+                      <leftOperand xsi:type="expr:ComparisonExpression" xmi:id="id128">
+                        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id129" field="network__global_ConveyorBeltControl_Sensor1"/>
+                        <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id130" value="true">
+                          <type xsi:type="expr:BoolType" xmi:id="id131"/>
+                        </rightOperand>
+                        <type xsi:type="expr:BoolType" xmi:id="id132"/>
+                      </leftOperand>
+                      <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id133">
+                        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id134" field="network__global_ConveyorBeltControl_Sensor2"/>
+                        <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id135" value="true">
+                          <type xsi:type="expr:BoolType" xmi:id="id136"/>
+                        </rightOperand>
+                        <type xsi:type="expr:BoolType" xmi:id="id137"/>
+                      </rightOperand>
+                    </leftOperand>
+                    <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id138">
+                      <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id139" field="network__global_ConveyorBeltControl_Sensor3"/>
+                      <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id140" value="true">
+                        <type xsi:type="expr:BoolType" xmi:id="id141"/>
+                      </rightOperand>
+                      <type xsi:type="expr:BoolType" xmi:id="id142"/>
+                    </rightOperand>
+                  </leftOperand>
+                  <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id143">
+                    <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id144" field="network__global_ConveyorBeltControl_Sensor4"/>
+                    <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id145" value="true">
+                      <type xsi:type="expr:BoolType" xmi:id="id146"/>
+                    </rightOperand>
+                    <type xsi:type="expr:BoolType" xmi:id="id147"/>
+                  </rightOperand>
+                </leftOperand>
+                <rightOperand xsi:type="expr:ComparisonExpression" xmi:id="id148">
+                  <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id149" field="network__global_ConveyorBeltControl_Sensor5"/>
+                  <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id150" value="true">
+                    <type xsi:type="expr:BoolType" xmi:id="id151"/>
+                  </rightOperand>
+                  <type xsi:type="expr:BoolType" xmi:id="id152"/>
+                </rightOperand>
+              </rightOperand>
+            </rightOperand>
+          </operand>
+        </rightOperand>
+      </condition>
+      <assignments xmi:id="id153">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id154" field="network__global_ConveyorBeltControl_BeltActive"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id155" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id156"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_ConveyorBeltControl_t10" name="t10" displayName="t10" source="network_ConveyorBeltControl_l7" target="network_ConveyorBeltControl_l12">
+      <condition xsi:type="expr:ComparisonExpression" xmi:id="id157">
+        <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id158" field="network__global_ConveyorBeltControl_BeltActive"/>
+        <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id159" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id160"/>
+        </rightOperand>
+        <type xsi:type="expr:BoolType" xmi:id="id161"/>
+      </condition>
+      <assignments xmi:id="id162">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id163" field="network__global_ConveyorBeltControl_BeltSpeed"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id164" value="2">
+          <type xsi:type="expr:IntType" xmi:id="id165" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_ConveyorBeltControl_t12" name="t12" displayName="t12" source="network_ConveyorBeltControl_l7" target="network_ConveyorBeltControl_l12">
+      <condition xsi:type="expr:UnaryLogicExpression" xmi:id="id166">
+        <operand xsi:type="expr:ComparisonExpression" xmi:id="id167">
+          <leftOperand xsi:type="cfadeclaration:FieldRef" xmi:id="id168" field="network__global_ConveyorBeltControl_BeltActive"/>
+          <rightOperand xsi:type="expr:BoolLiteral" xmi:id="id169" value="true">
+            <type xsi:type="expr:BoolType" xmi:id="id170"/>
+          </rightOperand>
+          <type xsi:type="expr:BoolType" xmi:id="id171"/>
+        </operand>
+      </condition>
+      <assignments xmi:id="id172">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id173" field="network__global_ConveyorBeltControl_BeltSpeed"/>
+        <rightValue xsi:type="expr:IntLiteral" xmi:id="id174" value="0">
+          <type xsi:type="expr:IntType" xmi:id="id175" signed="true" bits="16"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <localDataStructure xmi:id="id176" definition="network__global_ConveyorBeltControl"/>
+  </automata>
+  <automata xmi:id="network_VerificationLoop" name="VerificationLoop" displayName="VerificationLoop" initialLocation="network_VerificationLoop_init" endLocation="network_VerificationLoop_end">
+    <locations xmi:id="network_VerificationLoop_init" name="init" displayName="init" frozen="true" outgoing="network_VerificationLoop_t_params"/>
+    <locations xmi:id="network_VerificationLoop_end" name="end" displayName="end" frozen="true" incoming="network_VerificationLoop_end1"/>
+    <locations xmi:id="network_VerificationLoop_loop_start" name="loop_start" displayName="loop_start" incoming="network_VerificationLoop_t_params network_VerificationLoop_restart" outgoing="network_VerificationLoop_set_BoC network_VerificationLoop_end1"/>
+    <locations xmi:id="network_VerificationLoop_prepare_BoC" name="prepare_BoC" displayName="prepare_BoC" frozen="true" incoming="network_VerificationLoop_set_BoC" outgoing="network_VerificationLoop_t_inputs"/>
+    <locations xmi:id="network_VerificationLoop_l_main_call" name="l_main_call" displayName="l_main_call" incoming="network_VerificationLoop_t_inputs" outgoing="network_VerificationLoop_main_call"/>
+    <locations xmi:id="network_VerificationLoop_callEnd" name="callEnd" displayName="callEnd" incoming="network_VerificationLoop_main_call" outgoing="network_VerificationLoop_set_EoC"/>
+    <locations xmi:id="network_VerificationLoop_prepare_EoC" name="prepare_EoC" displayName="prepare_EoC" frozen="true" incoming="network_VerificationLoop_set_EoC" outgoing="network_VerificationLoop_restart"/>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_t_params" name="t_params" displayName="t_params" source="network_VerificationLoop_init" target="network_VerificationLoop_loop_start">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id177" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id178"/>
+      </condition>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_set_BoC" name="set_BoC" displayName="set_BoC" frozen="true" source="network_VerificationLoop_loop_start" target="network_VerificationLoop_prepare_BoC">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id179" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id180"/>
+      </condition>
+      <assignments xmi:id="id181">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id182" field="network__global_ConveyorBeltControl_Sensor1">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id183" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id184">
+          <type xsi:type="expr:BoolType" xmi:id="id185"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id186">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id187" field="network__global_ConveyorBeltControl_Sensor2">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id188" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id189">
+          <type xsi:type="expr:BoolType" xmi:id="id190"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id191">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id192" field="network__global_ConveyorBeltControl_Sensor3">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id193" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id194">
+          <type xsi:type="expr:BoolType" xmi:id="id195"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id196">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id197" field="network__global_ConveyorBeltControl_Sensor4">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id198" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id199">
+          <type xsi:type="expr:BoolType" xmi:id="id200"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id201">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id202" field="network__global_ConveyorBeltControl_Sensor5">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id203" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id204">
+          <type xsi:type="expr:BoolType" xmi:id="id205"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id206">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id207" field="network__global_ConveyorBeltControl_Start">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id208" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id209">
+          <type xsi:type="expr:BoolType" xmi:id="id210"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id211">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id212" field="network__global_ConveyorBeltControl_StopStation1">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id213" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id214">
+          <type xsi:type="expr:BoolType" xmi:id="id215"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id216">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id217" field="network__global_ConveyorBeltControl_StopStation2">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id218" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id219">
+          <type xsi:type="expr:BoolType" xmi:id="id220"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id221">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id222" field="network__global_ConveyorBeltControl_StopStation3">
+          <prefix xsi:type="cfadeclaration:FieldRef" xmi:id="id223" field="network__global_instance"/>
+        </leftValue>
+        <rightValue xsi:type="expr:Nondeterministic" xmi:id="id224">
+          <type xsi:type="expr:BoolType" xmi:id="id225"/>
+        </rightValue>
+      </assignments>
+      <assignments xmi:id="id226" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id227" frozen="true" field="network__global_BoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id228" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id229"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_t_inputs" name="t_inputs" displayName="t_inputs" frozen="true" source="network_VerificationLoop_prepare_BoC" target="network_VerificationLoop_l_main_call">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id230" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id231"/>
+      </condition>
+      <assignments xmi:id="id232" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id233" frozen="true" field="network__global_BoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id234" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id235"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:CallTransition" xmi:id="network_VerificationLoop_main_call" name="main_call" displayName="main_call" source="network_VerificationLoop_l_main_call" target="network_VerificationLoop_callEnd">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id236" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id237"/>
+      </condition>
+      <calls xmi:id="id238" calledAutomaton="network_ConveyorBeltControl">
+        <calleeContext xsi:type="cfadeclaration:FieldRef" xmi:id="id239" field="network__global_instance"/>
+      </calls>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_set_EoC" name="set_EoC" displayName="set_EoC" frozen="true" source="network_VerificationLoop_callEnd" target="network_VerificationLoop_prepare_EoC">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id240" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id241"/>
+      </condition>
+      <assignments xmi:id="id242" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id243" frozen="true" field="network__global_EoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id244" value="true">
+          <type xsi:type="expr:BoolType" xmi:id="id245"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_restart" name="restart" displayName="restart" frozen="true" source="network_VerificationLoop_prepare_EoC" target="network_VerificationLoop_loop_start">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id246" value="true">
+        <type xsi:type="expr:BoolType" xmi:id="id247"/>
+      </condition>
+      <assignments xmi:id="id248" frozen="true">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id249" frozen="true" field="network__global_EoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id250" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id251"/>
+        </rightValue>
+      </assignments>
+    </transitions>
+    <transitions xsi:type="cfadeclaration:AssignmentTransition" xmi:id="network_VerificationLoop_end1" name="end1" displayName="end" source="network_VerificationLoop_loop_start" target="network_VerificationLoop_end">
+      <condition xsi:type="expr:BoolLiteral" xmi:id="id252" value="false">
+        <type xsi:type="expr:BoolType" xmi:id="id253"/>
+      </condition>
+    </transitions>
+    <localDataStructure xmi:id="id254" definition="network__global_VerificationLoopDS"/>
+  </automata>
+  <rootDataStructure xmi:id="network__global" name="_global" displayName="_global">
+    <fields xmi:id="network__global_instance" name="instance" displayName="instance">
+      <type xsi:type="cfadeclaration:DataStructureRef" xmi:id="id255" definition="network__global_ConveyorBeltControl"/>
+    </fields>
+    <fields xmi:id="network__global_verificationLoop" name="verificationLoop" displayName="verificationLoop">
+      <type xsi:type="cfadeclaration:DataStructureRef" xmi:id="id256" definition="network__global_VerificationLoopDS"/>
+    </fields>
+    <fields xmi:id="network__global_EoC" name="EoC" displayName="EoC" frozen="true">
+      <type xsi:type="expr:BoolType" xmi:id="id257"/>
+      <initialAssignments xmi:id="id258">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id259" field="network__global_EoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id260" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id261"/>
+        </rightValue>
+      </initialAssignments>
+      <annotations xsi:type="cfadeclaration:InternalGeneratedFieldAnnotation" xmi:id="id262"/>
+    </fields>
+    <fields xmi:id="network__global_BoC" name="BoC" displayName="BoC" frozen="true">
+      <type xsi:type="expr:BoolType" xmi:id="id263"/>
+      <initialAssignments xmi:id="id264">
+        <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id265" field="network__global_BoC"/>
+        <rightValue xsi:type="expr:BoolLiteral" xmi:id="id266" value="false">
+          <type xsi:type="expr:BoolType" xmi:id="id267"/>
+        </rightValue>
+      </initialAssignments>
+      <annotations xsi:type="cfadeclaration:InternalGeneratedFieldAnnotation" xmi:id="id268"/>
+    </fields>
+    <complexTypes xmi:id="network__global_ConveyorBeltControl" name="ConveyorBeltControl" displayName="ConveyorBeltControl">
+      <fields xmi:id="network__global_ConveyorBeltControl_Start" name="Start" displayName="Start">
+        <type xsi:type="expr:BoolType" xmi:id="id269"/>
+        <initialAssignments xmi:id="id270">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id271" field="network__global_ConveyorBeltControl_Start"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id272" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id273"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id274"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id275" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_StopStation1" name="StopStation1" displayName="StopStation1">
+        <type xsi:type="expr:BoolType" xmi:id="id276"/>
+        <initialAssignments xmi:id="id277">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id278" field="network__global_ConveyorBeltControl_StopStation1"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id279" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id280"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id281"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id282" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_StopStation2" name="StopStation2" displayName="StopStation2">
+        <type xsi:type="expr:BoolType" xmi:id="id283"/>
+        <initialAssignments xmi:id="id284">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id285" field="network__global_ConveyorBeltControl_StopStation2"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id286" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id287"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id288"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id289" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_StopStation3" name="StopStation3" displayName="StopStation3">
+        <type xsi:type="expr:BoolType" xmi:id="id290"/>
+        <initialAssignments xmi:id="id291">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id292" field="network__global_ConveyorBeltControl_StopStation3"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id293" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id294"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id295"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id296" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_Sensor1" name="Sensor1" displayName="Sensor1">
+        <type xsi:type="expr:BoolType" xmi:id="id297"/>
+        <initialAssignments xmi:id="id298">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id299" field="network__global_ConveyorBeltControl_Sensor1"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id300" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id301"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id302"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id303" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_Sensor2" name="Sensor2" displayName="Sensor2">
+        <type xsi:type="expr:BoolType" xmi:id="id304"/>
+        <initialAssignments xmi:id="id305">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id306" field="network__global_ConveyorBeltControl_Sensor2"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id307" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id308"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id309"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id310" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_Sensor3" name="Sensor3" displayName="Sensor3">
+        <type xsi:type="expr:BoolType" xmi:id="id311"/>
+        <initialAssignments xmi:id="id312">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id313" field="network__global_ConveyorBeltControl_Sensor3"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id314" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id315"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id316"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id317" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_Sensor4" name="Sensor4" displayName="Sensor4">
+        <type xsi:type="expr:BoolType" xmi:id="id318"/>
+        <initialAssignments xmi:id="id319">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id320" field="network__global_ConveyorBeltControl_Sensor4"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id321" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id322"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id323"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id324" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_Sensor5" name="Sensor5" displayName="Sensor5">
+        <type xsi:type="expr:BoolType" xmi:id="id325"/>
+        <initialAssignments xmi:id="id326">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id327" field="network__global_ConveyorBeltControl_Sensor5"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id328" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id329"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id330"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id331" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_BeltActive" name="BeltActive" displayName="BeltActive">
+        <type xsi:type="expr:BoolType" xmi:id="id332"/>
+        <initialAssignments xmi:id="id333">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id334" field="network__global_ConveyorBeltControl_BeltActive"/>
+          <rightValue xsi:type="expr:BoolLiteral" xmi:id="id335" value="false">
+            <type xsi:type="expr:BoolType" xmi:id="id336"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id337" direction="OUTPUT"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id338" plcDataType="BOOL"/>
+      </fields>
+      <fields xmi:id="network__global_ConveyorBeltControl_BeltSpeed" name="BeltSpeed" displayName="BeltSpeed">
+        <type xsi:type="expr:IntType" xmi:id="id339" signed="true" bits="16"/>
+        <initialAssignments xmi:id="id340">
+          <leftValue xsi:type="cfadeclaration:FieldRef" xmi:id="id341" field="network__global_ConveyorBeltControl_BeltSpeed"/>
+          <rightValue xsi:type="expr:IntLiteral" xmi:id="id342" value="0">
+            <type xsi:type="expr:IntType" xmi:id="id343" signed="true" bits="16"/>
+          </rightValue>
+        </initialAssignments>
+        <annotations xsi:type="cfadeclaration:DirectionFieldAnnotation" xmi:id="id344" direction="OUTPUT"/>
+        <annotations xsi:type="cfadeclaration:OriginalDataTypeFieldAnnotation" xmi:id="id345" plcDataType="INT"/>
+      </fields>
+    </complexTypes>
+    <complexTypes xmi:id="network__global_VerificationLoopDS" name="VerificationLoopDS" displayName="VerificationLoopDS"/>
+  </rootDataStructure>
+  <mainContext xsi:type="cfadeclaration:FieldRef" xmi:id="id346" field="network__global_verificationLoop"/>
+</cfadeclaration:CfaNetworkDeclaration>

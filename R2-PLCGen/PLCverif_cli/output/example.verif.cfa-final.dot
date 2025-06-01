@@ -1,0 +1,35 @@
+digraph G {
+	vars_declaration_pseudonode_network [
+		label="VARIABLES\linstance/Start = false\linstance/StopStation1 = false\linstance/StopStation2 = false\linstance/StopStation3 = false\linstance/Sensor1 = false\linstance/Sensor2 = false\linstance/Sensor3 = false\linstance/Sensor4 = false\linstance/Sensor5 = false\linstance/BeltActive = false\lEoC = false\lBoC = false\l",
+		fillcolor="lightgray", shape="rectangle"];
+	subgraph clusterverificationLoop_VerificationLoop {
+		node [style="filled"];
+		style=bold;
+		color="black";
+		fontsize=10;
+		ranksep=0.4;
+		
+		label="verificationLoop.VerificationLoop";
+		
+		annotations_pseudonode_verificationLoop_VerificationLoop [
+			label="ANNOTATIONS",
+			fontsize=9, margin="0.04,0.04", fillcolor="white", shape="rectangle", style="dashed"];
+		
+		init_verificationLoop_VerificationLoop [label="init", color="black", fillcolor="cadetblue1", peripheries=2, shape="ellipse"];
+		end_verificationLoop_VerificationLoop [label="end", color="black", fillcolor="cadetblue1", style=bold, shape="ellipse"];
+		loop_start_verificationLoop_VerificationLoop [label="loop_start", color="black", fillcolor="white", shape="ellipse"];
+		prepare_BoC_verificationLoop_VerificationLoop [label="prepare_BoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		l_main_call_verificationLoop_VerificationLoop [label="l_main_call", color="black", fillcolor="white", shape="ellipse"];
+		prepare_EoC_verificationLoop_VerificationLoop [label="prepare_EoC", color="black", fillcolor="cadetblue1", shape="ellipse"];
+		verificationLoop_VerificationLoop_l7_verificationLoop_VerificationLoop [label="verificationLoop.VerificationLoop_l7", color="black", fillcolor="white", shape="ellipse"];
+		init_verificationLoop_VerificationLoop -> loop_start_verificationLoop_VerificationLoop [color="black", label=""];
+		loop_start_verificationLoop_VerificationLoop -> prepare_BoC_verificationLoop_VerificationLoop [color="blue", label="instance/Sensor1 := NONDETERMINISTIC of bool\linstance/Sensor2 := NONDETERMINISTIC of bool\linstance/Sensor3 := NONDETERMINISTIC of bool\linstance/Sensor4 := NONDETERMINISTIC of bool\linstance/Sensor5 := NONDETERMINISTIC of bool\linstance/Start := NONDETERMINISTIC of bool\linstance/StopStation1 := NONDETERMINISTIC of bool\linstance/StopStation2 := NONDETERMINISTIC of bool\linstance/StopStation3 := NONDETERMINISTIC of bool\lBoC := true (*)\l"];
+		prepare_BoC_verificationLoop_VerificationLoop -> l_main_call_verificationLoop_VerificationLoop [color="blue", label="BoC := false (*)"];
+		verificationLoop_VerificationLoop_l7_verificationLoop_VerificationLoop -> prepare_EoC_verificationLoop_VerificationLoop [color="blue", label="EoC := true (*)"];
+		prepare_EoC_verificationLoop_VerificationLoop -> loop_start_verificationLoop_VerificationLoop [color="blue", label="EoC := false (*)"];
+		l_main_call_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l7_verificationLoop_VerificationLoop [color="black", label="[((instance/StopStation1 || instance/StopStation2)\l || instance/StopStation3)]\linstance/BeltActive := false\l"];
+		l_main_call_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l7_verificationLoop_VerificationLoop [color="black", label="[((! ((instance/StopStation1 || instance/StopStati\lon2) || instance/StopStation3)) && (instance/Start\l && ((((instance/Sensor1 || instance/Sensor2) || i\lnstance/Sensor3) || instance/Sensor4) || instance/\lSensor5)))]\linstance/BeltActive := true\l"];
+		l_main_call_verificationLoop_VerificationLoop -> verificationLoop_VerificationLoop_l7_verificationLoop_VerificationLoop [color="black", label="[((! ((instance/StopStation1 || instance/StopStati\lon2) || instance/StopStation3)) && (! ((! ((instan\lce/StopStation1 || instance/StopStation2) || insta\lnce/StopStation3)) && (instance/Start && ((((insta\lnce/Sensor1 || instance/Sensor2) || instance/Senso\lr3) || instance/Sensor4) || instance/Sensor5)))))]\linstance/BeltActive := false\l"];
+	}
+}
+

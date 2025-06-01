@@ -27,6 +27,6 @@ Agent: To translate the patterns design into CTL or LTL logic specifications for
    - Example:
      - `{1}: AG(Motor1_Stop -> AX(Motor2_Start));`
      - `{2}: AG(!(Motor1_Start & Motor2_Start));`
-     - `{3}: G((Motor1_Start & X(Motor3_Stop)) -> F(timer <= 10));`
+     - `{3}: G((Motor1_Start & X(Motor3_Stop)) -> X(timer <= 10));`
 
 By following these guidelines, the Sequential Motor Control System's operation can be accurately modeled and verified using CTL and LTL logic specifications.
