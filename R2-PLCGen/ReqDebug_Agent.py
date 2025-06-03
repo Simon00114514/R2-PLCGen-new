@@ -22,7 +22,7 @@ try:
 except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
 # change the path to your own
-folder_path = 'UseCase_Info'
+folder_path = 'SMV_Info'
 pdf_files = glob.glob(os.path.join(folder_path, '*.md'))
 documents = SimpleDirectoryReader(input_files=pdf_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
@@ -34,7 +34,7 @@ def build_sentence_window_index(
         documents,
         embed_model="local:BAAI/bge-large-en-v1.5",
         sentence_window_size=3,
-        save_dir="usecase_index",
+        save_dir="smv_index",
 ):
     node_parser = SentenceWindowNodeParser(
         window_size=sentence_window_size,
@@ -73,7 +73,7 @@ def get_sentence_window_query_engine(
 
 index = build_sentence_window_index(
     [document],
-    save_dir="usecase_index",
+    save_dir="smv_index",
 )
 query_engine = get_sentence_window_query_engine(index, similarity_top_k=6)
 
