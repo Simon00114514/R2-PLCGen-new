@@ -15,7 +15,7 @@ Requirement patterns
     ◦ {1}: Invariant to be respected at the end of each cycle.
 
 
-    3.Forbidden state (ID: pattern-forbidden)
+3.Forbidden state (ID: pattern-forbidden)
 • Informal requirement: {1} is impossible at the end of the PLC cycle.
 • Formal requirement: AG({PLC_END} --> NOT ({1})) (type: ctl)
 • Parameters:

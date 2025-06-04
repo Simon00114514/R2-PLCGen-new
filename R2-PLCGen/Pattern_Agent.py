@@ -120,7 +120,7 @@ Your task is to translate the provided 'Refined Use Case Design' into predefined
 
 **Refined Use Case Design (Input):**
 {usecase_file}
-**Reference - Requirement Patterns Explanation (Consult this for pattern understanding):**
+**Reference - Requirement Patterns Explanation (Consult this for pattern understanding,including patterns definition):**
 {patterns_explain}
 **Reference - Output Format Example (Strictly follow this JSON structure):**
 {patterns_example}

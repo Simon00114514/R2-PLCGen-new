@@ -3,9 +3,9 @@ Output structure:
   "use_case": "<Brief description or identifier of the use case>",
   "patterns-i(i=1,2,3...)": [
     {
-      "pattern_name": "<Pattern Name>",
+      "pattern_name": "<Pattern Type>",[Pattern Type is the name of the pattern, e.g., only can be:"pattern-implication/pattern-invariant/pattern-forbidden/pattern-statechange-duringcycle/pattern-statechange-betweencycles/pattern-reachability/pattern-repeatability/pattern-leadsto/pattern-leadsto-trigger/pattern-leadsto-earlier/timed-trigger", etc.]
       "Informal requirement": If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle.
-      "ctl_ltl_formula": "<Generated Formula>",
+      "Formal requirement": "<Pattern Formula with corresponding>",[once you selected one pattern, this content cannot be modified, only can be filled with CTL or LTL desicription in the definition of Patterns. For example:AG({PLC_END} --> NOT ({1})) (type: ctl)]
       "parameters": {
         "{1}": "<Extracted condition or state>",
         "{2}": "<Extracted condition or state>",
@@ -22,7 +22,7 @@ Example based on provided patterns:
       "use_case": "UC-4 Process Emergency Vehicle Request",
       "patterns": [
         {
-          "pattern_name": "Implication",
+          "pattern_name": "pattern-implication",
           "Informal requirement": If {1} is true at the end of the PLC cycle, then {2} should always be true at the end of the same cycle. ,[once you selected 'Implication', this content cannot be modified, follow the patterns set in relevant file]
           "Formal requirement": AG(({PLC_END} AND ({1})) --> ({2})) (type: ctl),[once you selected 'Implication', this content cannot be modified, follow the patterns set in relevant file]
           "parameters": {
@@ -33,7 +33,7 @@ Example based on provided patterns:
         {
           "pattern_name": "pattern-leadsto-earlier",
           "Informal requirement": If {1} is true at the end of a cycle, {2} was true at the beginning of this or an earlier cycle. ,[once you selected 'pattern-leadsto-earlier', this content cannot be modified, follow the patterns set in relevant file]
-          "ctl_ltl_formula": G(({PLC_END} AND ({1})) --> O({PLC_START} AND ({2}))) (type: ltl),[once you selected 'pattern-leadsto-earlier', this content cannot be modified, follow the patterns set in relevant file]
+          "Formal requirement": G(({PLC_END} AND ({1})) --> O({PLC_START} AND ({2}))) (type: ltl),[once you selected 'pattern-leadsto-earlier', this content cannot be modified, follow the patterns set in relevant file]
           "parameters": {
             "{1}": "emergency_vehicle_detected AND pedestrian_button_pressed AND sensors_ok",
             "{2}": "light = red"
@@ -53,10 +53,10 @@ Pattern grammar:
 ⟨pattern_object⟩ ::= LBRACE EOL?
                      ( ⟨pattern_name_pair⟩ ',' EOL?
                        ⟨informal_req_pair⟩ ',' EOL?
-                       ⟨ctl_ltl_formula_pair⟩ ',' EOL?
+                       ⟨Formal requirement⟩ ',' EOL?
                        ⟨parameters_pair⟩
                      | ⟨informal_req_pair⟩ ',' EOL?
-                       ⟨ctl_ltl_formula_pair⟩ ',' EOL?
+                       ⟨Formal requirement⟩ ',' EOL?
                        ⟨parameters_pair⟩ ',' EOL?
                        ⟨pattern_name_pair⟩
                      ) EOL?
@@ -64,7 +64,7 @@ Pattern grammar:
 
 ⟨pattern_name_pair⟩      ::= P_NAME_KEY ':' ⟨pattern_name_value⟩
 ⟨informal_req_pair⟩     ::= INF_REQ_KEY ':' STRING
-⟨ctl_ltl_formula_pair⟩ ::= CTL_LTL_KEY ':' STRING
+⟨Formal requirement⟩ ::= CTL_LTL_KEY ':' STRING
 
 ⟨parameters_pair⟩ ::= PARAMS_KEY ':' LBRACE EOL?
                         ⟨parameter⟩ ( ',' EOL? ⟨parameter⟩ )* EOL?
@@ -92,20 +92,20 @@ LBRACK            ::= '['
 RBRACK            ::= ']'
 P_NAME_KEY        ::= '"pattern_name"'
 INF_REQ_KEY       ::= '"Informal requirement"'
-CTL_LTL_KEY       ::= '"ctl_ltl_formula"'
+CTL_LTL_KEY       ::= '"Formal requirement"'
 PARAMS_KEY        ::= '"parameters"'
 
-P_IMPLICATION         ::= '"Implication"'
-P_INVARIANT           ::= '"Invariant"'
-P_FORBIDDEN           ::= '"Forbidden state"'
-P_STATECHANGE_DURING  ::= '"State change during a cycle"'
-P_STATECHANGE_BETWEEN ::= '"State change between cycles"'
-P_REACHABILITY        ::= '"Reachability"'
-P_REPEATABILITY       ::= '"Repeatability"'
-P_LEADSTO             ::= '"Leads to"'
-P_LEADSTO_TRIGGER     ::= '"Leads to trigger"'
-P_LEADSTO_EARLIER     ::= '"Leads to earlier"'
-P_TIMED_TRIGGER       ::= '"Timed trigger response"'
+P_IMPLICATION         ::= '"pattern-implication"'
+P_INVARIANT           ::= '"pattern-invariant"'
+P_FORBIDDEN           ::= '"pattern-forbidden"'
+P_STATECHANGE_DURING  ::= '"pattern-statechange-duringcycle"'
+P_STATECHANGE_BETWEEN ::= '"pattern-statechange-betweencycles"'
+P_REACHABILITY        ::= '"pattern-reachability"'
+P_REPEATABILITY       ::= '"pattern-repeatability"'
+P_LEADSTO             ::= '"pattern-leadsto"'
+P_LEADSTO_TRIGGER     ::= '"pattern-leadsto-trigger"'
+P_LEADSTO_EARLIER     ::= '"pattern-leadsto-earlier"'
+P_TIMED_TRIGGER       ::= '"timed-trigger"'
 
 STRING ::= '"' ( ~["\\] | '\\' . )* '"'
          | '\'' ( ~['\\] | '\\' . )* '\''
