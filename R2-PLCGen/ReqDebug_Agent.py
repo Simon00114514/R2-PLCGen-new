@@ -23,7 +23,7 @@ except ImportError:
     print("[WARN] config.py not found or variables missing. Using defaults/environment variables.")
 # change the path to your own
 folder_path = 'SMV_Info'
-pdf_files = glob.glob(os.path.join(folder_path, '*.md'))
+pdf_files = glob.glob(os.path.join(folder_path, '*.pdf'))
 documents = SimpleDirectoryReader(input_files=pdf_files).load_data()
 document = Document(text="\n\n".join([doc.text for doc in documents]))
 Settings.llm = OpenAI(model="o3-mini", temperature=0.1)

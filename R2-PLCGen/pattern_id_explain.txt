@@ -80,7 +80,7 @@ Requirement patterns
 
 11.Timed trigger response (ID: timed-trigger)
 • Informal requirement: If {1} is true at EoC, and stays true at EoC for {2} ms of time, {3} will be true.
-• Formal requirement: G(({PLC_END} AND {1} AND timer={2}) --> ({3})) (type: ltl)
+• Formal requirement: G(({PLC_END} AND (TIMER_TRIGGERED)) --> ({3})) (type: ltl)
 • Parameters:
     ◦ {1}: Trigger
     ◦ {2}: Time
